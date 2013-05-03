@@ -1,0 +1,22 @@
+Source: libcthreads
+Section: unknown
+Priority: extra
+Maintainer: Joachim Metz <joachim.metz@gmail.com>
+Build-Depends: debhelper (>= 7), autotools-dev
+Standards-Version: 3.8.3
+Homepage: http://code.google.com/p/libcthreads/
+
+Package: libcthreads
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Library to support cross-platform C threads functions
+ libcthreads is a library to support cross-platform C threads functions.
+
+Package: libcthreads-dev
+Section: libdevel
+Architecture: any
+Depends: libcthreads (= ${Source-Version})
+Description: Header files and libraries for developing applications for libcthreads
+ Header files and libraries for developing applications for libcthreads.
+

@@ -1,0 +1,72 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcthreads_dll", "libcthreads_dll\libcthreads_dll.vcproj", "{B5225323-AC67-411D-8FBA-199E9467FAB5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcstring", "libcstring\libcstring.vcproj", "{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcerror", "libcerror\libcerror.vcproj", "{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cthreads_test_read", "cthreads_test_lock\cthreads_test_lock.vcproj", "{F7A2D803-FC42-4C42-B1E6-E794F94228BF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5225323-AC67-411D-8FBA-199E9467FAB5} = {B5225323-AC67-411D-8FBA-199E9467FAB5}
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cthreads_test_read", "cthreads_test_read_write_lock\cthreads_test_read_write_lock.vcproj", "{FCF4C8D7-D26C-48D9-9BCD-01E9A6E8E3C2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5225323-AC67-411D-8FBA-199E9467FAB5} = {B5225323-AC67-411D-8FBA-199E9467FAB5}
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cthreads_test_read", "cthreads_test_thread\cthreads_test_thread.vcproj", "{C9ADE93B-50A0-4A9E-9985-8DA694B03F4B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5225323-AC67-411D-8FBA-199E9467FAB5} = {B5225323-AC67-411D-8FBA-199E9467FAB5}
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|Win32 = Release|Win32
+		VSDebug|Win32 = VSDebug|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B5225323-AC67-411D-8FBA-199E9467FAB5}.Release|Win32.ActiveCfg = Release|Win32
+		{B5225323-AC67-411D-8FBA-199E9467FAB5}.Release|Win32.Build.0 = Release|Win32
+		{B5225323-AC67-411D-8FBA-199E9467FAB5}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{B5225323-AC67-411D-8FBA-199E9467FAB5}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}.Release|Win32.ActiveCfg = Release|Win32
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}.Release|Win32.Build.0 = Release|Win32
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.Release|Win32.ActiveCfg = Release|Win32
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.Release|Win32.Build.0 = Release|Win32
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{F7A2D803-FC42-4C42-B1E6-E794F94228BF}.Release|Win32.ActiveCfg = Release|Win32
+		{F7A2D803-FC42-4C42-B1E6-E794F94228BF}.Release|Win32.Build.0 = Release|Win32
+		{F7A2D803-FC42-4C42-B1E6-E794F94228BF}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{F7A2D803-FC42-4C42-B1E6-E794F94228BF}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{FCF4C8D7-D26C-48D9-9BCD-01E9A6E8E3C2}.Release|Win32.ActiveCfg = Release|Win32
+		{FCF4C8D7-D26C-48D9-9BCD-01E9A6E8E3C2}.Release|Win32.Build.0 = Release|Win32
+		{FCF4C8D7-D26C-48D9-9BCD-01E9A6E8E3C2}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{FCF4C8D7-D26C-48D9-9BCD-01E9A6E8E3C2}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{C9ADE93B-50A0-4A9E-9985-8DA694B03F4B}.Release|Win32.ActiveCfg = Release|Win32
+		{C9ADE93B-50A0-4A9E-9985-8DA694B03F4B}.Release|Win32.Build.0 = Release|Win32
+		{C9ADE93B-50A0-4A9E-9985-8DA694B03F4B}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{C9ADE93B-50A0-4A9E-9985-8DA694B03F4B}.VSDebug|Win32.Build.0 = VSDebug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

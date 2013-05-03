@@ -1,0 +1,213 @@
+/*
+ * Library to support cross-platform C threads functions
+ *
+ * Copyright (c) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
+ *
+ * Refer to AUTHORS for acknowledgements.
+ *
+ * This software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#if !defined( _LIBCTHREADS_H )
+#define _LIBCTHREADS_H
+
+#include <libcthreads/codepage.h>
+#include <libcthreads/definitions.h>
+#include <libcthreads/error.h>
+#include <libcthreads/extern.h>
+#include <libcthreads/features.h>
+#include <libcthreads/types.h>
+
+#if defined( __cplusplus )
+extern "C" {
+#endif
+
+/* -------------------------------------------------------------------------
+ * Support functions
+ * ------------------------------------------------------------------------- */
+
+/* Returns the library version as a string
+ */
+LIBCTHREADS_EXTERN \
+const char *libcthreads_get_version(
+             void );
+
+/* -------------------------------------------------------------------------
+ * Error functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees an error
+ */
+LIBCTHREADS_EXTERN \
+void libcthreads_error_free(
+      libcthreads_error_t **error );
+
+/* Prints a descriptive string of the error to the stream
+ * Returns the number of printed characters if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_error_fprint(
+     libcthreads_error_t *error,
+     FILE *stream );
+
+/* Prints a descriptive string of the error to the string
+ * Returns the number of printed characters if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_error_sprint(
+     libcthreads_error_t *error,
+     char *string,
+     size_t size );
+
+/* Prints a backtrace of the error to the stream
+ * Returns the number of printed characters if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_error_backtrace_fprint(
+     libcthreads_error_t *error,
+     FILE *stream );
+
+/* Prints a backtrace of the error to the string
+ * Returns the number of printed characters if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_error_backtrace_sprint(
+     libcthreads_error_t *error,
+     char *string,
+     size_t size );
+
+/* -------------------------------------------------------------------------
+ * Thread functions
+ * ------------------------------------------------------------------------- */
+
+/* Creates a thread
+ * Make sure the value thread is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_thread_create(
+     libcthreads_thread_t **thread,
+     const libcthreads_thread_attributes_t *thread_attributes,
+     int (*start_function)(
+            void *arguments),
+     void *start_function_arguments,
+     libcthreads_error_t **error );
+
+/* Exits a thread
+ * Call this function within the thread
+ */
+LIBCTHREADS_EXTERN \
+void libcthreads_thread_exit(
+      void );
+
+/* -------------------------------------------------------------------------
+ * Thread attribute functions
+ * ------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------
+ * Lock functions
+ * ------------------------------------------------------------------------- */
+
+/* Creates a lock
+ * Make sure the value lock is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_lock_initialize(
+     libcthreads_lock_t **lock,
+     libcthreads_error_t **error );
+
+/* Frees a lock
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_lock_free(
+     libcthreads_lock_t **lock,
+     libcthreads_error_t **error );
+
+/* Grabs a lock
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_lock_grab(
+     const libcthreads_lock_t *lock,
+     libcthreads_error_t **error );
+
+/* Releases a lock
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_lock_release(
+     const libcthreads_lock_t *lock,
+     libcthreads_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Read/Write locks functions
+ * ------------------------------------------------------------------------- */
+
+/* Creates a read/write lock
+ * Make sure the value read_write_lock is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_read_write_lock_initialize(
+     libcthreads_read_write_lock_t **read_write_lock,
+     libcthreads_error_t **error );
+
+/* Frees a read/write lock
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_read_write_lock_free(
+     libcthreads_read_write_lock_t **read_write_lock,
+     libcthreads_error_t **error );
+
+/* Grabs a read/write lock for reading
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_read_write_lock_grab_for_read(
+     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_error_t **error );
+
+/* Grabs a read/write lock for writing
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_read_write_lock_grab_for_write(
+     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_error_t **error );
+
+/* Releases a read/write lock for reading
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_read_write_lock_release_for_read(
+     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_error_t **error );
+
+/* Releases a read/write lock for writing
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_read_write_lock_release_for_write(
+     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_error_t **error );
+
+#if defined( __cplusplus )
+}
+#endif
+
+#endif
+
