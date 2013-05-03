@@ -4,7 +4,7 @@ AC_DEFUN([AX_LIBCTHREADS_CHECK_LOCAL],
   [test "x$ac_cv_enable_winapi" = xno],
   [dnl Check for enabling pthread support
   AX_PTHREAD_CHECK_ENABLE
-   ac_cv_libcthreads_locking=$ac_cv_pthread],
-  [ac_cv_libcthreads_locking="winapi"])
+   ac_cv_libcthreads_multi_threading=$ac_cv_pthread],
+  [ac_cv_libcthreads_multi_threading="winapi"])
  ])
 
