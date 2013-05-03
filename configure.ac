@@ -61,12 +61,8 @@ AX_LIBCSTRING_CHECK_ENABLE
 dnl Check for enabling libcerror for cross-platform C error functions
 AX_LIBCERROR_CHECK_ENABLE
 
-dnl Check for enabling pthread support
-AS_IF(
- [test "x$ac_cv_enable_winapi" = xno],
- [AX_PTHREAD_CHECK_ENABLE
-  ac_cv_libcthreads_locking=$ac_cv_pthread],
- [ac_cv_libcthreads_locking="winapi"])
+dnl Check for library function support
+AX_LIBCTHREADS_CHECK_LOCAL
 
 dnl Set additional compiler flags
 CFLAGS="$CFLAGS -Wall";
