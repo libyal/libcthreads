@@ -98,6 +98,13 @@ int cthreads_test_read_write_lock_initialize(
 			 "%s: unable to free read/write lock.",
 			 function );
 
+			libcerror_error_backtrace_fprint(
+			 error,
+			 stdout );
+
+			libcerror_error_free(
+			 &error );
+
 			return( -1 );
 		}
 	}
