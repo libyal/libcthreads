@@ -128,9 +128,9 @@ AC_MSG_NOTICE([
 Building:
    libcstring support:          $ac_cv_libcstring
    libcerror support:           $ac_cv_libcerror
-   Multi-threading support:     $ac_cv_libcthreads_multi_threading
 
 Features:
+   Multi-threading support:     $ac_cv_libcthreads_multi_threading
    Wide character type support: $ac_cv_enable_wide_character_type
 ]);
 
