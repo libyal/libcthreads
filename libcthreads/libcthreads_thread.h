@@ -55,12 +55,21 @@ struct libcthreads_internal_thread
 	 */
 	pthread_t thread;
 
-	/* The start function return value
+	/* The start functions return value
 	 */
 	int start_function_result;
 #else
 #error Missing thread type
 #endif
+
+	/* The start function
+	 */
+	int (*start_function)(
+	       void *arguments );
+
+	/* The start function arguments
+	 */
+	void *start_function_arguments;
 };
 
 LIBCTHREADS_EXTERN \
@@ -73,12 +82,8 @@ int libcthreads_thread_create(
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
-void libcthreads_thread_exit(
-      void );
-
-LIBCTHREADS_EXTERN \
 int libcthreads_thread_join(
-     libcthreads_thread_t *thread,
+     libcthreads_thread_t **thread,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

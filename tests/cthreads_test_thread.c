@@ -37,8 +37,6 @@
 int cthreads_test_thread_start_function(
      void *arguments )
 {
-	libcthreads_thread_exit();
-
 	return( 1 );
 }
 
@@ -108,6 +106,61 @@ int cthreads_test_thread_create(
 	return( 1 );
 }
 
+/* Tests joining a thread
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int cthreads_test_thread_join(
+     libcthreads_thread_t **thread )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "cthreads_test_thread_join";
+	int result               = 0;
+
+	fprintf(
+	 stdout,
+	 "Testing join\t" );
+
+	result = libcthreads_thread_join(
+		  thread,
+		  &error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to join thread.",
+		 function );
+
+		fprintf(
+		 stdout,
+		 "(FAIL)" );
+	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
+	fprintf(
+	 stdout,
+	 "\n" );
+
+	if( result == -1 )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
+		 &error );
+
+		return( 0 );
+	}
+	return( 1 );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -138,6 +191,15 @@ int main( int argc, char * const argv[] )
 		fprintf(
 		 stderr,
 		 "Unable to test create.\n" );
+
+		return( EXIT_FAILURE );
+	}
+	if( cthreads_test_thread_join(
+	     &thread ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test join.\n" );
 
 		return( EXIT_FAILURE );
 	}

@@ -106,18 +106,13 @@ int libcthreads_thread_create(
      void *start_function_arguments,
      libcthreads_error_t **error );
 
-/* Exits the current thread
- */
-LIBCTHREADS_EXTERN \
-void libcthreads_thread_exit(
-      void );
-
 /* Joins the current with a specified thread
+ * The the thread is freed after join
  * Returns 1 if successful or -1 on error
  */
 LIBCTHREADS_EXTERN \
 int libcthreads_thread_join(
-     libcthreads_thread_t *thread,
+     libcthreads_thread_t **thread,
      libcthreads_error_t **error );
 
 /* -------------------------------------------------------------------------

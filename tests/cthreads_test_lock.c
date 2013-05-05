@@ -115,6 +115,61 @@ int cthreads_test_lock_initialize(
 	return( 1 );
 }
 
+/* Tests joining a thread
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int cthreads_test_lock_join(
+     libcthreads_thread_t **thread )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "cthreads_test_lock_join";
+	int result               = 0;
+
+	fprintf(
+	 stdout,
+	 "Testing join\t" );
+
+	result = libcthreads_thread_join(
+		  thread,
+		  &error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to join thread.",
+		 function );
+
+		fprintf(
+		 stdout,
+		 "(FAIL)" );
+	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
+	fprintf(
+	 stdout,
+	 "\n" );
+
+	if( result == -1 )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
+		 &error );
+
+		return( 0 );
+	}
+	return( 1 );
+}
+
 libcthreads_lock_t *cthreads_test_lock = NULL;
 int cthreads_test_locked_value         = 0;
 
@@ -160,8 +215,6 @@ int cthreads_test_lock_start_function1(
 
 		goto on_error;
 	}
-	libcthreads_thread_exit();
-
 	return( 1 );
 
 on_error:
@@ -219,8 +272,6 @@ int cthreads_test_lock_start_function2(
 
 		goto on_error;
 	}
-	libcthreads_thread_exit();
-
 	return( 1 );
 
 on_error:
@@ -373,6 +424,32 @@ int cthreads_test_locking(
 
 		libcerror_error_free(
 		 &error );
+	}
+	if( libcthreads_thread_join(
+	     &thread2,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to join thread2.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_thread_join(
+	     &thread1,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to join thread1.",
+		 function );
+
+		goto on_error;
 	}
 	if( libcthreads_lock_free(
 	     &cthreads_test_lock,
