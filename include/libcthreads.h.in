@@ -93,6 +93,8 @@ int libcthreads_error_backtrace_sprint(
 
 /* Creates a thread
  * Make sure the value thread is referencing, is set to NULL
+ *
+ * The start_function should return 1 if successful and -1 on error
  * Returns 1 if successful or -1 on error
  */
 LIBCTHREADS_EXTERN \
@@ -104,16 +106,51 @@ int libcthreads_thread_create(
      void *start_function_arguments,
      libcthreads_error_t **error );
 
-/* Exits a thread
- * Call this function within the thread
+/* Exits the current thread
  */
 LIBCTHREADS_EXTERN \
 void libcthreads_thread_exit(
       void );
 
+/* Joins the current with a specified thread
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_thread_join(
+     libcthreads_thread_t *thread,
+     libcthreads_error_t **error );
+
 /* -------------------------------------------------------------------------
- * Thread attribute functions
+ * Thread attributes functions
  * ------------------------------------------------------------------------- */
+
+/* Creates thread attributes
+ * Make sure the value thread_attributes is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_thread_attributes_initialize(
+     libcthreads_thread_attributes_t **thread_attributes,
+     libcthreads_error_t **error );
+
+/* Frees thread attributes
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_thread_attributes_free(
+     libcthreads_thread_attributes_t **thread_attributes,
+     libcthreads_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Thread pool functions
+ * ------------------------------------------------------------------------- */
+
+/* Creates a thread pool
+ * Make sure the value thread_pool is referencing, is set to NULL
+ *
+ * The start_function should return 1 if successful and -1 on error
+ * Returns 1 if successful or -1 on error
+ */
 
 /* -------------------------------------------------------------------------
  * Lock functions

@@ -28,15 +28,7 @@
 
 /* The libcthreads version string
  */
-#define LIBCTHREADS_VERSION_STRING			"@VERSION@"
-
-#if defined( WINAPI )
-#define LIBCTHREADS_SEPARATOR			'\\'
-
-#else
-#define LIBCTHREADS_SEPARATOR			'/'
-
-#endif /* defined( WINAPI ) */
+#define LIBCTHREADS_VERSION_STRING		"@VERSION@"
 
 #endif
 

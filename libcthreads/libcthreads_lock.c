@@ -23,8 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <errno.h>
-
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 #include <pthread.h>
 #endif
@@ -111,7 +109,7 @@ int libcthreads_lock_initialize(
 	{
 		libcerror_system_set_error(
 		 error,
-		 errno,
+		 result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize mutex.",
@@ -172,7 +170,7 @@ int libcthreads_lock_free(
 		{
 			libcerror_system_set_error(
 			 error,
-			 errno,
+			 result,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to destroy mutex.",
@@ -230,7 +228,7 @@ int libcthreads_lock_grab(
 	{
 		libcerror_system_set_error(
 		 error,
-		 errno,
+		 result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to lock mutex.",
@@ -281,7 +279,7 @@ int libcthreads_lock_release(
 	{
 		libcerror_system_set_error(
 		 error,
-		 errno,
+		 result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to unlock mutex.",

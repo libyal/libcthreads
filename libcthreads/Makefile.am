@@ -18,7 +18,8 @@ libcthreads_la_SOURCES = \
 	libcthreads_read_write_lock.c libcthreads_read_write_lock.h \
 	libcthreads_support.c libcthreads_support.h \
 	libcthreads_thread.c libcthreads_thread.h \
-	libcthreads_thread_attributes.h \
+	libcthreads_thread_attributes.c libcthreads_thread_attributes.h \
+	libcthreads_thread_pool.c libcthreads_thread_pool.h \
 	libcthreads_types.h \
 	libcthreads_unused.h
 

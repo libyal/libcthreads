@@ -2,9 +2,13 @@ TODO
 * add macros for locking ? or have fallback dummy locks ?
 * lock add try grab function
 * read/write lock add try grab functions
-* add thread pool
 * update man pages
 * add glib support
+
+20130505
+* worked on thread
+* worked on thread attributes
+* worked on thread pool
 
 20130503
 * Initial version based rename of libcmulti

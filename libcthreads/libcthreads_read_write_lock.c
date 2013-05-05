@@ -23,8 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <errno.h>
-
 #if defined( WINAPI ) && ( WINVER >= 0x0602 )
 #include <Synchapi.h>
 #endif
@@ -148,7 +146,7 @@ int libcthreads_read_write_lock_initialize(
 	{
 		libcerror_system_set_error(
 		 error,
-		 errno,
+		 result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize read/write lock.",
@@ -257,7 +255,7 @@ int libcthreads_read_write_lock_free(
 		{
 			libcerror_system_set_error(
 			 error,
-			 errno,
+			 result,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to destroy read/write lock.",
@@ -358,7 +356,7 @@ int libcthreads_read_write_lock_grab_for_read(
 	{
 		libcerror_system_set_error(
 		 error,
-		 errno,
+		 result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to lock read/write lock for read.",
@@ -439,7 +437,7 @@ int libcthreads_read_write_lock_grab_for_write(
 	{
 		libcerror_system_set_error(
 		 error,
-		 errno,
+		 result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to lock read/write lock for write.",
@@ -527,7 +525,7 @@ int libcthreads_read_write_lock_release_for_read(
 	{
 		libcerror_system_set_error(
 		 error,
-		 errno,
+		 result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to unlock read/write lock.",
@@ -582,7 +580,7 @@ int libcthreads_read_write_lock_release_for_write(
 	{
 		libcerror_system_set_error(
 		 error,
-		 errno,
+		 result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to unlock read/write lock.",

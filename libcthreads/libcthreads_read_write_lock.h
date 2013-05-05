@@ -25,7 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#if defined( WINAPI ) && ( WINVER >= 0x0602 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
 #include <Synchapi.h>
 #endif
 
@@ -45,12 +45,12 @@ typedef struct libcthreads_internal_read_write_lock libcthreads_internal_read_wr
 
 struct libcthreads_internal_read_write_lock
 {
-#if defined( WINAPI ) && ( WINVER >= 0x0600 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER >= 0x0600 )
 	/* The slim read/write lock
 	 */
 	SRWLOCK slim_read_write_lock;
 
-#elif defined( WINAPI ) && ( WINVER > 0x0500 ) && !defined( USE_CRT_FUNCTIONS )
+#elif defined( WINAPI ) && ( WINVER > 0x0500 )
 	/* The read critical section
 	 */
 	CRITICAL_SECTION read_critical_section;
@@ -67,7 +67,7 @@ struct libcthreads_internal_read_write_lock
 	 */
 	HANDLE no_read_event;
 
-#elif defined( WINAPI ) && !defined( USE_CRT_FUNCTIONS )
+#elif defined( WINAPI )
 
 /* TODO */
 #error WINAPI read/write lock for Windows 2000 or earlier NOT implemented yet

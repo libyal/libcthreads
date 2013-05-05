@@ -38,12 +38,14 @@ typedef struct libcthreads_lock {}		libcthreads_lock_t;
 typedef struct libcthreads_read_write_lock {}	libcthreads_read_write_lock_t;
 typedef struct libcthreads_thread {}		libcthreads_thread_t;
 typedef struct libcthreads_thread_attributes {}	libcthreads_thread_attributes_t;
+typedef struct libcthreads_thread_pool {}	libcthreads_thread_pool_t;
 
 #else
 typedef intptr_t libcthreads_lock_t;
 typedef intptr_t libcthreads_read_write_lock_t;
 typedef intptr_t libcthreads_thread_t;
 typedef intptr_t libcthreads_thread_attributes_t;
+typedef intptr_t libcthreads_thread_pool_t;
 
 #endif
 

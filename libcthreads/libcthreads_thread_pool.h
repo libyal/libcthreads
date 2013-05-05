@@ -1,5 +1,5 @@
 /*
- * Thread attributes functions
+ * Thread pool functions
  *
  * Copyright (C) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,14 +19,14 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCTHREADS_THREAD_ATTRIBUTES_H )
-#define _LIBCTHREADS_THREAD_ATTRIBUTES_H
+#if !defined( _LIBCTHREADS_THREAD_POOL_H )
+#define _LIBCTHREADS_THREAD_POOL_H
 
 #include <common.h>
 #include <types.h>
 
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-#include <pthread.h>
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
+#include <Threadpoolapiset.h>
 #endif
 
 #include "libcthreads_extern.h"
@@ -37,33 +37,43 @@
 extern "C" {
 #endif
 
-typedef struct libcthreads_internal_thread_attributes libcthreads_internal_thread_attributes_t;
+typedef struct libcthreads_internal_thread_pool libcthreads_internal_thread_pool_t;
 
-struct libcthreads_internal_thread_attributes
+struct libcthreads_internal_thread_pool
 {
-#if defined( WINAPI )
-	/* The security attributes
+#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+	/* The thread pool
 	 */
-	SECURITY_ATTRIBUTES security_attributes;
-
-#elif defined( HAVE_PTHREAD_H )
-	/* The attributes
-	 */
-	pthread_attr_t attributes;
+	TP_POOL *thread_pool;
 
 #else
-#error Missing thread attributes type
+	/* The maximum number of threads in the pool
+	 */
+	int maximum_number_of_threads;
+
+	/* The threads array
+	 */
+	libcthreads_thread_t **threads_array;
+
+	/* The start function
+	 */
+	int (*start_function)(
+	       void *arguments );
+
+	/* The start function arguments
+	 */
+	void *start_function_arguments;
 #endif
 };
 
 LIBCTHREADS_EXTERN \
-int libcthreads_thread_attributes_initialize(
-     libcthreads_thread_attributes_t **thread_attributes,
-     libcerror_error_t **error );
-
-LIBCTHREADS_EXTERN \
-int libcthreads_thread_attributes_free(
-     libcthreads_thread_attributes_t **thread_attributes,
+int libcthreads_thread_pool_create(
+     libcthreads_thread_pool_t **thread_pool,
+     const libcthreads_thread_attributes_t *thread_attributes,
+     int maximum_number_of_threads,
+     int (*start_function)(
+            void *arguments ),
+     void *start_function_arguments,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -205,6 +205,7 @@ typedef intptr_t libcthreads_lock_t;
 typedef intptr_t libcthreads_read_write_lock_t;
 typedef intptr_t libcthreads_thread_t;
 typedef intptr_t libcthreads_thread_attributes_t;
+typedef intptr_t libcthreads_thread_pool_t;
 
 #ifdef __cplusplus
 }
