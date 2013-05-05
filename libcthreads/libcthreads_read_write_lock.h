@@ -65,7 +65,7 @@ struct libcthreads_internal_read_write_lock
 
 	/* The no read event handle
 	 */
-	HANDLE no_read_event;
+	HANDLE no_read_event_handle;
 
 #elif defined( WINAPI )
 

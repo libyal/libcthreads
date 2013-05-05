@@ -9,6 +9,8 @@ TODO
 * worked on thread
 * worked on thread attributes
 * worked on thread pool
+* worked on mutex
+* worked on repeating thread
 
 20130503
 * Initial version based rename of libcmulti

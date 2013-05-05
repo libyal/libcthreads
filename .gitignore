@@ -99,6 +99,7 @@ stamp-h1
 /libcthreads/libcthreads.rc
 /libcthreads/libcthreads_definitions.h
 /tests/cthreads_test_lock
+/tests/cthreads_test_mutex
 /tests/cthreads_test_read_write_lock
 /tests/cthreads_test_thread
 

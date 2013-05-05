@@ -1,5 +1,5 @@
 /*
- * Library lock type testing program
+ * Library mutex type testing program
  *
  * Copyright (c) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -31,24 +31,24 @@
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
 
-/* Tests initializing a lock
- * Make sure the value lock is referencing, is set to NULL
+/* Tests initializing a mutex
+ * Make sure the value mutex is referencing, is set to NULL
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cthreads_test_lock_initialize(
-     libcthreads_lock_t **lock,
+int cthreads_test_mutex_initialize(
+     libcthreads_mutex_t **mutex,
      int expected_result )
 {
 	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_lock_initialize";
+	static char *function    = "cthreads_test_mutex_initialize";
 	int result               = 0;
 
 	fprintf(
 	 stdout,
 	 "Testing initialize\t" );
 
-	result = libcthreads_lock_initialize(
-	          lock,
+	result = libcthreads_mutex_initialize(
+	          mutex,
 	          &error );
 
 	if( result == -1 )
@@ -57,7 +57,7 @@ int cthreads_test_lock_initialize(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create lock.",
+		 "%s: unable to create mutex.",
 		 function );
 	}
 	if( result != expected_result )
@@ -87,15 +87,15 @@ int cthreads_test_lock_initialize(
 	}
 	if( result == 1 )
 	{
-		if( libcthreads_lock_free(
-		     lock,
+		if( libcthreads_mutex_free(
+		     mutex,
 		     &error ) == -1 )
 		{
 			libcerror_error_set(
 			 &error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free lock.",
+			 "%s: unable to free mutex.",
 			 function );
 
 			libcerror_error_backtrace_fprint(
@@ -115,21 +115,21 @@ int cthreads_test_lock_initialize(
 	return( 1 );
 }
 
-libcthreads_lock_t *cthreads_test_lock = NULL;
-int cthreads_test_locked_value         = 0;
+libcthreads_mutex_t *cthreads_test_mutex = NULL;
+int cthreads_test_locked_value           = 0;
 
 /* The thread1 start function
  * Returns 1 if successful or -1 on error
  */
-int cthreads_test_lock_start_function1(
+int cthreads_test_mutex_start_function1(
      void *arguments )
 {
 	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_lock_start_function1";
+	static char *function    = "cthreads_test_mutex_start_function1";
 	int result               = 0;
 
-	result = libcthreads_lock_grab(
-	          cthreads_test_lock,
+	result = libcthreads_mutex_grab(
+	          cthreads_test_mutex,
 	          &error );
 
 	if( result != 1 )
@@ -138,15 +138,15 @@ int cthreads_test_lock_start_function1(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab lock.",
+		 "%s: unable to grab mutex.",
 		 function );
 
 		goto on_error;
 	}
 	cthreads_test_locked_value += 19;
 
-	result = libcthreads_lock_release(
-		  cthreads_test_lock,
+	result = libcthreads_mutex_release(
+		  cthreads_test_mutex,
 		  &error );
 
 	if( result != 1 )
@@ -155,7 +155,7 @@ int cthreads_test_lock_start_function1(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release lock.",
+		 "%s: unable to release mutex.",
 		 function );
 
 		goto on_error;
@@ -178,15 +178,15 @@ on_error:
 /* The thread2 start function
  * Returns 1 if successful or -1 on error
  */
-int cthreads_test_lock_start_function2(
+int cthreads_test_mutex_start_function2(
      void *arguments )
 {
 	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_lock_start_function2";
+	static char *function    = "cthreads_test_mutex_start_function2";
 	int result               = 0;
 
-	result = libcthreads_lock_grab(
-	          cthreads_test_lock,
+	result = libcthreads_mutex_grab(
+	          cthreads_test_mutex,
 	          &error );
 
 	if( result != 1 )
@@ -195,15 +195,15 @@ int cthreads_test_lock_start_function2(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab lock.",
+		 "%s: unable to grab mutex.",
 		 function );
 
 		goto on_error;
 	}
 	cthreads_test_locked_value += 38;
 
-	result = libcthreads_lock_release(
-		  cthreads_test_lock,
+	result = libcthreads_mutex_release(
+		  cthreads_test_mutex,
 		  &error );
 
 	if( result != 1 )
@@ -212,7 +212,7 @@ int cthreads_test_lock_start_function2(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release lock.",
+		 "%s: unable to release mutex.",
 		 function );
 
 		goto on_error;
@@ -232,27 +232,27 @@ on_error:
 	return( -1 );
 }
 
-/* Tests thread lock locking
+/* Tests thread mutex locking
  * Returns 1 if successful or -1 on error
  */
-int cthreads_test_lock_locking(
+int cthreads_test_mutex_locking(
      void )
 {
 	libcerror_error_t *error      = NULL;
 	libcthreads_thread_t *thread1 = NULL;
 	libcthreads_thread_t *thread2 = NULL;
-	static char *function         = "cthreads_test_lock_locking";
+	static char *function         = "cthreads_test_mutex_locking";
 	int result                    = 0;
 
-	if( libcthreads_lock_initialize(
-	     &cthreads_test_lock,
+	if( libcthreads_mutex_initialize(
+	     &cthreads_test_mutex,
 	     &error ) != 1 )
 	{
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create lock.",
+		 "%s: unable to create mutex.",
 		 function );
 
 		goto on_error;
@@ -261,8 +261,8 @@ int cthreads_test_lock_locking(
 	 stdout,
 	 "Testing grab\t" );
 
-	result = libcthreads_lock_grab(
-	          cthreads_test_lock,
+	result = libcthreads_mutex_grab(
+	          cthreads_test_mutex,
 	          &error );
 
 	if( result != 1 )
@@ -271,7 +271,7 @@ int cthreads_test_lock_locking(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab lock.",
+		 "%s: unable to grab mutex.",
 		 function );
 
 		fprintf(
@@ -293,7 +293,7 @@ int cthreads_test_lock_locking(
 		result = libcthreads_thread_create(
 			  &thread1,
 			  NULL,
-			  cthreads_test_lock_start_function1,
+			  cthreads_test_mutex_start_function1,
 			  NULL,
 			  &error );
 
@@ -311,7 +311,7 @@ int cthreads_test_lock_locking(
 		result = libcthreads_thread_create(
 			  &thread2,
 			  NULL,
-			  cthreads_test_lock_start_function2,
+			  cthreads_test_mutex_start_function2,
 			  NULL,
 			  &error );
 
@@ -332,8 +332,8 @@ int cthreads_test_lock_locking(
 		 stdout,
 		 "Testing release\t" );
 
-		result = libcthreads_lock_release(
-			  cthreads_test_lock,
+		result = libcthreads_mutex_release(
+			  cthreads_test_mutex,
 			  &error );
 
 		if( result != 1 )
@@ -342,7 +342,7 @@ int cthreads_test_lock_locking(
 			 &error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to release lock.",
+			 "%s: unable to release mutex.",
 			 function );
 		}
 		if( result != 1 )
@@ -396,15 +396,15 @@ int cthreads_test_lock_locking(
 
 		goto on_error;
 	}
-	if( libcthreads_lock_free(
-	     &cthreads_test_lock,
+	if( libcthreads_mutex_free(
+	     &cthreads_test_mutex,
 	     &error ) != 1 )
 	{
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free lock.",
+		 "%s: unable to free mutex.",
 		 function );
 
 		goto on_error;
@@ -441,13 +441,13 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( cthreads_test_lock != NULL )
+	if( cthreads_test_mutex != NULL )
 	{
-		libcthreads_lock_release(
-		 cthreads_test_lock,
+		libcthreads_mutex_release(
+		 cthreads_test_mutex,
 		 NULL );
-		libcthreads_lock_free(
-		 &cthreads_test_lock,
+		libcthreads_mutex_free(
+		 &cthreads_test_mutex,
 		 NULL );
 	}
 	return( -1 );
@@ -461,7 +461,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcthreads_lock_t *lock = NULL;
+	libcthreads_mutex_t *mutex = NULL;
 
 	if( argc != 1 )
 	{
@@ -473,10 +473,10 @@ int main( int argc, char * const argv[] )
 	}
 	/* Initialization tests
 	 */
-	lock = NULL;
+	mutex = NULL;
 
-	if( cthreads_test_lock_initialize(
-	     &lock,
+	if( cthreads_test_mutex_initialize(
+	     &mutex,
 	     1 ) != 1 )
 	{
 		fprintf(
@@ -485,10 +485,10 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	lock = (libcthreads_lock_t *) 0x12345678UL;
+	mutex = (libcthreads_mutex_t *) 0x12345678UL;
 
-	if( cthreads_test_lock_initialize(
-	     &lock,
+	if( cthreads_test_mutex_initialize(
+	     &mutex,
 	     -1 ) != 1 )
 	{
 		fprintf(
@@ -499,7 +499,7 @@ int main( int argc, char * const argv[] )
 	}
 	/* Test: locking
 	 */
-	if( cthreads_test_lock_locking() != 1 )
+	if( cthreads_test_mutex_locking() != 1 )
 	{
 		fprintf(
 		 stderr,

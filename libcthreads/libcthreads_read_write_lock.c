@@ -117,13 +117,13 @@ int libcthreads_read_write_lock_initialize(
 	InitializeCriticalSection(
 	 &( internal_read_write_lock->read_critical_section ) );
 
-        internal_read_write_lock->no_read_event = CreateEvent(
-	                                           NULL,
-	                                           TRUE,
-	                                           TRUE,
-	                                           NULL );
+        internal_read_write_lock->no_read_event_handle = CreateEvent(
+	                                                  NULL,
+	                                                  TRUE,
+	                                                  TRUE,
+	                                                  NULL );
 
-	if( internal_read_write_lock->no_read_event == NULL )
+	if( internal_read_write_lock->no_read_event_handle == NULL )
 	{
 		error_code = GetLastError();
 
@@ -132,7 +132,7 @@ int libcthreads_read_write_lock_initialize(
 		 error_code,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize no read event.",
+		 "%s: unable to initialize no read event handle.",
 		 function );
 
 		goto on_error;
@@ -209,7 +209,7 @@ int libcthreads_read_write_lock_free(
 
 #if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
 		wait_status = WaitForSingleObject(
-		               internal_read_write_lock->no_read_event,
+		               internal_read_write_lock->no_read_event_handle,
 		               INFINITE );
 
 		if( wait_status == WAIT_FAILED )
@@ -221,13 +221,13 @@ int libcthreads_read_write_lock_free(
 			 error_code,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: wait for no read event failed.",
+			 "%s: wait for no read event handle failed.",
 			 function );
 
 			result = -1;
 		}
 		if( CloseHandle(
-		     internal_read_write_lock->no_read_event ) == 0 )
+		     internal_read_write_lock->no_read_event_handle ) == 0 )
 		{
 			error_code = GetLastError();
 
@@ -236,7 +236,7 @@ int libcthreads_read_write_lock_free(
 			 error_code,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free no read event.",
+			 "%s: unable to free no read event handle.",
 			 function );
 
 			result = -1;
@@ -321,7 +321,7 @@ int libcthreads_read_write_lock_grab_for_read(
 	if( internal_read_write_lock->number_of_readers == 1 )
 	{
 		result = ResetEvent(
-		          internal_read_write_lock->no_read_event );
+		          internal_read_write_lock->no_read_event_handle );
 
 		if( result == 0 )
 		{
@@ -409,7 +409,7 @@ int libcthreads_read_write_lock_grab_for_write(
 	 &( internal_read_write_lock->write_critical_section ) );
 
 	wait_status = WaitForSingleObject(
-	               internal_read_write_lock->no_read_event,
+	               internal_read_write_lock->no_read_event_handle,
 	               INFINITE );
 
 	if( wait_status == WAIT_FAILED )
@@ -421,7 +421,7 @@ int libcthreads_read_write_lock_grab_for_write(
 		 error_code,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: wait for no read event failed.",
+		 "%s: wait for no read event handle failed.",
 		 function );
 
 		LeaveCriticalSection(
@@ -493,7 +493,7 @@ int libcthreads_read_write_lock_release_for_read(
 	if( internal_read_write_lock->number_of_readers == 0 )
 	{
 		result = SetEvent(
-		          internal_read_write_lock->no_read_event );
+		          internal_read_write_lock->no_read_event_handle );
 
 		if( result == 0 )
 		{
