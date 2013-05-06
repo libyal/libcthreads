@@ -45,7 +45,8 @@ DWORD WINAPI libcthreads_thread_start_function_helper(
               void *arguments )
 {
 	libcthreads_internal_thread_t *internal_thread = NULL;
-	int result                                     = 1;
+	DWORD result                                   = 1;
+	int start_function_result                      = 0;
 
 	if( arguments != NULL )
 	{
@@ -54,11 +55,10 @@ DWORD WINAPI libcthreads_thread_start_function_helper(
 		if( ( internal_thread != NULL )
 		 && ( internal_thread->start_function != NULL ) )
 		{
-			result = internal_thread->start_function(
-			          internal_thread->start_function_arguments );
-
-			result = ( result != 1 );
+			start_function_result = internal_thread->start_function(
+			                         internal_thread->start_function_arguments );
 		}
+		result = (DWORD) ( start_function_result != 1 );
 	}
 	ExitThread(
 	 result );
@@ -72,6 +72,7 @@ void *libcthreads_thread_start_function_helper(
        void *arguments )
 {
 	libcthreads_internal_thread_t *internal_thread = NULL;
+	int start_function_result                      = 0;
 	void *result                                   = NULL;
 
 	if( arguments != NULL )
@@ -81,8 +82,10 @@ void *libcthreads_thread_start_function_helper(
 		if( ( internal_thread != NULL )
   		 && ( internal_thread->start_function != NULL ) )
 		{
-			internal_thread->start_function_result = internal_thread->start_function(
-								  internal_thread->start_function_arguments );
+			start_function_result = internal_thread->start_function(
+			                         internal_thread->start_function_arguments );
+
+			internal_thread->start_function_result = start_function_result;
 
 			result = (void *) &( internal_thread->start_function_result );
 		}
@@ -116,7 +119,7 @@ int libcthreads_thread_create(
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_attr_t *attributes                     = NULL;
-	int result                                     = 0;
+	int pthread_result                             = 0;
 #endif
 
 	if( thread == NULL )
@@ -215,17 +218,17 @@ int libcthreads_thread_create(
 	{
 		attributes = &( ( (libcthreads_internal_thread_attributes_t *) thread_attributes )->attributes );
 	}
-	result = pthread_create(
-		  &( internal_thread->thread ),
-	          attributes,
-	          &libcthreads_thread_start_function_helper,
-	          (void *) internal_thread );
+	pthread_result = pthread_create(
+		          &( internal_thread->thread ),
+	                  attributes,
+	                  &libcthreads_thread_start_function_helper,
+	                  (void *) internal_thread );
 
-	if( result != 0 )
+	if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,
-		 result,
+		 pthread_result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create thread.",
@@ -264,7 +267,7 @@ int libcthreads_thread_join(
 
 #elif defined( HAVE_PTHREAD_H )
 	int *thread_return_value                       = NULL;
-	int result                                     = 0;
+	int pthread_result                             = 0;
 #endif
 
 	if( thread == NULL )
@@ -312,15 +315,15 @@ int libcthreads_thread_join(
 		goto on_error;
 	}
 #elif defined( HAVE_PTHREAD_H )
-	result = pthread_join(
-	          internal_thread->thread,
-	          (void **) &thread_return_value );
+	pthread_result = pthread_join(
+	                  internal_thread->thread,
+	                  (void **) &thread_return_value );
 
-	if( result != 0 )
+	if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,
-		 result,
+		 pthread_result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to join thread.",
@@ -353,19 +356,15 @@ int libcthreads_thread_join(
 		goto on_error;
 	}
 #endif
-	if( internal_thread != NULL )
-	{
-		memory_free(
-		 internal_thread );
-	}
+	memory_free(
+	 internal_thread );
+
 	return( 1 );
 
 on_error:
-	if( internal_thread != NULL )
-	{
-		memory_free(
-		 internal_thread );
-	}
+	memory_free(
+	 internal_thread );
+
 	return( -1 );
 }
 
