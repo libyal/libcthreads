@@ -1,5 +1,5 @@
 /*
- * Mutex functions
+ * Condition functions
  *
  * Copyright (C) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCTHREADS_INTERNAL_MUTEX_H )
-#define _LIBCTHREADS_INTERNAL_MUTEX_H
+#if !defined( _LIBCTHREADS_INTERNAL_CONDITION_H )
+#define _LIBCTHREADS_INTERNAL_CONDITION_H
 
 #include <common.h>
 #include <types.h>
@@ -37,42 +37,43 @@
 extern "C" {
 #endif
 
-typedef struct libcthreads_internal_mutex libcthreads_internal_mutex_t;
+typedef struct libcthreads_internal_condition libcthreads_internal_condition_t;
 
-struct libcthreads_internal_mutex
+struct libcthreads_internal_condition
 {
 #if defined( WINAPI )
-	/* The critical section
+	/* The condition handle
 	 */
-	CRITICAL_SECTION critical_section;
+	HANDLE condition;
 
 #elif defined( HAVE_PTHREAD_H )
-	/* The mutex
+	/* The condition
 	 */
-	pthread_mutex_t mutex;
+	pthread_cond_t condition;
 
 #else
-#error Missing mutex type
+#error Missing condition type
 #endif
 };
 
 LIBCTHREADS_EXTERN \
-int libcthreads_mutex_initialize(
-     libcthreads_mutex_t **mutex,
+int libcthreads_condition_initialize(
+     libcthreads_condition_t **condition,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
-int libcthreads_mutex_free(
-     libcthreads_mutex_t **mutex,
+int libcthreads_condition_free(
+     libcthreads_condition_t **condition,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
-int libcthreads_mutex_grab(
-     libcthreads_mutex_t *mutex,
+int libcthreads_condition_signal(
+     libcthreads_condition_t *condition,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
-int libcthreads_mutex_release(
+int libcthreads_condition_wait(
+     libcthreads_condition_t *condition,
      libcthreads_mutex_t *mutex,
      libcerror_error_t **error );
 

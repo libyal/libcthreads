@@ -140,6 +140,36 @@ int libcthreads_thread_attributes_free(
  * Repeating thread functions
  * ------------------------------------------------------------------------- */
 
+/* Creates a repeating thread
+ * Make sure the value repeating_thread is referencing, is set to NULL
+ *
+ * The start_function should return 1 if successful and -1 on error
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_repeating_thread_create(
+     libcthreads_repeating_thread_t **repeating_thread,
+     const libcthreads_thread_attributes_t *thread_attributes,
+     int (*start_function)(
+            void *arguments ),
+     void *start_function_arguments,
+     libcthreads_error_t **error );
+
+/* TODO */
+LIBCTHREADS_EXTERN \
+int libcthreads_repeating_thread_push(
+     libcthreads_repeating_thread_t *repeating_thread,
+     libcthreads_error_t **error );
+
+/* Joins the current with a specified repeating thread
+ * The the thread is freed after join
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_repeating_thread_join(
+     libcthreads_repeating_thread_t **repeating_thread,
+     libcthreads_error_t **error );
+
 /* -------------------------------------------------------------------------
  * Thread pool functions
  * ------------------------------------------------------------------------- */
@@ -152,45 +182,62 @@ int libcthreads_thread_attributes_free(
  */
 
 /* -------------------------------------------------------------------------
- * Lock functions
+ * Condition functions
  * ------------------------------------------------------------------------- */
 
-/* Creates a lock
- * Make sure the value lock is referencing, is set to NULL
+/* Creates a condition
+ * Make sure the value condition is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 LIBCTHREADS_EXTERN \
-int libcthreads_lock_initialize(
-     libcthreads_lock_t **lock,
+int libcthreads_condition_initialize(
+     libcthreads_condition_t **condition,
      libcthreads_error_t **error );
 
-/* Frees a lock
+/* Frees a condition
  * Returns 1 if successful or -1 on error
  */
 LIBCTHREADS_EXTERN \
-int libcthreads_lock_free(
-     libcthreads_lock_t **lock,
-     libcthreads_error_t **error );
-
-/* Grabs a lock
- * Returns 1 if successful or -1 on error
- */
-LIBCTHREADS_EXTERN \
-int libcthreads_lock_grab(
-     const libcthreads_lock_t *lock,
-     libcthreads_error_t **error );
-
-/* Releases a lock
- * Returns 1 if successful or -1 on error
- */
-LIBCTHREADS_EXTERN \
-int libcthreads_lock_release(
-     const libcthreads_lock_t *lock,
+int libcthreads_condition_free(
+     libcthreads_condition_t **condition,
      libcthreads_error_t **error );
 
 /* -------------------------------------------------------------------------
  * Mutex functions
  * ------------------------------------------------------------------------- */
+
+/* Creates a mutex
+ * Make sure the value mutex is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_mutex_initialize(
+     libcthreads_mutex_t **mutex,
+     libcthreads_error_t **error );
+
+/* Frees a mutex
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_mutex_free(
+     libcthreads_mutex_t **mutex,
+     libcthreads_error_t **error );
+
+/* Grabs a mutex
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_mutex_grab(
+     libcthreads_mutex_t *mutex,
+     libcthreads_error_t **error );
+
+/* Releases a mutex
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_mutex_release(
+     libcthreads_mutex_t *mutex,
+     libcthreads_error_t **error );
 
 /* -------------------------------------------------------------------------
  * Read/Write locks functions
@@ -218,7 +265,7 @@ int libcthreads_read_write_lock_free(
  */
 LIBCTHREADS_EXTERN \
 int libcthreads_read_write_lock_grab_for_read(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcthreads_error_t **error );
 
 /* Grabs a read/write lock for writing
@@ -226,7 +273,7 @@ int libcthreads_read_write_lock_grab_for_read(
  */
 LIBCTHREADS_EXTERN \
 int libcthreads_read_write_lock_grab_for_write(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcthreads_error_t **error );
 
 /* Releases a read/write lock for reading
@@ -234,7 +281,7 @@ int libcthreads_read_write_lock_grab_for_write(
  */
 LIBCTHREADS_EXTERN \
 int libcthreads_read_write_lock_release_for_read(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcthreads_error_t **error );
 
 /* Releases a read/write lock for writing
@@ -242,7 +289,7 @@ int libcthreads_read_write_lock_release_for_read(
  */
 LIBCTHREADS_EXTERN \
 int libcthreads_read_write_lock_release_for_write(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcthreads_error_t **error );
 
 #if defined( __cplusplus )

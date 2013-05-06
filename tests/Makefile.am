@@ -6,32 +6,35 @@ AM_CPPFLAGS = \
 
 TESTS = \
 	test_thread.sh \
-	test_lock.sh \
-	test_mutex.sh \
-	test_read_write_lock.sh
-
-check_SCRIPTS = \
-	test_lock.sh \
 	test_mutex.sh \
 	test_read_write_lock.sh \
+	test_condition.sh \
+	test_repeating_thread.sh
+
+check_SCRIPTS = \
+	test_condition.sh \
+	test_mutex.sh \
+	test_read_write_lock.sh \
+	test_repeating_thread.sh \
 	test_thread.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
-	cthreads_test_lock \
+	cthreads_test_condition \
 	cthreads_test_mutex \
 	cthreads_test_read_write_lock \
+	cthreads_test_repeating_thread \
 	cthreads_test_thread
 
-cthreads_test_lock_SOURCES = \
+cthreads_test_condition_SOURCES = \
 	cthreads_test_libcerror.h \
 	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
-	cthreads_test_lock.c
+	cthreads_test_condition.c
 
-cthreads_test_lock_LDADD = \
+cthreads_test_condition_LDADD = \
 	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	../libcthreads/libcthreads.la
@@ -54,6 +57,17 @@ cthreads_test_read_write_lock_SOURCES = \
 	cthreads_test_read_write_lock.c
 
 cthreads_test_read_write_lock_LDADD = \
+	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	../libcthreads/libcthreads.la
+
+cthreads_test_repeating_thread_SOURCES = \
+	cthreads_test_libcerror.h \
+	cthreads_test_libcthreads.h \
+	cthreads_test_libcstring.h \
+	cthreads_test_repeating_thread.c
+
+cthreads_test_repeating_thread_LDADD = \
 	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	../libcthreads/libcthreads.la

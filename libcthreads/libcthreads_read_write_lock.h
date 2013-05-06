@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCTHREADS_READ_WRITE_LOCK_H )
-#define _LIBCTHREADS_READ_WRITE_LOCK_H
+#if !defined( _LIBCTHREADS_INTERNAL_READ_WRITE_LOCK_H )
+#define _LIBCTHREADS_INTERNAL_READ_WRITE_LOCK_H
 
 #include <common.h>
 #include <types.h>
@@ -94,22 +94,22 @@ int libcthreads_read_write_lock_free(
 
 LIBCTHREADS_EXTERN \
 int libcthreads_read_write_lock_grab_for_read(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
 int libcthreads_read_write_lock_grab_for_write(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
 int libcthreads_read_write_lock_release_for_read(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
 int libcthreads_read_write_lock_release_for_write(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -1,5 +1,5 @@
 /*
- * Thread functions
+ * Repeating thread functions
  *
  * Copyright (C) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCTHREADS_INTERNAL_THREAD_H )
-#define _LIBCTHREADS_INTERNAL_THREAD_H
+#if !defined( _LIBCTHREADS_INTERNAL_REPEATING_THREAD_H )
+#define _LIBCTHREADS_INTERNAL_REPEATING_THREAD_H
 
 #include <common.h>
 #include <types.h>
@@ -37,9 +37,14 @@
 extern "C" {
 #endif
 
-typedef struct libcthreads_internal_thread libcthreads_internal_thread_t;
+enum LIBCTHREADS_STATUS
+{
+	LIBCTHREADS_STATUS_EXIT		= 1
+};
 
-struct libcthreads_internal_thread
+typedef struct libcthreads_internal_repeating_thread libcthreads_internal_repeating_thread_t;
+
+struct libcthreads_internal_repeating_thread
 {
 #if defined( WINAPI )
 	/* The thread handle
@@ -70,11 +75,27 @@ struct libcthreads_internal_thread
 	/* The start function arguments
 	 */
 	void *start_function_arguments;
+
+	/* The running mutex
+	 */
+	libcthreads_mutex_t *running_mutex;
+
+	/* The idle mutex
+	 */
+	libcthreads_mutex_t *idle_mutex;
+
+	/* The idle condition
+	 */
+	libcthreads_condition_t *idle_condition;
+
+	/* The status
+	 */
+	uint8_t status;
 };
 
 LIBCTHREADS_EXTERN \
-int libcthreads_thread_create(
-     libcthreads_thread_t **thread,
+int libcthreads_repeating_thread_create(
+     libcthreads_repeating_thread_t **repeating_thread,
      const libcthreads_thread_attributes_t *thread_attributes,
      int (*start_function)(
             void *arguments ),
@@ -82,8 +103,13 @@ int libcthreads_thread_create(
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
-int libcthreads_thread_join(
-     libcthreads_thread_t **thread,
+int libcthreads_repeating_thread_push(
+     libcthreads_repeating_thread_t *repeating_thread,
+     libcerror_error_t **error );
+
+LIBCTHREADS_EXTERN \
+int libcthreads_repeating_thread_join(
+     libcthreads_repeating_thread_t **repeating_thread,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

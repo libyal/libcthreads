@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCTHREADS_THREAD_POOL_H )
-#define _LIBCTHREADS_THREAD_POOL_H
+#if !defined( _LIBCTHREADS_INTERNAL_THREAD_POOL_H )
+#define _LIBCTHREADS_INTERNAL_THREAD_POOL_H
 
 #include <common.h>
 #include <types.h>

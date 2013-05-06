@@ -1,5 +1,5 @@
 /*
- * Lock functions
+ * Queue functions
  *
  * Copyright (C) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,61 +19,52 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCTHREADS_LOCK_H )
-#define _LIBCTHREADS_LOCK_H
+#if !defined( _LIBCTHREADS_QUEUE_H )
+#define _LIBCTHREADS_QUEUE_H
 
 #include <common.h>
 #include <types.h>
 
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-#include <pthread.h>
-#endif
-
-#include "libcthreads_extern.h"
 #include "libcthreads_libcerror.h"
-#include "libcthreads_types.h"
+#include "libcthreads_queue_element.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libcthreads_internal_lock libcthreads_internal_lock_t;
+typedef struct libcthreads_queue libcthreads_queue_t;
 
-struct libcthreads_internal_lock
+struct libcthreads_queue
 {
-#if defined( WINAPI )
-	/* The critical section
+	/* The number of elements
 	 */
-	CRITICAL_SECTION critical_section;
+	int number_of_elements;
 
-#elif defined( HAVE_PTHREAD_H )
-	/* The mutex
+	/* The first (queue) element
 	 */
-	pthread_mutex_t mutex;
+	libcthreads_queue_element_t *first_element;
 
-#else
-#error Missing lock type
-#endif
+	/* The last (queue) element
+	 */
+	libcthreads_queue_element_t *last_element;
 };
 
-LIBCTHREADS_EXTERN \
-int libcthreads_lock_initialize(
-     libcthreads_lock_t **lock,
+int libcthreads_queue_initialize(
+     libcthreads_queue_t **queue,
      libcerror_error_t **error );
 
-LIBCTHREADS_EXTERN \
-int libcthreads_lock_free(
-     libcthreads_lock_t **lock,
+int libcthreads_queue_free(
+     libcthreads_queue_t **queue,
      libcerror_error_t **error );
 
-LIBCTHREADS_EXTERN \
-int libcthreads_lock_grab(
-     const libcthreads_lock_t *lock,
+int libcthreads_queue_pop(
+     libcthreads_queue_t *queue,
+     intptr_t **value,
      libcerror_error_t **error );
 
-LIBCTHREADS_EXTERN \
-int libcthreads_lock_release(
-     const libcthreads_lock_t *lock,
+int libcthreads_queue_push(
+     libcthreads_queue_t *queue,
+     intptr_t *value,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

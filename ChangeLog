@@ -1,9 +1,18 @@
 TODO
+* add WINAPI condition equivalent
+* have local library be dependent on HAVE_MULTI_THREAD_SUPPORT
 * add macros for locking ? or have fallback dummy locks ?
-* lock add try grab function
-* read/write lock add try grab functions
+* add try grab function
+  - lock
+  - mutex
+  - read/write
 * update man pages
 * add glib support
+
+20130506
+* worked on condition
+* worked on repeating thread
+* removed lock in favor of mutex
 
 20130505
 * worked on thread

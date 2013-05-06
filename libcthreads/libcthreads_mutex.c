@@ -25,10 +25,6 @@
 
 #include <errno.h>
 
-#if defined( WINAPI ) && ( WINVER >= 0x0602 )
-#include <Synchapi.h>
-#endif
-
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 #include <pthread.h>
 #endif
@@ -103,29 +99,12 @@ int libcthreads_mutex_initialize(
 		goto on_error;
 	}
 #if defined( WINAPI )
-	internal_mutex->mutex_handle = CreateMutex(
-	                                NULL,
-	                                FALSE,
-	                                NULL );
-
-	if( internal_read_write_lock->mutex_handle == NULL )
-	{
-		error_code = GetLastError();
-
-		libcerror_system_set_error(
-		 error,
-		 error_code,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize mutex handle.",
-		 function );
-
-		goto on_error;
-	}
+	InitializeCriticalSection(
+	 &( internal_mutex->critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_mutex_init(
-		          &( internal_mutex->mutex ),
+	                  &( internal_mutex->mutex ),
 	                  NULL );
 
 	if( pthread_result != 0 )
@@ -186,21 +165,8 @@ int libcthreads_mutex_free(
 		*mutex         = NULL;
 
 #if defined( WINAPI )
-		if( CloseHandle(
-		     internal_read_write_lock->mutex_handle ) == 0 )
-		{
-			error_code = GetLastError();
-
-			libcerror_system_set_error(
-			 error,
-			 error_code,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free mutex handle.",
-			 function );
-
-			result = -1;
-		}
+		DeleteCriticalSection(
+		 &( internal_mutex->critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
 		pthread_result = pthread_mutex_destroy(
@@ -244,7 +210,7 @@ int libcthreads_mutex_free(
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_mutex_grab(
-     const libcthreads_mutex_t *mutex,
+     libcthreads_mutex_t *mutex,
      libcerror_error_t **error )
 {
 	libcthreads_internal_mutex_t *internal_mutex = NULL;
@@ -268,24 +234,8 @@ int libcthreads_mutex_grab(
 	internal_mutex = (libcthreads_internal_mutex_t *) mutex;
 
 #if defined( WINAPI )
-	wait_status = WaitForSingleObject(
-	               internal_read_write_lock->mutex_handle,
-	               INFINITE );
-
-	if( wait_status == WAIT_FAILED )
-	{
-		error_code = GetLastError();
-
-		libcerror_system_set_error(
-		 error,
-		 error_code,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: wait for mutex handle failed.",
-		 function );
-
-		return( -1 );
-	}
+	EnterCriticalSection(
+	 &( internal_mutex->critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_mutex_lock(
@@ -311,16 +261,13 @@ int libcthreads_mutex_grab(
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_mutex_release(
-     const libcthreads_mutex_t *mutex,
+     libcthreads_mutex_t *mutex,
      libcerror_error_t **error )
 {
 	libcthreads_internal_mutex_t *internal_mutex = NULL;
 	static char *function                        = "libcthreads_mutex_release";
 
-#if defined( WINAPI )
-	BOOL release_result                          = 0;
-
-#elif defined( HAVE_PTHREAD_H )
+#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 	int pthread_result                           = 0;
 #endif
 
@@ -338,23 +285,8 @@ int libcthreads_mutex_release(
 	internal_mutex = (libcthreads_internal_mutex_t *) mutex;
 
 #if defined( WINAPI )
-	release_result = ReleaseMutex(
-	                  internal_read_write_lock->mutex_handle );
-
-	if( release_result == 0 )
-	{
-		error_code = GetLastError();
-
-		libcerror_system_set_error(
-		 error,
-		 error_code,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to relates mutex handle.",
-		 function );
-
-		return( -1 );
-	}
+	LeaveCriticalSection(
+	 &( internal_mutex->critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_mutex_unlock(

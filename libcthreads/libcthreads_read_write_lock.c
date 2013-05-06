@@ -275,7 +275,7 @@ int libcthreads_read_write_lock_free(
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_read_write_lock_grab_for_read(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcerror_error_t **error )
 {
 	libcthreads_internal_read_write_lock_t *internal_read_write_lock = NULL;
@@ -370,7 +370,7 @@ int libcthreads_read_write_lock_grab_for_read(
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_read_write_lock_grab_for_write(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcerror_error_t **error )
 {
 	libcthreads_internal_read_write_lock_t *internal_read_write_lock = NULL;
@@ -451,7 +451,7 @@ int libcthreads_read_write_lock_grab_for_write(
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_read_write_lock_release_for_read(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcerror_error_t **error )
 {
 	libcthreads_internal_read_write_lock_t *internal_read_write_lock = NULL;
@@ -540,7 +540,7 @@ int libcthreads_read_write_lock_release_for_read(
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_read_write_lock_release_for_write(
-     const libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_read_write_lock_t *read_write_lock,
      libcerror_error_t **error )
 {
 	libcthreads_internal_read_write_lock_t *internal_read_write_lock = NULL;

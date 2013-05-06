@@ -116,7 +116,7 @@ int cthreads_test_mutex_initialize(
 }
 
 libcthreads_mutex_t *cthreads_test_mutex = NULL;
-int cthreads_test_locked_value           = 0;
+int cthreads_test_mutexed_value          = 0;
 
 /* The thread1 start function
  * Returns 1 if successful or -1 on error
@@ -143,7 +143,7 @@ int cthreads_test_mutex_start_function1(
 
 		goto on_error;
 	}
-	cthreads_test_locked_value += 19;
+	cthreads_test_mutexed_value += 19;
 
 	result = libcthreads_mutex_release(
 		  cthreads_test_mutex,
@@ -200,7 +200,7 @@ int cthreads_test_mutex_start_function2(
 
 		goto on_error;
 	}
-	cthreads_test_locked_value += 38;
+	cthreads_test_mutexed_value += 38;
 
 	result = libcthreads_mutex_release(
 		  cthreads_test_mutex,
@@ -232,16 +232,16 @@ on_error:
 	return( -1 );
 }
 
-/* Tests thread mutex locking
+/* Tests thread mutex mutexing
  * Returns 1 if successful or -1 on error
  */
-int cthreads_test_mutex_locking(
+int cthreads_test_mutex_mutexing(
      void )
 {
 	libcerror_error_t *error      = NULL;
 	libcthreads_thread_t *thread1 = NULL;
 	libcthreads_thread_t *thread2 = NULL;
-	static char *function         = "cthreads_test_mutex_locking";
+	static char *function         = "cthreads_test_mutex_mutexing";
 	int result                    = 0;
 
 	if( libcthreads_mutex_initialize(
@@ -322,7 +322,7 @@ int cthreads_test_mutex_locking(
 
 			goto on_error;
 		}
-		cthreads_test_locked_value = 46;
+		cthreads_test_mutexed_value = 46;
 
 		fprintf(
 		 stdout,
@@ -407,9 +407,9 @@ int cthreads_test_mutex_locking(
 	}
 	fprintf(
 	 stdout,
-	 "Testing locked value\t" );
+	 "Testing mutexed value\t" );
 
-	if( cthreads_test_locked_value != ( 46 + 19 + 38 ) )
+	if( cthreads_test_mutexed_value != ( 46 + 19 + 38 ) )
 	{
 		fprintf(
 		 stdout,
@@ -493,13 +493,13 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	/* Test: locking
+	/* Test: mutexing
 	 */
-	if( cthreads_test_mutex_locking() != 1 )
+	if( cthreads_test_mutex_mutexing() != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test locking.\n" );
+		 "Unable to test mutexing.\n" );
 
 		return( EXIT_FAILURE );
 	}

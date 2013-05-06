@@ -98,10 +98,12 @@ stamp-h1
 /include/libcthreads/types.h
 /libcthreads/libcthreads.rc
 /libcthreads/libcthreads_definitions.h
-/tests/cthreads_test_lock
+/tests/cthreads_test_condition
 /tests/cthreads_test_mutex
 /tests/cthreads_test_read_write_lock
+/tests/cthreads_test_repeating_thread
 /tests/cthreads_test_thread
+/tests/cthreads_test_thread_pool
 
 # Local library dependencies specific files
 /libcerror
