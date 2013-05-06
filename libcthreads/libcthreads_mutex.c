@@ -23,6 +23,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <errno.h>
+
 #if defined( WINAPI ) && ( WINVER >= 0x0602 )
 #include <Synchapi.h>
 #endif
@@ -47,7 +49,7 @@ int libcthreads_mutex_initialize(
 	static char *function                        = "libcthreads_mutex_initialize";
 
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-	int result                                   = 0;
+	int pthread_result                           = 0;
 #endif
 
 	if( mutex == NULL )
@@ -120,16 +122,17 @@ int libcthreads_mutex_initialize(
 
 		goto on_error;
 	}
-#elif defined( HAVE_PTHREAD_H )
-	result = pthread_mutex_init(
-		  &( internal_mutex->mutex ),
-	          NULL );
 
-	if( result != 0 )
+#elif defined( HAVE_PTHREAD_H )
+	pthread_result = pthread_mutex_init(
+		          &( internal_mutex->mutex ),
+	                  NULL );
+
+	if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,
-		 result,
+		 pthread_result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize mutex.",
@@ -161,6 +164,10 @@ int libcthreads_mutex_free(
 	libcthreads_internal_mutex_t *internal_mutex = NULL;
 	static char *function                        = "libcthreads_mutex_free";
 	int result                                   = 1;
+
+#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+	int pthread_result                           = 0;
+#endif
 
 	if( mutex == NULL )
 	{
@@ -196,24 +203,35 @@ int libcthreads_mutex_free(
 		}
 
 #elif defined( HAVE_PTHREAD_H )
-		result = pthread_mutex_destroy(
-		          &( internal_mutex->mutex ) );
+		pthread_result = pthread_mutex_destroy(
+		                  &( internal_mutex->mutex ) );
 
-		if( result != 0 )
+		if( pthread_result != 0 )
 		{
-			libcerror_system_set_error(
-			 error,
-			 result,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to destroy mutex.",
-			 function );
+			switch( pthread_result )
+			{
+				case EBUSY:
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to destroy mutex with error: Resource busy.",
+					 function );
 
+					break;
+
+				default:
+					libcerror_system_set_error(
+					 error,
+					 pthread_result,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to destroy mutex.",
+					 function );
+
+					break;
+			}
 			result = -1;
-		}
-		else
-		{
-			result = 1;
 		}
 #endif
 		memory_free(
@@ -233,7 +251,7 @@ int libcthreads_mutex_grab(
 	static char *function                        = "libcthreads_mutex_grab";
 
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-	int result                                 = 0;
+	int pthread_result                           = 0;
 #endif
 
 	if( mutex == NULL )
@@ -270,14 +288,14 @@ int libcthreads_mutex_grab(
 	}
 
 #elif defined( HAVE_PTHREAD_H )
-	result = pthread_mutex_lock(
-	          &( internal_mutex->mutex ) );
+	pthread_result = pthread_mutex_lock(
+	                  &( internal_mutex->mutex ) );
 
-	if( result != 0 )
+	if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,
-		 result,
+		 pthread_result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to lock mutex.",
@@ -300,10 +318,10 @@ int libcthreads_mutex_release(
 	static char *function                        = "libcthreads_mutex_release";
 
 #if defined( WINAPI )
-	BOOL result                                  = 0;
+	BOOL release_result                          = 0;
 
 #elif defined( HAVE_PTHREAD_H )
-	int result                                   = 0;
+	int pthread_result                           = 0;
 #endif
 
 	if( mutex == NULL )
@@ -320,10 +338,10 @@ int libcthreads_mutex_release(
 	internal_mutex = (libcthreads_internal_mutex_t *) mutex;
 
 #if defined( WINAPI )
-	result = ReleaseMutex(
-	          internal_read_write_lock->mutex_handle );
+	release_result = ReleaseMutex(
+	                  internal_read_write_lock->mutex_handle );
 
-	if( result == 0 )
+	if( release_result == 0 )
 	{
 		error_code = GetLastError();
 
@@ -339,14 +357,14 @@ int libcthreads_mutex_release(
 	}
 
 #elif defined( HAVE_PTHREAD_H )
-	result = pthread_mutex_unlock(
-	          &( internal_mutex->mutex ) );
+	pthread_result = pthread_mutex_unlock(
+	                  &( internal_mutex->mutex ) );
 
-	if( result != 0 )
+	if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,
-		 result,
+		 pthread_result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to unlock mutex.",

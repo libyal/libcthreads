@@ -51,7 +51,7 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_lock ${FILENAME};
+if ! test_lock;
 then
 	exit ${EXIT_FAILURE};
 fi

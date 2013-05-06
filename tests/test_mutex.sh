@@ -51,7 +51,7 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_mutex ${FILENAME};
+if ! test_mutex;
 then
 	exit ${EXIT_FAILURE};
 fi

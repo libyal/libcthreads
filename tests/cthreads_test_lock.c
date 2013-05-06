@@ -290,14 +290,12 @@ int cthreads_test_lock_locking(
 
 	if( result == 1 )
 	{
-		result = libcthreads_thread_create(
-			  &thread1,
-			  NULL,
-			  cthreads_test_lock_start_function1,
-			  NULL,
-			  &error );
-
-		if( result == -1 )
+		if( libcthreads_thread_create(
+		     &thread1,
+		     NULL,
+		     cthreads_test_lock_start_function1,
+		     NULL,
+		     &error ) != 1 )
 		{
 			libcerror_error_set(
 			 &error,
@@ -308,14 +306,12 @@ int cthreads_test_lock_locking(
 
 			goto on_error;
 		}
-		result = libcthreads_thread_create(
-			  &thread2,
-			  NULL,
-			  cthreads_test_lock_start_function2,
-			  NULL,
-			  &error );
-
-		if( result == -1 )
+		if( libcthreads_thread_create(
+		     &thread2,
+		     NULL,
+		     cthreads_test_lock_start_function2,
+		     NULL,
+		     &error ) != 1 )
 		{
 			libcerror_error_set(
 			 &error,

@@ -51,7 +51,7 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_thread ${FILENAME};
+if ! test_thread;
 then
 	exit ${EXIT_FAILURE};
 fi

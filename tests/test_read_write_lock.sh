@@ -51,7 +51,7 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_read_write_lock ${FILENAME};
+if ! test_read_write_lock;
 then
 	exit ${EXIT_FAILURE};
 fi

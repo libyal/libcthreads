@@ -23,6 +23,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <errno.h>
+
 #if defined( WINAPI ) && ( WINVER >= 0x0602 )
 #include <Synchapi.h>
 #endif
@@ -48,9 +50,9 @@ int libcthreads_read_write_lock_initialize(
 
 #if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
-#endif
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-	int result                                                       = 0;
+
+#elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+	int pthread_result                                               = 0;
 #endif
 
 	if( read_write_lock == NULL )
@@ -138,15 +140,15 @@ int libcthreads_read_write_lock_initialize(
 		goto on_error;
 	}
 #elif defined( HAVE_PTHREAD_H )
-	result = pthread_rwlock_init(
-		  &( internal_read_write_lock->read_write_lock ),
-	          NULL );
+	pthread_result = pthread_rwlock_init(
+		          &( internal_read_write_lock->read_write_lock ),
+	                  NULL );
 
-	if( result != 0 )
+	if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,
-		 result,
+		 pthread_result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize read/write lock.",
@@ -188,7 +190,9 @@ int libcthreads_read_write_lock_free(
 
 #if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
-	DWORD wait_status                                                = 0;
+
+#elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+	int pthread_result                                               = 0;
 #endif
 
 	if( read_write_lock == NULL )
@@ -208,24 +212,6 @@ int libcthreads_read_write_lock_free(
 		*read_write_lock         = NULL;
 
 #if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
-		wait_status = WaitForSingleObject(
-		               internal_read_write_lock->no_read_event_handle,
-		               INFINITE );
-
-		if( wait_status == WAIT_FAILED )
-		{
-			error_code = GetLastError();
-
-			libcerror_system_set_error(
-			 error,
-			 error_code,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: wait for no read event handle failed.",
-			 function );
-
-			result = -1;
-		}
 		if( CloseHandle(
 		     internal_read_write_lock->no_read_event_handle ) == 0 )
 		{
@@ -248,24 +234,35 @@ int libcthreads_read_write_lock_free(
 		 &( internal_read_write_lock->write_critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
-		result = pthread_rwlock_destroy(
-		          &( internal_read_write_lock->read_write_lock ) );
+		pthread_result = pthread_rwlock_destroy(
+		                  &( internal_read_write_lock->read_write_lock ) );
 
-		if( result != 0 )
+		if( pthread_result != 0 )
 		{
-			libcerror_system_set_error(
-			 error,
-			 result,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to destroy read/write lock.",
-			 function );
+			switch( pthread_result )
+			{
+				case EBUSY:
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to destroy read/write lock with error: Resource busy.",
+					 function );
 
+					break;
+
+				default:
+					libcerror_system_set_error(
+					 error,
+					 pthread_result,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to destroy read/write lock.",
+					 function );
+
+					break;
+			}
 			result = -1;
-		}
-		else
-		{
-			result = 1;
 		}
 #endif
 		memory_free(
@@ -286,10 +283,10 @@ int libcthreads_read_write_lock_grab_for_read(
 
 #if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
-	DWORD result                                                     = 1;
-#endif
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-	int result                                                       = 0;
+	DWORD release_result                                             = 1;
+
+#elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+	int pthread_result                                               = 0;
 #endif
 
 	if( read_write_lock == NULL )
@@ -320,10 +317,10 @@ int libcthreads_read_write_lock_grab_for_read(
 
 	if( internal_read_write_lock->number_of_readers == 1 )
 	{
-		result = ResetEvent(
-		          internal_read_write_lock->no_read_event_handle );
+		release_result = ResetEvent(
+		                  internal_read_write_lock->no_read_event_handle );
 
-		if( result == 0 )
+		if( release_result == 0 )
 		{
 			error_code = GetLastError();
 
@@ -336,7 +333,7 @@ int libcthreads_read_write_lock_grab_for_read(
 	LeaveCriticalSection(
 	 &( internal_read_write_lock->write_critical_section ) );
 
-	if( result == 0 )
+	if( release_result == 0 )
 	{
 		libcerror_system_set_error(
 		 error,
@@ -348,15 +345,16 @@ int libcthreads_read_write_lock_grab_for_read(
 
 		return( -1 );
 	}
-#elif defined( HAVE_PTHREAD_H )
-	result = pthread_rwlock_rdlock(
-	          &( internal_read_write_lock->read_write_lock ) );
 
-	if( result != 0 )
+#elif defined( HAVE_PTHREAD_H )
+	pthread_result = pthread_rwlock_rdlock(
+	                  &( internal_read_write_lock->read_write_lock ) );
+
+	if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,
-		 result,
+		 pthread_result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to lock read/write lock for read.",
@@ -381,10 +379,9 @@ int libcthreads_read_write_lock_grab_for_write(
 #if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
 	DWORD wait_status                                                = 0;
-#endif
 
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-	int result                                                       = 0;
+#elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+	int pthread_result                                               = 0;
 #endif
 
 	if( read_write_lock == NULL )
@@ -429,15 +426,16 @@ int libcthreads_read_write_lock_grab_for_write(
 
 		return( -1 );
 	}
-#elif defined( HAVE_PTHREAD_H )
-	result = pthread_rwlock_wrlock(
-	          &( internal_read_write_lock->read_write_lock ) );
 
-	if( result != 0 )
+#elif defined( HAVE_PTHREAD_H )
+	pthread_result = pthread_rwlock_wrlock(
+	                  &( internal_read_write_lock->read_write_lock ) );
+
+	if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,
-		 result,
+		 pthread_result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to lock read/write lock for write.",
@@ -461,10 +459,10 @@ int libcthreads_read_write_lock_release_for_read(
 
 #if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
-	DWORD result                                                     = 1;
-#endif
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-	int result                                                       = 0;
+	DWORD release_result                                             = 0;
+
+#elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+	int pthread_result                                               = 0;
 #endif
 
 	if( read_write_lock == NULL )
@@ -492,10 +490,10 @@ int libcthreads_read_write_lock_release_for_read(
 
 	if( internal_read_write_lock->number_of_readers == 0 )
 	{
-		result = SetEvent(
-		          internal_read_write_lock->no_read_event_handle );
+		release_result = SetEvent(
+		                  internal_read_write_lock->no_read_event_handle );
 
-		if( result == 0 )
+		if( release_result == 0 )
 		{
 			error_code = GetLastError();
 
@@ -505,7 +503,7 @@ int libcthreads_read_write_lock_release_for_read(
 	LeaveCriticalSection(
 	 &( internal_read_write_lock->read_critical_section ) );
 
-	if( result == 0 )
+	if( release_result == 0 )
 	{
 		libcerror_system_set_error(
 		 error,
@@ -517,15 +515,16 @@ int libcthreads_read_write_lock_release_for_read(
 
 		return( -1 );
 	}
-#elif defined( HAVE_PTHREAD_H )
-	result = pthread_rwlock_unlock(
-	          &( internal_read_write_lock->read_write_lock ) );
 
-	if( result != 0 )
+#elif defined( HAVE_PTHREAD_H )
+	pthread_result = pthread_rwlock_unlock(
+	                  &( internal_read_write_lock->read_write_lock ) );
+
+	if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,
-		 result,
+		 pthread_result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to unlock read/write lock.",
@@ -548,7 +547,7 @@ int libcthreads_read_write_lock_release_for_write(
 	static char *function                                            = "libcthreads_read_write_lock_release_for_write";
 
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-	int result                                                       = 0;
+	int pthread_result                                               = 0;
 #endif
 
 	if( read_write_lock == NULL )
@@ -573,14 +572,14 @@ int libcthreads_read_write_lock_release_for_write(
 	 &( internal_read_write_lock->write_critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
-	result = pthread_rwlock_unlock(
-	          &( internal_read_write_lock->read_write_lock ) );
+	pthread_result = pthread_rwlock_unlock(
+	                  &( internal_read_write_lock->read_write_lock ) );
 
-	if( result != 0 )
+	if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,
-		 result,
+		 pthread_result,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to unlock read/write lock.",
