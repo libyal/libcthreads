@@ -1,5 +1,5 @@
 /*
- * Mutex functions
+ * Lock functions
  *
  * Copyright (C) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,107 +25,86 @@
 
 #include <errno.h>
 
-#if defined( WINAPI ) && ( WINVER >= 0x0602 )
-#include <Synchapi.h>
-#endif
-
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 #include <pthread.h>
 #endif
 
 #include "libcthreads_libcerror.h"
-#include "libcthreads_mutex.h"
+#include "libcthreads_lock.h"
 #include "libcthreads_types.h"
 
-/* Creates a mutex
- * Make sure the value mutex is referencing, is set to NULL
+/* Creates a lock
+ * Make sure the value lock is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
-int libcthreads_mutex_initialize(
-     libcthreads_mutex_t **mutex,
+int libcthreads_lock_initialize(
+     libcthreads_lock_t **lock,
      libcerror_error_t **error )
 {
-	libcthreads_internal_mutex_t *internal_mutex = NULL;
-	static char *function                        = "libcthreads_mutex_initialize";
+	libcthreads_internal_lock_t *internal_lock = NULL;
+	static char *function                      = "libcthreads_lock_initialize";
 
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-	int pthread_result                           = 0;
+	int pthread_result                         = 0;
 #endif
 
-	if( mutex == NULL )
+	if( lock == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mutex.",
+		 "%s: invalid lock.",
 		 function );
 
 		return( -1 );
 	}
-	if( *mutex != NULL )
+	if( *lock != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid mutex value already set.",
+		 "%s: invalid lock value already set.",
 		 function );
 
 		return( -1 );
 	}
-	internal_mutex = memory_allocate_structure(
-	                  libcthreads_internal_mutex_t );
+	internal_lock = memory_allocate_structure(
+	                 libcthreads_internal_lock_t );
 
-	if( internal_mutex == NULL )
+	if( internal_lock == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create mutex.",
+		 "%s: unable to create lock.",
 		 function );
 
 		goto on_error;
 	}
 	if( memory_set(
-	     internal_mutex,
+	     internal_lock,
 	     0,
-	     sizeof( libcthreads_internal_mutex_t ) ) == NULL )
+	     sizeof( libcthreads_internal_lock_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear mutex.",
+		 "%s: unable to clear lock.",
 		 function );
 
 		goto on_error;
 	}
 #if defined( WINAPI )
-	internal_mutex->mutex_handle = CreateMutex(
-	                                NULL,
-	                                FALSE,
-	                                NULL );
-
-	if( internal_read_write_lock->mutex_handle == NULL )
-	{
-		error_code = GetLastError();
-
-		libcerror_system_set_error(
-		 error,
-		 error_code,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize mutex handle.",
-		 function );
-
-		goto on_error;
-	}
+	InitializeCriticalSection(
+	 &( internal_lock->critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_mutex_init(
-	                  &( internal_mutex->mutex ),
+	                  &( internal_lock->mutex ),
 	                  NULL );
 
 	if( pthread_result != 0 )
@@ -141,70 +120,57 @@ int libcthreads_mutex_initialize(
 		goto on_error;
 	}
 #endif
-	*mutex = (libcthreads_mutex_t *) internal_mutex;
+	*lock = (libcthreads_lock_t *) internal_lock;
 
 	return( 1 );
 
 on_error:
-	if( internal_mutex != NULL )
+	if( internal_lock != NULL )
 	{
 		memory_free(
-		 internal_mutex );
+		 internal_lock );
 	}
 	return( -1 );
 }
 
-/* Frees a mutex
+/* Frees a lock
  * Returns 1 if successful or -1 on error
  */
-int libcthreads_mutex_free(
-     libcthreads_mutex_t **mutex,
+int libcthreads_lock_free(
+     libcthreads_lock_t **lock,
      libcerror_error_t **error )
 {
-	libcthreads_internal_mutex_t *internal_mutex = NULL;
-	static char *function                        = "libcthreads_mutex_free";
-	int result                                   = 1;
+	libcthreads_internal_lock_t *internal_lock = NULL;
+	static char *function                      = "libcthreads_lock_free";
+	int result                                 = 1;
 
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
-	int pthread_result                           = 0;
+	int pthread_result                         = 0;
 #endif
 
-	if( mutex == NULL )
+	if( lock == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mutex.",
+		 "%s: invalid lock.",
 		 function );
 
 		return( -1 );
 	}
-	if( *mutex != NULL )
+	if( *lock != NULL )
 	{
-		internal_mutex = (libcthreads_internal_mutex_t *) *mutex;
-		*mutex         = NULL;
+		internal_lock = (libcthreads_internal_lock_t *) *lock;
+		*lock         = NULL;
 
 #if defined( WINAPI )
-		if( CloseHandle(
-		     internal_read_write_lock->mutex_handle ) == 0 )
-		{
-			error_code = GetLastError();
-
-			libcerror_system_set_error(
-			 error,
-			 error_code,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free mutex handle.",
-			 function );
-
-			result = -1;
-		}
+		DeleteCriticalSection(
+		 &( internal_lock->critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
 		pthread_result = pthread_mutex_destroy(
-		                  &( internal_mutex->mutex ) );
+		                  &( internal_lock->mutex ) );
 
 		if( pthread_result != 0 )
 		{
@@ -235,64 +201,45 @@ int libcthreads_mutex_free(
 		}
 #endif
 		memory_free(
-		 internal_mutex );
+		 internal_lock );
 	}
 	return( result );
 }
 
-/* Grabs a mutex
+/* Grabs a lock
  * Returns 1 if successful or -1 on error
  */
-int libcthreads_mutex_grab(
-     libcthreads_mutex_t *mutex,
+int libcthreads_lock_grab(
+     const libcthreads_lock_t *lock,
      libcerror_error_t **error )
 {
-	libcthreads_internal_mutex_t *internal_mutex = NULL;
-	static char *function                        = "libcthreads_mutex_grab";
+	libcthreads_internal_lock_t *internal_lock = NULL;
+	static char *function                      = "libcthreads_lock_grab";
 
-#if defined( WINAPI )
-	DWORD wait_status                            = 0;
-
-#elif defined( HAVE_PTHREAD_H )
-	int pthread_result                           = 0;
+#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+	int pthread_result                         = 0;
 #endif
 
-	if( mutex == NULL )
+	if( lock == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mutex.",
+		 "%s: invalid lock.",
 		 function );
 
 		return( -1 );
 	}
-	internal_mutex = (libcthreads_internal_mutex_t *) mutex;
+	internal_lock = (libcthreads_internal_lock_t *) lock;
 
 #if defined( WINAPI )
-	wait_status = WaitForSingleObject(
-	               internal_read_write_lock->mutex_handle,
-	               INFINITE );
-
-	if( wait_status == WAIT_FAILED )
-	{
-		error_code = GetLastError();
-
-		libcerror_system_set_error(
-		 error,
-		 error_code,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: wait for mutex handle failed.",
-		 function );
-
-		return( -1 );
-	}
+	EnterCriticalSection(
+	 &( internal_lock->critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_mutex_lock(
-	                  &( internal_mutex->mutex ) );
+	                  &( internal_lock->mutex ) );
 
 	if( pthread_result != 0 )
 	{
@@ -310,58 +257,40 @@ int libcthreads_mutex_grab(
 	return( 1 );
 }
 
-/* Releases a mutex
+/* Releases a lock
  * Returns 1 if successful or -1 on error
  */
-int libcthreads_mutex_release(
-     libcthreads_mutex_t *mutex,
+int libcthreads_lock_release(
+     const libcthreads_lock_t *lock,
      libcerror_error_t **error )
 {
-	libcthreads_internal_mutex_t *internal_mutex = NULL;
-	static char *function                        = "libcthreads_mutex_release";
+	libcthreads_internal_lock_t *internal_lock = NULL;
+	static char *function                      = "libcthreads_lock_release";
 
-#if defined( WINAPI )
-	BOOL result                                  = 0;
-
-#elif defined( HAVE_PTHREAD_H )
-	int pthread_result                           = 0;
+#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+	int pthread_result                         = 0;
 #endif
 
-	if( mutex == NULL )
+	if( lock == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mutex.",
+		 "%s: invalid lock.",
 		 function );
 
 		return( -1 );
 	}
-	internal_mutex = (libcthreads_internal_mutex_t *) mutex;
+	internal_lock = (libcthreads_internal_lock_t *) lock;
 
 #if defined( WINAPI )
-	result = ReleaseMutex(
-	          internal_read_write_lock->mutex_handle );
-
-	if( result == 0 )
-	{
-		error_code = GetLastError();
-
-		libcerror_system_set_error(
-		 error,
-		 error_code,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to relates mutex handle.",
-		 function );
-
-		return( -1 );
-	}
+	LeaveCriticalSection(
+	 &( internal_lock->critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_mutex_unlock(
-	                  &( internal_mutex->mutex ) );
+	                  &( internal_lock->mutex ) );
 
 	if( pthread_result != 0 )
 	{

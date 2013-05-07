@@ -15,6 +15,7 @@ libcthreads_la_SOURCES = \
 	libcthreads_extern.h \
 	libcthreads_libcerror.h \
 	libcthreads_libcstring.h \
+	libcthreads_lock.c libcthreads_lock.h \
 	libcthreads_mutex.c libcthreads_mutex.h \
 	libcthreads_queue.c libcthreads_queue.h \
 	libcthreads_read_write_lock.c libcthreads_read_write_lock.h \

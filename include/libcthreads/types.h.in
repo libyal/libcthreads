@@ -202,6 +202,7 @@ typedef int64_t off64_t;
 /* The following type definitions hide internal data structures
  */
 typedef intptr_t libcthreads_condition_t;
+typedef intptr_t libcthreads_lock_t;
 typedef intptr_t libcthreads_mutex_t;
 typedef intptr_t libcthreads_queue_t;
 typedef intptr_t libcthreads_read_write_lock_t;

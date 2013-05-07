@@ -42,9 +42,9 @@ typedef struct libcthreads_internal_mutex libcthreads_internal_mutex_t;
 struct libcthreads_internal_mutex
 {
 #if defined( WINAPI )
-	/* The critical section
+	/* The mutex handle
 	 */
-	CRITICAL_SECTION critical_section;
+	HANDLE mutex_handle;
 
 #elif defined( HAVE_PTHREAD_H )
 	/* The mutex

@@ -283,7 +283,7 @@ int libcthreads_read_write_lock_grab_for_read(
 
 #if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
-	DWORD release_result                                             = 1;
+	BOOL result                                                      = 0;
 
 #elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 	int pthread_result                                               = 0;
@@ -317,10 +317,10 @@ int libcthreads_read_write_lock_grab_for_read(
 
 	if( internal_read_write_lock->number_of_readers == 1 )
 	{
-		release_result = ResetEvent(
-		                  internal_read_write_lock->no_read_event_handle );
+		result = ResetEvent(
+		          internal_read_write_lock->no_read_event_handle );
 
-		if( release_result == 0 )
+		if( result == 0 )
 		{
 			error_code = GetLastError();
 
@@ -333,7 +333,7 @@ int libcthreads_read_write_lock_grab_for_read(
 	LeaveCriticalSection(
 	 &( internal_read_write_lock->write_critical_section ) );
 
-	if( release_result == 0 )
+	if( result == 0 )
 	{
 		libcerror_system_set_error(
 		 error,
@@ -412,7 +412,12 @@ int libcthreads_read_write_lock_grab_for_write(
 	if( wait_status == WAIT_FAILED )
 	{
 		error_code = GetLastError();
+	}
+	LeaveCriticalSection(
+	 &( internal_read_write_lock->write_critical_section ) );
 
+	if( wait_status == WAIT_FAILED )
+	{
 		libcerror_system_set_error(
 		 error,
 		 error_code,
@@ -420,9 +425,6 @@ int libcthreads_read_write_lock_grab_for_write(
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: wait for no read event handle failed.",
 		 function );
-
-		LeaveCriticalSection(
-		 &( internal_read_write_lock->write_critical_section ) );
 
 		return( -1 );
 	}
@@ -459,7 +461,7 @@ int libcthreads_read_write_lock_release_for_read(
 
 #if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
-	DWORD release_result                                             = 0;
+	BOOL result                                                      = 0;
 
 #elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 	int pthread_result                                               = 0;
@@ -490,10 +492,10 @@ int libcthreads_read_write_lock_release_for_read(
 
 	if( internal_read_write_lock->number_of_readers == 0 )
 	{
-		release_result = SetEvent(
-		                  internal_read_write_lock->no_read_event_handle );
+		result = SetEvent(
+		          internal_read_write_lock->no_read_event_handle );
 
-		if( release_result == 0 )
+		if( result == 0 )
 		{
 			error_code = GetLastError();
 
@@ -503,7 +505,7 @@ int libcthreads_read_write_lock_release_for_read(
 	LeaveCriticalSection(
 	 &( internal_read_write_lock->read_critical_section ) );
 
-	if( release_result == 0 )
+	if( result == 0 )
 	{
 		libcerror_system_set_error(
 		 error,

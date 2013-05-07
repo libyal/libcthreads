@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20130503
+# Version: 20130507
 
 # Generic auto-generated build files
 *~
@@ -17,6 +17,7 @@
 *.Tpo
 .deps
 .libs
+INSTALL
 Makefile
 Makefile.in
 stamp-h1
@@ -89,6 +90,7 @@ stamp-h1
 /libcthreads.pc
 /libcthreads.spec
 /common/config.h
+/common/config.h.in
 /common/types.h
 /dpkg/changelog
 /dpkg/copyright
@@ -99,6 +101,7 @@ stamp-h1
 /libcthreads/libcthreads.rc
 /libcthreads/libcthreads_definitions.h
 /tests/cthreads_test_condition
+/tests/cthreads_test_lock
 /tests/cthreads_test_mutex
 /tests/cthreads_test_read_write_lock
 /tests/cthreads_test_repeating_thread

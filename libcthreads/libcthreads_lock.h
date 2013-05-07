@@ -1,5 +1,5 @@
 /*
- * Condition functions
+ * Lock functions
  *
  * Copyright (C) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCTHREADS_INTERNAL_CONDITION_H )
-#define _LIBCTHREADS_INTERNAL_CONDITION_H
+#if !defined( _LIBCTHREADS_LOCK_H )
+#define _LIBCTHREADS_LOCK_H
 
 #include <common.h>
 #include <types.h>
@@ -37,61 +37,43 @@
 extern "C" {
 #endif
 
-typedef struct libcthreads_internal_condition libcthreads_internal_condition_t;
+typedef struct libcthreads_internal_lock libcthreads_internal_lock_t;
 
-struct libcthreads_internal_condition
+struct libcthreads_internal_lock
 {
 #if defined( WINAPI )
-	/* The number of waiting threads
+	/* The critical section
 	 */
-	int number_of_waiting_threads;
-
-	/* The wait critical section
-	 */
-	CRITICAL_SECTION wait_critical_section;
-
-	/* Semaphore handle used to signal the waiting threads
-	 */
-	HANDLE signal_semaphore_handle;
-
-	/* Event handle used to signal the waiting threads
-	 */
-	HANDLE signal_event_handle;
+	CRITICAL_SECTION critical_section;
 
 #elif defined( HAVE_PTHREAD_H )
-	/* The condition
+	/* The mutex
 	 */
-	pthread_cond_t condition;
+	pthread_mutex_t mutex;
 
 #else
-#error Missing condition type
+#error Missing lock type
 #endif
 };
 
 LIBCTHREADS_EXTERN \
-int libcthreads_condition_initialize(
-     libcthreads_condition_t **condition,
+int libcthreads_lock_initialize(
+     libcthreads_lock_t **lock,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
-int libcthreads_condition_free(
-     libcthreads_condition_t **condition,
+int libcthreads_lock_free(
+     libcthreads_lock_t **lock,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
-int libcthreads_condition_broadcast(
-     libcthreads_condition_t *condition,
+int libcthreads_lock_grab(
+     const libcthreads_lock_t *lock,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
-int libcthreads_condition_signal(
-     libcthreads_condition_t *condition,
-     libcerror_error_t **error );
-
-LIBCTHREADS_EXTERN \
-int libcthreads_condition_wait(
-     libcthreads_condition_t *condition,
-     libcthreads_mutex_t *mutex,
+int libcthreads_lock_release(
+     const libcthreads_lock_t *lock,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

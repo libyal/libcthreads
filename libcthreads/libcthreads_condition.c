@@ -100,13 +100,16 @@ int libcthreads_condition_initialize(
 		goto on_error;
 	}
 #if defined( WINAPI )
-/* TODO
-	internal_condition->condition_handle = CreateMutex(
-	                                        NULL,
-	                                        FALSE,
-	                                        NULL );
+	InitializeCriticalSection(
+	 &( internal_condition->wait_critical_section ) );
 
-	if( internal_read_write_lock->condition_handle == NULL )
+	internal_condition->signal_semaphore_handle = CreateSemaphore (
+	                                               NULL,
+	                                               0,
+	                                               INT_MAX,
+	                                               NULL );
+
+	if( internal_condition->signal_semaphore_handle == NULL )
 	{
 		error_code = GetLastError();
 
@@ -115,12 +118,31 @@ int libcthreads_condition_initialize(
 		 error_code,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize condition handle.",
+		 "%s: unable to initialize signal semaphore handle.",
 		 function );
 
 		goto on_error;
 	}
-*/
+	internal_condition->signal_event_handle = CreateEvent (
+	                                           NULL,
+	                                           FALSE,
+	                                           FALSE,
+	                                           NULL );
+
+	if( internal_condition->signal_event_handle == NULL )
+	{
+		error_code = GetLastError();
+
+		libcerror_system_set_error(
+		 error,
+		 error_code,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize signal event handle.",
+		 function );
+
+		goto on_error;
+	}
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_cond_init(
@@ -147,6 +169,15 @@ int libcthreads_condition_initialize(
 on_error:
 	if( internal_condition != NULL )
 	{
+#if defined( WINAPI )
+		if( internal_condition->signal_semaphore_handle != NULL )
+		{
+			CloseHandle(
+			 internal_condition->signal_semaphore_handle );
+		}
+		DeleteCriticalSection(
+		 &( internal_condition->wait_critical_section ) );
+#endif
 		memory_free(
 		 internal_condition );
 	}
@@ -185,9 +216,8 @@ int libcthreads_condition_free(
 		*condition         = NULL;
 
 #if defined( WINAPI )
-/* TODO
 		if( CloseHandle(
-		     internal_read_write_lock->condition_handle ) == 0 )
+		     internal_condition->signal_event_handle ) == 0 )
 		{
 			error_code = GetLastError();
 
@@ -196,12 +226,28 @@ int libcthreads_condition_free(
 			 error_code,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free condition handle.",
+			 "%s: unable to free signal event handle.",
 			 function );
 
 			result = -1;
 		}
-*/
+		if( CloseHandle(
+		     internal_condition->signal_semaphore_handle ) == 0 )
+		{
+			error_code = GetLastError();
+
+			libcerror_system_set_error(
+			 error,
+			 error_code,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free signal semaphore handle.",
+			 function );
+
+			result = -1;
+		}
+		DeleteCriticalSection(
+		 &( internal_condition->wait_critical_section ) );
 
 #elif defined( HAVE_PTHREAD_H )
 		pthread_result = pthread_cond_destroy(
@@ -251,7 +297,12 @@ int libcthreads_condition_broadcast(
 	libcthreads_internal_condition_t *internal_condition = NULL;
 	static char *function                                = "libcthreads_condition_broadcast";
 
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+#if defined( WINAPI )
+	DWORD wait_status                                    = 0;
+	BOOL result                                          = 0;
+	int number_of_waiting_threads                        = 0;
+
+#elif defined( HAVE_PTHREAD_H )
 	int pthread_result                                   = 0;
 #endif
 
@@ -269,26 +320,59 @@ int libcthreads_condition_broadcast(
 	internal_condition = (libcthreads_internal_condition_t *) condition;
 
 #if defined( WINAPI )
-/* TODO
-	wait_status = WaitForSingleObject(
-	               internal_read_write_lock->condition_handle,
-	               INFINITE );
+	EnterCriticalSection(
+	 &( internal_condition->wait_critical_section ) );
 
-	if( wait_status == WAIT_FAILED )
+	number_of_waiting_threads = internal_condition->number_of_waiting_threads;
+
+	if( number_of_waiting_threads > 0 )
 	{
-		error_code = GetLastError();
+		result = ReleaseSemaphore(
+		          internal_condition->signal_semaphore_handle,
+		          number_of_waiting_threads,
+		          0 );
 
+		if( result == 0 )
+		{
+			error_code = GetLastError();
+		}
+	}
+	LeaveCriticalSection(
+	 &( internal_condition->wait_critical_section ) );
+
+	if( result == 0 )
+	{
 		libcerror_system_set_error(
 		 error,
 		 error_code,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: wait for condition handle failed.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release signal semaphore handle.",
 		 function );
 
 		return( -1 );
 	}
-*/
+	if( number_of_waiting_threads > 0 )
+	{
+		wait_status = WaitForSingleObject(
+		               internal_condition->signal_event_handle,
+		               INFINITE );
+
+		if( wait_status == WAIT_FAILED )
+		{
+			error_code = GetLastError();
+
+			libcerror_system_set_error(
+			 error,
+			 error_code,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: wait for no read event handle failed.",
+			 function );
+
+			return( -1 );
+		}
+	}
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_cond_broadcast(
@@ -320,7 +404,11 @@ int libcthreads_condition_signal(
 	libcthreads_internal_condition_t *internal_condition = NULL;
 	static char *function                                = "libcthreads_condition_signal";
 
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+#if defined( WINAPI )
+	BOOL result                                          = 0;
+	int number_of_waiting_threads                        = 0;
+
+#elif defined( HAVE_PTHREAD_H )
 	int pthread_result                                   = 0;
 #endif
 
@@ -338,26 +426,36 @@ int libcthreads_condition_signal(
 	internal_condition = (libcthreads_internal_condition_t *) condition;
 
 #if defined( WINAPI )
-/* TODO
-	wait_status = WaitForSingleObject(
-	               internal_read_write_lock->condition_handle,
-	               INFINITE );
+	EnterCriticalSection(
+	 &( internal_condition->wait_critical_section ) );
 
-	if( wait_status == WAIT_FAILED )
+	number_of_waiting_threads = internal_condition->number_of_waiting_threads;
+
+	LeaveCriticalSection(
+	 &( internal_condition->wait_critical_section ) );
+
+	if( number_of_waiting_threads > 0 )
 	{
-		error_code = GetLastError();
+		result = ReleaseSemaphore(
+		          internal_condition->signal_semaphore_handle,
+		          1,
+		          0 );
 
-		libcerror_system_set_error(
-		 error,
-		 error_code,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: wait for condition handle failed.",
-		 function );
+		if( result == 0 )
+		{
+			error_code = GetLastError();
 
-		return( -1 );
+			libcerror_system_set_error(
+			 error,
+			 error_code,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to release signal semaphore handle.",
+			 function );
+
+			return( -1 );
+		}
 	}
-*/
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_cond_signal(
@@ -391,7 +489,11 @@ int libcthreads_condition_wait(
 	libcthreads_internal_mutex_t *internal_mutex         = NULL;
 	static char *function                                = "libcthreads_condition_wait";
 
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+#if defined( WINAPI )
+	DWORD error_code                                     = 0;
+	DWORD wait_status                                    = 0;
+
+#elif defined( HAVE_PTHREAD_H )
 	int pthread_result                                   = 0;
 #endif
 
@@ -421,27 +523,48 @@ int libcthreads_condition_wait(
 	}
 	internal_mutex = (libcthreads_internal_mutex_t *) mutex;
 
-#if defined( WINAPI )
-/* TODO
-	wait_status = WaitForSingleObject(
-	               internal_read_write_lock->condition_handle,
-	               INFINITE );
+#if defined( WINAPI ) && ( WINVER >= 0x0400 )
+	EnterCriticalSection(
+	 &( internal_condition->wait_critical_section ) );
 
-	if( wait_status == WAIT_FAILED )
-	{
-		error_code = GetLastError();
+	internal_condition->number_of_waiting_threads += 1;
 
-		libcerror_system_set_error(
-		 error,
-		 error_code,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: wait for condition handle failed.",
-		 function );
+	LeaveCriticalSection(
+	 &( internal_condition->wait_critical_section ) );
 
-		return( -1 );
-	}
-*/
+	wait_status = SignalObjectAndWait(
+	               internal_mutex->mutex_handle,
+	               internal_condition->signal_semaphore_handle,
+	               INFINITE,
+	               FALSE );
+
+	EnterCriticalSection(
+	 &( internal_condition->wait_critical_section ) );
+
+	internal_condition->number_of_waiting_threads -= 1;
+
+
+  // Check to see if we're the last waiter after <pthread_cond_broadcast>.
+  int last_waiter = cv->was_broadcast_ && cv->waiters_count_ == 0;
+
+	LeaveCriticalSection(
+	 &( internal_condition->wait_critical_section ) );
+
+
+  // If we're the last waiter thread during this particular broadcast
+  // then let all the other threads proceed.
+  if (last_waiter)
+    // This call atomically signals the <waiters_done_> event and waits until
+    // it can acquire the <external_mutex>.  This is required to ensure fairness. 
+    SignalObjectAndWait (cv->waiters_done_, *external_mutex, INFINITE, FALSE);
+  else
+    // Always regain the external mutex since that's the guarantee we
+    // give to our callers. 
+    WaitForSingleObject (*external_mutex);
+
+#elif defined( WINAPI )
+
+#error libcthreads_condition_wait for Windows earlier than NT4 not implemented
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_cond_wait(

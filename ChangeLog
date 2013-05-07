@@ -17,6 +17,9 @@ TODO
 20130507
 * worked on condition
 * worked on queue
+* reintroduced lock, need to distinguish between critical section
+  and mutex on WINAPI for condition
+* removed INSTALL from git version
 
 20130506
 * worked on condition
