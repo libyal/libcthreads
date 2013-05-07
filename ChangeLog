@@ -1,8 +1,8 @@
 TODO
 * condition
   - add more tests
-* queue
-  - add more tests
+* thread pool
+  - wait until queue is empty
 * have local library be dependent on HAVE_MULTI_THREAD_SUPPORT
 * add macros for locking ? or have fallback dummy locks ?
 * add try grab function

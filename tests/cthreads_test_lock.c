@@ -373,7 +373,7 @@ int cthreads_test_lock_locking(
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to join thread2.",
 		 function );
 
@@ -386,7 +386,7 @@ int cthreads_test_lock_locking(
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to join thread1.",
 		 function );
 
@@ -436,6 +436,18 @@ on_error:
 
 		libcerror_error_free(
 		 &error );
+	}
+	if( thread2 != NULL )
+	{
+		libcthreads_thread_join(
+		 &thread2,
+		 NULL );
+	}
+	if( thread1 != NULL )
+	{
+		libcthreads_thread_join(
+		 &thread1,
+		 NULL );
 	}
 	if( cthreads_test_lock != NULL )
 	{

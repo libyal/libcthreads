@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <memory.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -31,13 +32,80 @@
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
 
+libcthreads_lock_t *cthreads_test_lock  = NULL;
+int cthreads_test_expected_queued_value = 0;
+int cthreads_test_queued_value          = 0;
+int cthreads_test_number_of_iterations  = 497;
+int cthreads_test_number_of_values      = 32;
+
 /* The thread pool callback function
  * Returns 1 if successful or -1 on error
  */
 int cthreads_test_thread_pool_callback_function(
+     intptr_t *value,
      void *arguments )
 {
+	libcerror_error_t *error = NULL;
+	static char *function    = "cthreads_test_thread_pool_callback_function";
+	int result               = 0;
+
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		goto on_error;
+	}
+	result = libcthreads_lock_grab(
+	          cthreads_test_lock,
+	          &error );
+
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab lock.",
+		 function );
+
+		goto on_error;
+	}
+fprintf( stderr, "C: %d\n", *value );
+	cthreads_test_queued_value += *value;
+
+	result = libcthreads_lock_release(
+		  cthreads_test_lock,
+		  &error );
+
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release lock.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( -1 );
 }
 
 /* Tests creating a thread pool
@@ -47,6 +115,7 @@ int cthreads_test_thread_pool_callback_function(
 int cthreads_test_thread_pool_create(
      libcthreads_thread_pool_t **thread_pool,
      int (*callback_function)(
+            intptr_t *value,
             void *arguments ),
      int expected_result )
 {
@@ -163,6 +232,173 @@ int cthreads_test_thread_pool_join(
 	return( 1 );
 }
 
+/* Tests thread pool push
+ * Returns 1 if successful or -1 on error
+ */
+int cthreads_test_thread_pool_push(
+     void )
+{
+	libcerror_error_t *error          = NULL;
+	libcthreads_thread_t *thread_pool = NULL;
+	int *queued_values                = NULL;
+	static char *function             = "cthreads_test_thread_pool_push";
+	int iterator                      = 0;
+	int result                        = 0;
+
+	cthreads_test_expected_queued_value = 0;
+	cthreads_test_queued_value          = 0;
+
+	queued_values = (int *) memory_allocate(
+	                         sizeof( int ) * cthreads_test_number_of_iterations );
+
+	if( queued_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create queued values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_lock_initialize(
+	     &cthreads_test_lock,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create lock.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_thread_pool_create(
+	     &thread_pool,
+	     NULL,
+	     8,
+	     cthreads_test_number_of_values,
+	     &cthreads_test_thread_pool_callback_function,
+	     NULL,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create thread pool.",
+		 function );
+
+		goto on_error;
+	}
+	for( iterator = 0;
+	     iterator < cthreads_test_number_of_iterations;
+	     iterator++ )
+	{
+		queued_values[ iterator ] = ( 98 * iterator ) % 45;
+
+		if( libcthreads_thread_pool_push(
+		     thread_pool,
+		     (intptr_t *) &( queued_values[ iterator ] ),
+		     &error ) == -1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to get value from queue.",
+			 function );
+
+			goto on_error;
+		}
+		cthreads_test_expected_queued_value += queued_values[ iterator ];
+	}
+	if( libcthreads_thread_pool_join(
+	     &thread_pool,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to join thread pool.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_lock_free(
+	     &cthreads_test_lock,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free lock.",
+		 function );
+
+		goto on_error;
+	}
+	memory_free(
+	 queued_values );
+
+	queued_values = NULL;
+
+	fprintf(
+	 stdout,
+	 "Testing queued value\t" );
+
+	if( cthreads_test_queued_value != cthreads_test_expected_queued_value )
+	{
+		fprintf(
+		 stdout,
+		 "(FAIL)" );
+	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
+	fprintf(
+	 stdout,
+	 "\n" );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
+		 &error );
+	}
+	if( thread_pool != NULL )
+	{
+		libcthreads_thread_pool_join(
+		 &thread_pool,
+		 NULL );
+	}
+	if( cthreads_test_lock != NULL )
+	{
+		libcthreads_lock_release(
+		 cthreads_test_lock,
+		 NULL );
+		libcthreads_lock_free(
+		 &cthreads_test_lock,
+		 NULL );
+	}
+	memory_free(
+	 queued_values );
+
+	return( -1 );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -228,6 +464,16 @@ int main( int argc, char * const argv[] )
 		fprintf(
 		 stderr,
 		 "Unable to test create.\n" );
+
+		return( EXIT_FAILURE );
+	}
+	/* Test: thread_pool_push
+	 */
+	if( cthreads_test_thread_pool_push() != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test push.\n" );
 
 		return( EXIT_FAILURE );
 	}

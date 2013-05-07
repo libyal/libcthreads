@@ -232,16 +232,16 @@ on_error:
 	return( -1 );
 }
 
-/* Tests thread mutex mutexing
+/* Tests thread mutex locking
  * Returns 1 if successful or -1 on error
  */
-int cthreads_test_mutex_mutexing(
+int cthreads_test_mutex_locking(
      void )
 {
 	libcerror_error_t *error      = NULL;
 	libcthreads_thread_t *thread1 = NULL;
 	libcthreads_thread_t *thread2 = NULL;
-	static char *function         = "cthreads_test_mutex_mutexing";
+	static char *function         = "cthreads_test_mutex_locking";
 	int result                    = 0;
 
 	if( libcthreads_mutex_initialize(
@@ -373,7 +373,7 @@ int cthreads_test_mutex_mutexing(
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to join thread2.",
 		 function );
 
@@ -386,7 +386,7 @@ int cthreads_test_mutex_mutexing(
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to join thread1.",
 		 function );
 
@@ -436,6 +436,18 @@ on_error:
 
 		libcerror_error_free(
 		 &error );
+	}
+	if( thread2 != NULL )
+	{
+		libcthreads_thread_join(
+		 &thread2,
+		 NULL );
+	}
+	if( thread1 != NULL )
+	{
+		libcthreads_thread_join(
+		 &thread1,
+		 NULL );
 	}
 	if( cthreads_test_mutex != NULL )
 	{
@@ -493,13 +505,13 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	/* Test: mutexing
+	/* Test: locking
 	 */
-	if( cthreads_test_mutex_mutexing() != 1 )
+	if( cthreads_test_mutex_locking() != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test mutexing.\n" );
+		 "Unable to test locking.\n" );
 
 		return( EXIT_FAILURE );
 	}
