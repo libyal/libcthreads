@@ -202,6 +202,31 @@ int libcthreads_condition_free(
      libcthreads_condition_t **condition,
      libcthreads_error_t **error );
 
+/* Broadcasts a condition
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_condition_broadcast(
+     libcthreads_condition_t *condition,
+     libcthreads_error_t **error );
+
+/* Signals a condition
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_condition_signal(
+     libcthreads_condition_t *condition,
+     libcthreads_error_t **error );
+
+/* Waits for a condition
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_condition_wait(
+     libcthreads_condition_t *condition,
+     libcthreads_mutex_t *mutex,
+     libcthreads_error_t **error );
+
 /* -------------------------------------------------------------------------
  * Mutex functions
  * ------------------------------------------------------------------------- */
@@ -290,6 +315,45 @@ int libcthreads_read_write_lock_release_for_read(
 LIBCTHREADS_EXTERN \
 int libcthreads_read_write_lock_release_for_write(
      libcthreads_read_write_lock_t *read_write_lock,
+     libcthreads_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Queue functions
+ * ------------------------------------------------------------------------- */
+
+/* Creates a queue
+ * Make sure the value queue is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_queue_initialize(
+     libcthreads_queue_t **queue,
+     libcthreads_error_t **error );
+
+/* Frees a queue
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_queue_free(
+     libcthreads_queue_t **queue,
+     libcthreads_error_t **error );
+
+/* Pops a value off the queue
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_queue_pop(
+     libcthreads_queue_t *queue,
+     intptr_t **value,
+     libcthreads_error_t **error );
+
+/* Pushes a value onto the queue
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_queue_push(
+     libcthreads_queue_t *queue,
+     intptr_t *value,
      libcthreads_error_t **error );
 
 #if defined( __cplusplus )

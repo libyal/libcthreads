@@ -260,6 +260,7 @@ int libcthreads_thread_join(
 {
 	libcthreads_internal_thread_t *internal_thread = NULL;
 	static char *function                          = "libcthreads_thread_join";
+	int result                                     = 1;
 
 #if defined( WINAPI )
 	DWORD error_code                               = 0;
@@ -312,8 +313,9 @@ int libcthreads_thread_join(
 		 "%s: wait for thread failed.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
+
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_join(
 	                  internal_thread->thread,
@@ -329,10 +331,10 @@ int libcthreads_thread_join(
 		 "%s: unable to join thread.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	if( ( thread_return_value == NULL )
-	 || ( thread_return_value != &( internal_thread->start_function_result ) ) )
+	else if( ( thread_return_value == NULL )
+	      || ( thread_return_value != &( internal_thread->start_function_result ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -341,9 +343,9 @@ int libcthreads_thread_join(
 		 "%s: invalid thread return value.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	if( *thread_return_value != 1 )
+	else if( *thread_return_value != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -353,18 +355,12 @@ int libcthreads_thread_join(
 		 function,
 		 *thread_return_value );
 
-		goto on_error;
+		result = -1;
 	}
 #endif
 	memory_free(
 	 internal_thread );
 
-	return( 1 );
-
-on_error:
-	memory_free(
-	 internal_thread );
-
-	return( -1 );
+	return( result );
 }
 

@@ -17,7 +17,6 @@ libcthreads_la_SOURCES = \
 	libcthreads_libcstring.h \
 	libcthreads_mutex.c libcthreads_mutex.h \
 	libcthreads_queue.c libcthreads_queue.h \
-	libcthreads_queue_element.c libcthreads_queue_element.h \
 	libcthreads_read_write_lock.c libcthreads_read_write_lock.h \
 	libcthreads_repeating_thread.c libcthreads_repeating_thread.h \
 	libcthreads_support.c libcthreads_support.h \

@@ -62,7 +62,7 @@ DWORD WINAPI libcthreads_repeating_thread_start_function_helper(
 			do
 			{
 				libcthreads_mutex_grab(
-				 internal_repeating_thread->idle_mutex,
+				 internal_repeating_thread->condition_mutex,
 				 NULL );
 
 				/* Check for exit status in case of the situation where the thread
@@ -72,11 +72,11 @@ DWORD WINAPI libcthreads_repeating_thread_start_function_helper(
 				{
 					libcthreads_condition_wait(
 					 internal_repeating_thread->idle_condition,
-					 internal_repeating_thread->idle_mutex,
+					 internal_repeating_thread->condition_mutex,
 					 NULL );
 				}
 				libcthreads_mutex_release(
-				 internal_repeating_thread->idle_mutex,
+				 internal_repeating_thread->condition_mutex,
 				 NULL );
 
 				start_function_result = internal_repeating_thread->start_function(
@@ -118,7 +118,7 @@ void *libcthreads_repeating_thread_start_function_helper(
 			do
 			{
 				libcthreads_mutex_grab(
-				 internal_repeating_thread->idle_mutex,
+				 internal_repeating_thread->condition_mutex,
 				 NULL );
 
 				/* Check for exit status in case of the situation where the thread
@@ -128,11 +128,11 @@ void *libcthreads_repeating_thread_start_function_helper(
 				{
 					libcthreads_condition_wait(
 					 internal_repeating_thread->idle_condition,
-					 internal_repeating_thread->idle_mutex,
+					 internal_repeating_thread->condition_mutex,
 					 NULL );
 				}
 				libcthreads_mutex_release(
-				 internal_repeating_thread->idle_mutex,
+				 internal_repeating_thread->condition_mutex,
 				 NULL );
 
 				start_function_result = internal_repeating_thread->start_function(
@@ -243,14 +243,14 @@ int libcthreads_repeating_thread_create(
 		goto on_error;
 	}
 	if( libcthreads_mutex_initialize(
-	     &( internal_repeating_thread->idle_mutex ),
+	     &( internal_repeating_thread->condition_mutex ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create idle mutex.",
+		 "%s: unable to create condition mutex.",
 		 function );
 
 		goto on_error;
@@ -335,10 +335,10 @@ on_error:
 			 &( internal_repeating_thread->idle_condition ),
 			 NULL );
 		}
-		if( internal_repeating_thread->idle_mutex != NULL )
+		if( internal_repeating_thread->condition_mutex != NULL )
 		{
 			libcthreads_mutex_free(
-			 &( internal_repeating_thread->idle_mutex ),
+			 &( internal_repeating_thread->condition_mutex ),
 			 NULL );
 		}
 		memory_free(
@@ -374,14 +374,14 @@ int libcthreads_repeating_thread_push(
 /* TODO some work */
 
 	if( libcthreads_mutex_grab(
-	     internal_repeating_thread->idle_mutex,
+	     internal_repeating_thread->condition_mutex,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab idle mutex.",
+		 "%s: unable to grab condition mutex.",
 		 function );
 
 		return( -1 );
@@ -400,14 +400,14 @@ int libcthreads_repeating_thread_push(
 		result = -1;
 	}
 	if( libcthreads_mutex_release(
-	     internal_repeating_thread->idle_mutex,
+	     internal_repeating_thread->condition_mutex,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release idle mutex.",
+		 "%s: unable to release condition mutex.",
 		 function );
 
 		return( -1 );
@@ -462,17 +462,17 @@ int libcthreads_repeating_thread_join(
 	*repeating_thread         = NULL;
 
 	if( libcthreads_mutex_grab(
-	     internal_repeating_thread->idle_mutex,
+	     internal_repeating_thread->condition_mutex,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab idle mutex.",
+		 "%s: unable to grab condition mutex.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	internal_repeating_thread->status = LIBCTHREADS_STATUS_EXIT;
 
@@ -490,21 +490,21 @@ int libcthreads_repeating_thread_join(
 		result = -1;
 	}
 	if( libcthreads_mutex_release(
-	     internal_repeating_thread->idle_mutex,
+	     internal_repeating_thread->condition_mutex,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release idle mutex.",
+		 "%s: unable to release condition mutex.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( result != 1 )
 	{
-		goto on_error;
+		return( -1 );
 	}
 #if defined( WINAPI )
 	wait_status = WaitForSingleObject(
@@ -523,7 +523,7 @@ int libcthreads_repeating_thread_join(
 		 "%s: wait for thread failed.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
 
 #elif defined( HAVE_PTHREAD_H )
@@ -543,8 +543,8 @@ int libcthreads_repeating_thread_join(
 
 		goto on_error;
 	}
-	if( ( thread_return_value == NULL )
-	 || ( thread_return_value != &( internal_repeating_thread->start_function_result ) ) )
+	else if( ( thread_return_value == NULL )
+	      || ( thread_return_value != &( internal_repeating_thread->start_function_result ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -553,9 +553,9 @@ int libcthreads_repeating_thread_join(
 		 "%s: invalid thread return value.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	if( *thread_return_value != 1 )
+	else if( *thread_return_value != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -565,22 +565,9 @@ int libcthreads_repeating_thread_join(
 		 function,
 		 *thread_return_value );
 
-		goto on_error;
+		result = -1;
 	}
 #endif
-	if( libcthreads_mutex_free(
-	     &( internal_repeating_thread->idle_mutex ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free idle mutex.",
-		 function );
-
-		goto on_error;
-	}
 	if( libcthreads_condition_free(
 	     &( internal_repeating_thread->idle_condition ),
 	     error ) != 1 )
@@ -592,7 +579,20 @@ int libcthreads_repeating_thread_join(
 		 "%s: unable to free idle condition.",
 		 function );
 
-		goto on_error;
+		result = -1;
+	}
+	if( libcthreads_mutex_free(
+	     &( internal_repeating_thread->condition_mutex ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free condition mutex.",
+		 function );
+
+		result = -1;
 	}
 	memory_free(
 	 internal_repeating_thread );
@@ -606,10 +606,10 @@ on_error:
 		 &( internal_repeating_thread->idle_condition ),
 		 NULL );
 	}
-	if( internal_repeating_thread->idle_mutex != NULL )
+	if( internal_repeating_thread->condition_mutex != NULL )
 	{
 		libcthreads_mutex_free(
-		 &( internal_repeating_thread->idle_mutex ),
+		 &( internal_repeating_thread->condition_mutex ),
 		 NULL );
 	}
 	memory_free(

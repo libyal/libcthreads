@@ -19,49 +19,75 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCTHREADS_QUEUE_H )
-#define _LIBCTHREADS_QUEUE_H
+#if !defined( _LIBCTHREADS_INTERNAL_QUEUE_H )
+#define _LIBCTHREADS_INTERNAL_QUEUE_H
 
 #include <common.h>
 #include <types.h>
 
+#include "libcthreads_extern.h"
 #include "libcthreads_libcerror.h"
-#include "libcthreads_queue_element.h"
+#include "libcthreads_types.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libcthreads_queue libcthreads_queue_t;
+typedef struct libcthreads_internal_queue libcthreads_internal_queue_t;
 
-struct libcthreads_queue
+struct libcthreads_internal_queue
 {
-	/* The number of elements
+	/* The (current) pop index
 	 */
-	int number_of_elements;
+	int pop_index;
 
-	/* The first (queue) element
+	/* The (current) push index
 	 */
-	libcthreads_queue_element_t *first_element;
+	int push_index;
 
-	/* The last (queue) element
+	/* The number of values
 	 */
-	libcthreads_queue_element_t *last_element;
+	int number_of_values;
+
+	/* The allocated number of values
+	 */
+	int allocated_number_of_values;
+
+	/* The values array
+	 */
+	intptr_t **values_array;
+
+	/* The condition mutex
+	 */
+	libcthreads_mutex_t *condition_mutex;
+
+	/* The queue empty condition
+	 */
+	libcthreads_condition_t *empty_condition;
+
+	/* The queue full condition
+	 */
+	libcthreads_condition_t *full_condition;
 };
 
+LIBCTHREADS_EXTERN \
 int libcthreads_queue_initialize(
      libcthreads_queue_t **queue,
+     int maximum_number_of_values,
      libcerror_error_t **error );
 
+LIBCTHREADS_EXTERN \
 int libcthreads_queue_free(
      libcthreads_queue_t **queue,
      libcerror_error_t **error );
 
+LIBCTHREADS_EXTERN \
 int libcthreads_queue_pop(
      libcthreads_queue_t *queue,
      intptr_t **value,
      libcerror_error_t **error );
 
+LIBCTHREADS_EXTERN \
 int libcthreads_queue_push(
      libcthreads_queue_t *queue,
      intptr_t *value,

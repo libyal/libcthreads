@@ -203,6 +203,7 @@ typedef int64_t off64_t;
  */
 typedef intptr_t libcthreads_condition_t;
 typedef intptr_t libcthreads_mutex_t;
+typedef intptr_t libcthreads_queue_t;
 typedef intptr_t libcthreads_read_write_lock_t;
 typedef intptr_t libcthreads_repeating_thread_t;
 typedef intptr_t libcthreads_thread_t;

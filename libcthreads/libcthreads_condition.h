@@ -67,6 +67,11 @@ int libcthreads_condition_free(
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
+int libcthreads_condition_broadcast(
+     libcthreads_condition_t *condition,
+     libcerror_error_t **error );
+
+LIBCTHREADS_EXTERN \
 int libcthreads_condition_signal(
      libcthreads_condition_t *condition,
      libcerror_error_t **error );

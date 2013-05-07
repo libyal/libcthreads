@@ -241,6 +241,75 @@ int libcthreads_condition_free(
 	return( result );
 }
 
+/* Broadcasts a condition
+ * Returns 1 if successful or -1 on error
+ */
+int libcthreads_condition_broadcasts(
+     libcthreads_condition_t *condition,
+     libcerror_error_t **error )
+{
+	libcthreads_internal_condition_t *internal_condition = NULL;
+	static char *function                                = "libcthreads_condition_broadcasts";
+
+#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+	int pthread_result                                   = 0;
+#endif
+
+	if( condition == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid condition.",
+		 function );
+
+		return( -1 );
+	}
+	internal_condition = (libcthreads_internal_condition_t *) condition;
+
+#if defined( WINAPI )
+/* TODO
+	wait_status = WaitForSingleObject(
+	               internal_read_write_lock->condition_handle,
+	               INFINITE );
+
+	if( wait_status == WAIT_FAILED )
+	{
+		error_code = GetLastError();
+
+		libcerror_system_set_error(
+		 error,
+		 error_code,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: wait for condition handle failed.",
+		 function );
+
+		return( -1 );
+	}
+*/
+
+#elif defined( HAVE_PTHREAD_H )
+	pthread_result = pthread_cond_broadcast(
+	                  &( internal_condition->condition ) );
+
+	if( pthread_result != 0 )
+	{
+		libcerror_system_set_error(
+		 error,
+		 pthread_result,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to broadcast condition.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+}
+
 /* Signals a condition
  * Returns 1 if successful or -1 on error
  */

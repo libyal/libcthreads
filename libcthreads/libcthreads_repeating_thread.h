@@ -76,13 +76,9 @@ struct libcthreads_internal_repeating_thread
 	 */
 	void *start_function_arguments;
 
-	/* The running mutex
+	/* The condition mutex
 	 */
-	libcthreads_mutex_t *running_mutex;
-
-	/* The idle mutex
-	 */
-	libcthreads_mutex_t *idle_mutex;
+	libcthreads_mutex_t *condition_mutex;
 
 	/* The idle condition
 	 */
