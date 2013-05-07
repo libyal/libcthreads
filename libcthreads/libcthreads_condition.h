@@ -58,6 +58,10 @@ struct libcthreads_internal_condition
 	 */
 	HANDLE signal_event_handle;
 
+	/* Value to indicate last signal was a broadcast
+	 */
+	uint8_t signal_is_broadcast;
+
 #elif defined( HAVE_PTHREAD_H )
 	/* The condition
 	 */

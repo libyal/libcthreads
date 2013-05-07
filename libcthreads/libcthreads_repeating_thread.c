@@ -541,7 +541,7 @@ int libcthreads_repeating_thread_join(
 		 "%s: unable to join thread.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
 	else if( ( thread_return_value == NULL )
 	      || ( thread_return_value != &( internal_repeating_thread->start_function_result ) ) )
@@ -598,23 +598,5 @@ int libcthreads_repeating_thread_join(
 	 internal_repeating_thread );
 
 	return( result );
-
-on_error:
-	if( internal_repeating_thread->idle_condition != NULL )
-	{
-		libcthreads_condition_free(
-		 &( internal_repeating_thread->idle_condition ),
-		 NULL );
-	}
-	if( internal_repeating_thread->condition_mutex != NULL )
-	{
-		libcthreads_mutex_free(
-		 &( internal_repeating_thread->condition_mutex ),
-		 NULL );
-	}
-	memory_free(
-	 internal_repeating_thread );
-
-	return( -1 );
 }
 

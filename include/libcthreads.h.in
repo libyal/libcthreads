@@ -228,6 +228,43 @@ int libcthreads_condition_wait(
      libcthreads_error_t **error );
 
 /* -------------------------------------------------------------------------
+ * Lock functions
+ * ------------------------------------------------------------------------- */
+
+/* Creates a lock
+ * Make sure the value lock is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_lock_initialize(
+     libcthreads_lock_t **lock,
+     libcthreads_error_t **error );
+
+/* Frees a lock
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_lock_free(
+     libcthreads_lock_t **lock,
+     libcthreads_error_t **error );
+
+/* Grabs a lock
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_lock_grab(
+     libcthreads_lock_t *lock,
+     libcthreads_error_t **error );
+
+/* Releases a lock
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_lock_release(
+     libcthreads_lock_t *lock,
+     libcthreads_error_t **error );
+
+/* -------------------------------------------------------------------------
  * Mutex functions
  * ------------------------------------------------------------------------- */
 

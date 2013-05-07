@@ -48,7 +48,10 @@ int libcthreads_mutex_initialize(
 	libcthreads_internal_mutex_t *internal_mutex = NULL;
 	static char *function                        = "libcthreads_mutex_initialize";
 
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+#if defined( WINAPI )
+	DWORD error_code                             = 0;
+
+#elif defined( HAVE_PTHREAD_H )
 	int pthread_result                           = 0;
 #endif
 
@@ -108,7 +111,7 @@ int libcthreads_mutex_initialize(
 	                                FALSE,
 	                                NULL );
 
-	if( internal_read_write_lock->mutex_handle == NULL )
+	if( internal_mutex->mutex_handle == NULL )
 	{
 		error_code = GetLastError();
 
@@ -165,7 +168,10 @@ int libcthreads_mutex_free(
 	static char *function                        = "libcthreads_mutex_free";
 	int result                                   = 1;
 
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+#if defined( WINAPI )
+	DWORD error_code                             = 0;
+
+#elif defined( HAVE_PTHREAD_H )
 	int pthread_result                           = 0;
 #endif
 
@@ -187,7 +193,7 @@ int libcthreads_mutex_free(
 
 #if defined( WINAPI )
 		if( CloseHandle(
-		     internal_read_write_lock->mutex_handle ) == 0 )
+		     internal_mutex->mutex_handle ) == 0 )
 		{
 			error_code = GetLastError();
 
@@ -251,6 +257,7 @@ int libcthreads_mutex_grab(
 	static char *function                        = "libcthreads_mutex_grab";
 
 #if defined( WINAPI )
+	DWORD error_code                             = 0;
 	DWORD wait_status                            = 0;
 
 #elif defined( HAVE_PTHREAD_H )
@@ -272,7 +279,7 @@ int libcthreads_mutex_grab(
 
 #if defined( WINAPI )
 	wait_status = WaitForSingleObject(
-	               internal_read_write_lock->mutex_handle,
+	               internal_mutex->mutex_handle,
 	               INFINITE );
 
 	if( wait_status == WAIT_FAILED )
@@ -321,6 +328,7 @@ int libcthreads_mutex_release(
 	static char *function                        = "libcthreads_mutex_release";
 
 #if defined( WINAPI )
+	DWORD error_code                             = 0;
 	BOOL result                                  = 0;
 
 #elif defined( HAVE_PTHREAD_H )
@@ -342,7 +350,7 @@ int libcthreads_mutex_release(
 
 #if defined( WINAPI )
 	result = ReleaseMutex(
-	          internal_read_write_lock->mutex_handle );
+	          internal_mutex->mutex_handle );
 
 	if( result == 0 )
 	{

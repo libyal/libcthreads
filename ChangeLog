@@ -1,9 +1,7 @@
 TODO
 * condition
-  - add broadcast
-  - add WINAPI equivalent
+  - add tests
 * queue
-  - complete
   - add tests
 * have local library be dependent on HAVE_MULTI_THREAD_SUPPORT
 * add macros for locking ? or have fallback dummy locks ?
@@ -20,6 +18,7 @@ TODO
 * reintroduced lock, need to distinguish between critical section
   and mutex on WINAPI for condition
 * removed INSTALL from git version
+* updated msvscpp files
 
 20130506
 * worked on condition

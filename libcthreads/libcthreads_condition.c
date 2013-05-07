@@ -45,7 +45,10 @@ int libcthreads_condition_initialize(
 	libcthreads_internal_condition_t *internal_condition = NULL;
 	static char *function                                = "libcthreads_condition_initialize";
 
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+#if defined( WINAPI )
+	DWORD error_code                                     = 0;
+
+#elif defined( HAVE_PTHREAD_H )
 	int pthread_result                                   = 0;
 #endif
 
@@ -195,7 +198,10 @@ int libcthreads_condition_free(
 	static char *function                                = "libcthreads_condition_free";
 	int result                                           = 1;
 
-#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+#if defined( WINAPI )
+	DWORD error_code                                     = 0;
+
+#elif defined( HAVE_PTHREAD_H )
 	int pthread_result                                   = 0;
 #endif
 
@@ -298,6 +304,7 @@ int libcthreads_condition_broadcast(
 	static char *function                                = "libcthreads_condition_broadcast";
 
 #if defined( WINAPI )
+	DWORD error_code                                     = 0;
 	DWORD wait_status                                    = 0;
 	BOOL result                                          = 0;
 	int number_of_waiting_threads                        = 0;
@@ -327,6 +334,8 @@ int libcthreads_condition_broadcast(
 
 	if( number_of_waiting_threads > 0 )
 	{
+		internal_condition->signal_is_broadcast = 1;
+
 		result = ReleaseSemaphore(
 		          internal_condition->signal_semaphore_handle,
 		          number_of_waiting_threads,
@@ -335,6 +344,8 @@ int libcthreads_condition_broadcast(
 		if( result == 0 )
 		{
 			error_code = GetLastError();
+
+			internal_condition->signal_is_broadcast = 0;
 		}
 	}
 	LeaveCriticalSection(
@@ -362,6 +373,8 @@ int libcthreads_condition_broadcast(
 		{
 			error_code = GetLastError();
 
+			internal_condition->signal_is_broadcast = 0;
+
 			libcerror_system_set_error(
 			 error,
 			 error_code,
@@ -372,6 +385,7 @@ int libcthreads_condition_broadcast(
 
 			return( -1 );
 		}
+		internal_condition->signal_is_broadcast = 0;
 	}
 
 #elif defined( HAVE_PTHREAD_H )
@@ -405,6 +419,7 @@ int libcthreads_condition_signal(
 	static char *function                                = "libcthreads_condition_signal";
 
 #if defined( WINAPI )
+	DWORD error_code                                     = 0;
 	BOOL result                                          = 0;
 	int number_of_waiting_threads                        = 0;
 
@@ -492,6 +507,7 @@ int libcthreads_condition_wait(
 #if defined( WINAPI )
 	DWORD error_code                                     = 0;
 	DWORD wait_status                                    = 0;
+	int is_last_waiting_thread                           = 0;
 
 #elif defined( HAVE_PTHREAD_H )
 	int pthread_result                                   = 0;
@@ -538,29 +554,77 @@ int libcthreads_condition_wait(
 	               INFINITE,
 	               FALSE );
 
+	if( wait_status == WAIT_FAILED )
+	{
+		error_code = GetLastError();
+
+		libcerror_system_set_error(
+		 error,
+		 error_code,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable signal mutex handle and wait for signal semaphore handle.",
+		 function );
+
+		return( -1 );
+	}
 	EnterCriticalSection(
 	 &( internal_condition->wait_critical_section ) );
 
 	internal_condition->number_of_waiting_threads -= 1;
 
-
-  // Check to see if we're the last waiter after <pthread_cond_broadcast>.
-  int last_waiter = cv->was_broadcast_ && cv->waiters_count_ == 0;
-
+	if( ( internal_condition->number_of_waiting_threads == 0 )
+	 && ( internal_condition->signal_is_broadcast != 0 ) )
+	{
+		is_last_waiting_thread = 1;
+	}
 	LeaveCriticalSection(
 	 &( internal_condition->wait_critical_section ) );
 
+	if( is_last_waiting_thread != 0 )
+	{
+		wait_status = SignalObjectAndWait(
+		               internal_condition->signal_event_handle,
+		               internal_mutex->mutex_handle,
+		               INFINITE,
+		               FALSE );
 
-  // If we're the last waiter thread during this particular broadcast
-  // then let all the other threads proceed.
-  if (last_waiter)
-    // This call atomically signals the <waiters_done_> event and waits until
-    // it can acquire the <external_mutex>.  This is required to ensure fairness. 
-    SignalObjectAndWait (cv->waiters_done_, *external_mutex, INFINITE, FALSE);
-  else
-    // Always regain the external mutex since that's the guarantee we
-    // give to our callers. 
-    WaitForSingleObject (*external_mutex);
+		if( wait_status == WAIT_FAILED )
+		{
+			error_code = GetLastError();
+
+			libcerror_system_set_error(
+			 error,
+			 error_code,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to signal signal event handle and wait for mutex handle.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		wait_status = WaitForSingleObject(
+			       internal_mutex->mutex_handle,
+			       INFINITE );
+
+		if( wait_status == WAIT_FAILED )
+		{
+			error_code = GetLastError();
+
+			libcerror_system_set_error(
+			 error,
+			 error_code,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: wait for mutex handle failed.",
+			 function );
+
+			return( -1 );
+		}
+	}
 
 #elif defined( WINAPI )
 

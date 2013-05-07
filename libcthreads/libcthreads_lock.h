@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBCTHREADS_LOCK_H )
-#define _LIBCTHREADS_LOCK_H
+#if !defined( _LIBCTHREADS_INTERNAL_LOCK_H )
+#define _LIBCTHREADS_INTERNAL_LOCK_H
 
 #include <common.h>
 #include <types.h>
