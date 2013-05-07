@@ -116,6 +116,262 @@ int cthreads_test_queue_initialize(
 	return( 1 );
 }
 
+libcthreads_queue_t *cthreads_test_queue = NULL;
+int cthreads_test_queued_value           = 0;
+
+/* The thread callback function
+ * Returns 1 if successful or -1 on error
+ */
+int cthreads_test_queue_callback_function(
+     void *arguments )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "cthreads_test_queue_callback_function";
+	int *queued_value        = NULL;
+	int iterator             = 0;
+	int number_of_iterations = 5;
+
+	for( iterator = 0;
+	     iterator < number_of_iterations;
+	     iterator++ )
+	{
+		if( libcthreads_queue_pop(
+		     cthreads_test_queue,
+		     (intptr_t **) &queued_value,
+		     &error ) == -1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to get value from queue.",
+			 function );
+
+			goto on_error;
+		}
+		cthreads_test_queued_value += *queued_value;
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( -1 );
+}
+
+/* Tests thread queuing
+ * Returns 1 if successful or -1 on error
+ */
+int cthreads_test_queue_queuing(
+     void )
+{
+	libcerror_error_t *error     = NULL;
+	libcthreads_thread_t *thread = NULL;
+	static char *function        = "cthreads_test_queue_queuing";
+	int exptected_queued_value   = 0;
+	int queued_value1            = 41;
+	int queued_value2            = 59;
+	int queued_value3            = 3;
+	int queued_value4            = 74;
+	int queued_value5            = 58;
+	int result                   = 0;
+
+	if( libcthreads_queue_initialize(
+	     &cthreads_test_queue,
+	     32,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create queue.",
+		 function );
+
+		goto on_error;
+	}
+	cthreads_test_queued_value = 0;
+
+	if( libcthreads_thread_create(
+	     &thread,
+	     NULL,
+	     cthreads_test_queue_callback_function,
+	     NULL,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create thread.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_queue_initialize(
+	     &cthreads_test_queue,
+	     32,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create queue.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_queue_push(
+	     cthreads_test_queue,
+	     (intptr_t *) &queued_value1,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to push value 1 on queue.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_queue_push(
+	     cthreads_test_queue,
+	     (intptr_t *) &queued_value2,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to push value 2 on queue.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_queue_push(
+	     cthreads_test_queue,
+	     (intptr_t *) &queued_value3,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to push value 3 on queue.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_queue_push(
+	     cthreads_test_queue,
+	     (intptr_t *) &queued_value4,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to push value 4 on queue.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_queue_push(
+	     cthreads_test_queue,
+	     (intptr_t *) &queued_value5,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to push value 5 on queue.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_thread_join(
+	     &thread,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to join thread.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_queue_free(
+	     &cthreads_test_queue,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free queue.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 stdout,
+	 "Testing queued value\t" );
+
+	exptected_queued_value  = queued_value1;
+	exptected_queued_value += queued_value2;
+	exptected_queued_value += queued_value3;
+	exptected_queued_value += queued_value4;
+	exptected_queued_value += queued_value5;
+
+	if( cthreads_test_queued_value != exptected_queued_value )
+	{
+		fprintf(
+		 stdout,
+		 "(FAIL)" );
+	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
+	fprintf(
+	 stdout,
+	 "\n" );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
+		 &error );
+	}
+	if( cthreads_test_queue != NULL )
+	{
+		libcthreads_queue_free(
+		 &cthreads_test_queue,
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
