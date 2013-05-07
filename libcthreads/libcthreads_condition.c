@@ -244,12 +244,12 @@ int libcthreads_condition_free(
 /* Broadcasts a condition
  * Returns 1 if successful or -1 on error
  */
-int libcthreads_condition_broadcasts(
+int libcthreads_condition_broadcast(
      libcthreads_condition_t *condition,
      libcerror_error_t **error )
 {
 	libcthreads_internal_condition_t *internal_condition = NULL;
-	static char *function                                = "libcthreads_condition_broadcasts";
+	static char *function                                = "libcthreads_condition_broadcast";
 
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 	int pthread_result                                   = 0;
