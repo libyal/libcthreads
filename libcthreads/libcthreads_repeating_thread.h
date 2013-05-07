@@ -37,11 +37,6 @@
 extern "C" {
 #endif
 
-enum LIBCTHREADS_STATUS
-{
-	LIBCTHREADS_STATUS_EXIT		= 1
-};
-
 typedef struct libcthreads_internal_repeating_thread libcthreads_internal_repeating_thread_t;
 
 struct libcthreads_internal_repeating_thread

@@ -94,19 +94,19 @@ int libcthreads_error_backtrace_sprint(
 /* Creates a thread
  * Make sure the value thread is referencing, is set to NULL
  *
- * The start_function should return 1 if successful and -1 on error
+ * The callback_function should return 1 if successful and -1 on error
  * Returns 1 if successful or -1 on error
  */
 LIBCTHREADS_EXTERN \
 int libcthreads_thread_create(
      libcthreads_thread_t **thread,
      const libcthreads_thread_attributes_t *thread_attributes,
-     int (*start_function)(
+     int (*callback_function)(
             void *arguments),
-     void *start_function_arguments,
+     void *callback_function_arguments,
      libcthreads_error_t **error );
 
-/* Joins the current with a specified thread
+/* Joins the current thread with a specified thread
  * The the thread is freed after join
  * Returns 1 if successful or -1 on error
  */
@@ -135,51 +135,6 @@ LIBCTHREADS_EXTERN \
 int libcthreads_thread_attributes_free(
      libcthreads_thread_attributes_t **thread_attributes,
      libcthreads_error_t **error );
-
-/* -------------------------------------------------------------------------
- * Repeating thread functions
- * ------------------------------------------------------------------------- */
-
-/* Creates a repeating thread
- * Make sure the value repeating_thread is referencing, is set to NULL
- *
- * The start_function should return 1 if successful and -1 on error
- * Returns 1 if successful or -1 on error
- */
-LIBCTHREADS_EXTERN \
-int libcthreads_repeating_thread_create(
-     libcthreads_repeating_thread_t **repeating_thread,
-     const libcthreads_thread_attributes_t *thread_attributes,
-     int (*start_function)(
-            void *arguments ),
-     void *start_function_arguments,
-     libcthreads_error_t **error );
-
-/* TODO */
-LIBCTHREADS_EXTERN \
-int libcthreads_repeating_thread_push(
-     libcthreads_repeating_thread_t *repeating_thread,
-     libcthreads_error_t **error );
-
-/* Joins the current with a specified repeating thread
- * The the thread is freed after join
- * Returns 1 if successful or -1 on error
- */
-LIBCTHREADS_EXTERN \
-int libcthreads_repeating_thread_join(
-     libcthreads_repeating_thread_t **repeating_thread,
-     libcthreads_error_t **error );
-
-/* -------------------------------------------------------------------------
- * Thread pool functions
- * ------------------------------------------------------------------------- */
-
-/* Creates a thread pool
- * Make sure the value thread_pool is referencing, is set to NULL
- *
- * The start_function should return 1 if successful and -1 on error
- * Returns 1 if successful or -1 on error
- */
 
 /* -------------------------------------------------------------------------
  * Condition functions
@@ -365,6 +320,7 @@ int libcthreads_read_write_lock_release_for_write(
 LIBCTHREADS_EXTERN \
 int libcthreads_queue_initialize(
      libcthreads_queue_t **queue,
+     int maximum_number_of_values,
      libcthreads_error_t **error );
 
 /* Frees a queue
@@ -391,6 +347,37 @@ LIBCTHREADS_EXTERN \
 int libcthreads_queue_push(
      libcthreads_queue_t *queue,
      intptr_t *value,
+     libcthreads_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Thread pool functions
+ * ------------------------------------------------------------------------- */
+
+/* Creates a thread pool
+ * Make sure the value thread_pool is referencing, is set to NULL
+ *
+ * The callback_function should return 1 if successful and -1 on error
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_thread_pool_create(
+     libcthreads_thread_pool_t **thread_pool,
+     const libcthreads_thread_attributes_t *thread_attributes,
+     int number_of_threads,
+     int maximum_number_of_values,
+     int (*callback_function)(
+            intptr_t *value,
+            void *arguments ),
+     void *callback_function_arguments,
+     libcthreads_error_t **error );
+
+/* Joins the current thread with a specified thread pool
+ * The the thread is freed after join
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_thread_pool_join(
+     libcthreads_thread_pool_t **thread_pool,
      libcthreads_error_t **error );
 
 #if defined( __cplusplus )

@@ -193,10 +193,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libcthreads\libcthreads_repeating_thread.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libcthreads\libcthreads_support.c"
 				>
 			</File>
@@ -256,10 +252,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libcthreads\libcthreads_read_write_lock.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcthreads\libcthreads_repeating_thread.h"
 				>
 			</File>
 			<File

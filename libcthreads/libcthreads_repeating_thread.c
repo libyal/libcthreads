@@ -33,6 +33,7 @@
 #endif
 
 #include "libcthreads_condition.h"
+#include "libcthreads_definitions.h"
 #include "libcthreads_libcerror.h"
 #include "libcthreads_mutex.h"
 #include "libcthreads_repeating_thread.h"

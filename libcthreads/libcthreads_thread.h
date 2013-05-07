@@ -55,30 +55,27 @@ struct libcthreads_internal_thread
 	 */
 	pthread_t thread;
 
-	/* The start functions return value
-	 */
-	int start_function_result;
 #else
 #error Missing thread type
 #endif
 
-	/* The start function
+	/* The callback function
 	 */
-	int (*start_function)(
+	int (*callback_function)(
 	       void *arguments );
 
-	/* The start function arguments
+	/* The callback function arguments
 	 */
-	void *start_function_arguments;
+	void *callback_function_arguments;
 };
 
 LIBCTHREADS_EXTERN \
 int libcthreads_thread_create(
      libcthreads_thread_t **thread,
      const libcthreads_thread_attributes_t *thread_attributes,
-     int (*start_function)(
+     int (*callback_function)(
             void *arguments ),
-     void *start_function_arguments,
+     void *callback_function_arguments,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \

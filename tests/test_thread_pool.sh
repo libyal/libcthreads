@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Library repeating thread type testing script
+# Library thread pool type testing script
 #
 # Copyright (c) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -24,11 +24,11 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-test_repeating_thread()
+test_thread_pool()
 { 
-	echo "Testing repeating thread type";
+	echo "Testing thread pool type";
 
-	./${CTHREADS_TEST_REPEATING_THREAD};
+	./${CTHREADS_TEST_THREAD_POOL};
 
 	RESULT=$?;
 
@@ -37,21 +37,21 @@ test_repeating_thread()
 	return ${RESULT};
 }
 
-CTHREADS_TEST_REPEATING_THREAD="cthreads_test_repeating_thread";
+CTHREADS_TEST_THREAD_POOL="cthreads_test_thread_pool";
 
-if ! test -x ${CTHREADS_TEST_REPEATING_THREAD};
+if ! test -x ${CTHREADS_TEST_THREAD_POOL};
 then
-	CTHREADS_TEST_REPEATING_THREAD="cthreads_test_repeating_thread.exe";
+	CTHREADS_TEST_THREAD_POOL="cthreads_test_thread_pool.exe";
 fi
 
-if ! test -x ${CTHREADS_TEST_REPEATING_THREAD};
+if ! test -x ${CTHREADS_TEST_THREAD_POOL};
 then
-	echo "Missing executable: ${CTHREADS_TEST_REPEATING_THREAD}";
+	echo "Missing executable: ${CTHREADS_TEST_THREAD_POOL}";
 
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_repeating_thread;
+if ! test_thread_pool;
 then
 	exit ${EXIT_FAILURE};
 fi

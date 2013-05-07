@@ -1,5 +1,5 @@
 /*
- * Library thread type testing program
+ * Library thread pool type testing program
  *
  * Copyright (c) 2012-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -31,36 +31,38 @@
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
 
-/* The thread callback function
+/* The thread pool callback function
  * Returns 1 if successful or -1 on error
  */
-int cthreads_test_thread_callback_function(
+int cthreads_test_thread_pool_callback_function(
      void *arguments )
 {
 	return( 1 );
 }
 
-/* Tests creating a thread
- * Make sure the value thread is referencing, is set to NULL
+/* Tests creating a thread pool
+ * Make sure the value thread_pool is referencing, is set to NULL
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cthreads_test_thread_create(
-     libcthreads_thread_t **thread,
+int cthreads_test_thread_pool_create(
+     libcthreads_thread_pool_t **thread_pool,
      int (*callback_function)(
             void *arguments ),
      int expected_result )
 {
 	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_thread_create";
+	static char *function    = "cthreads_test_thread_pool_create";
 	int result               = 0;
 
 	fprintf(
 	 stdout,
 	 "Testing create\t" );
 
-	result = libcthreads_thread_create(
-	          thread,
+	result = libcthreads_thread_pool_create(
+	          thread_pool,
 	          NULL,
+	          8,
+	          32,
 	          callback_function,
 	          NULL,
 	          &error );
@@ -71,7 +73,7 @@ int cthreads_test_thread_create(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create thread.",
+		 "%s: unable to create thread pool.",
 		 function );
 	}
 	if( result != expected_result )
@@ -106,22 +108,22 @@ int cthreads_test_thread_create(
 	return( 1 );
 }
 
-/* Tests joining a thread
+/* Tests joining a thread pool
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int cthreads_test_thread_join(
-     libcthreads_thread_t **thread )
+int cthreads_test_thread_pool_join(
+     libcthreads_thread_pool_t **thread_pool )
 {
 	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_thread_join";
+	static char *function    = "cthreads_test_thread_pool_join";
 	int result               = 0;
 
 	fprintf(
 	 stdout,
 	 "Testing join\t" );
 
-	result = libcthreads_thread_join(
-		  thread,
+	result = libcthreads_thread_pool_join(
+		  thread_pool,
 		  &error );
 
 	if( result == -1 )
@@ -130,7 +132,7 @@ int cthreads_test_thread_join(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to join thread.",
+		 "%s: unable to join thread pool.",
 		 function );
 
 		fprintf(
@@ -169,7 +171,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcthreads_thread_t *thread = NULL;
+	libcthreads_thread_pool_t *thread_pool = NULL;
 
 	if( argc != 1 )
 	{
@@ -181,11 +183,11 @@ int main( int argc, char * const argv[] )
 	}
 	/* Create tests
 	 */
-	thread = NULL;
+	thread_pool = NULL;
 
-	if( cthreads_test_thread_create(
-	     &thread,
-	     &cthreads_test_thread_callback_function,
+	if( cthreads_test_thread_pool_create(
+	     &thread_pool,
+	     &cthreads_test_thread_pool_callback_function,
 	     1 ) != 1 )
 	{
 		fprintf(
@@ -194,8 +196,8 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( cthreads_test_thread_join(
-	     &thread ) != 1 )
+	if( cthreads_test_thread_pool_join(
+	     &thread_pool ) != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -203,10 +205,10 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	thread = NULL;
+	thread_pool = NULL;
 
-	if( cthreads_test_thread_create(
-	     &thread,
+	if( cthreads_test_thread_pool_create(
+	     &thread_pool,
 	     NULL,
 	     -1 ) != 1 )
 	{
@@ -216,11 +218,11 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	thread = (libcthreads_thread_t *) 0x12345678UL;
+	thread_pool = (libcthreads_thread_pool_t *) 0x12345678UL;
 
-	if( cthreads_test_thread_create(
-	     &thread,
-	     &cthreads_test_thread_callback_function,
+	if( cthreads_test_thread_pool_create(
+	     &thread_pool,
+	     &cthreads_test_thread_pool_callback_function,
 	     -1 ) != 1 )
 	{
 		fprintf(

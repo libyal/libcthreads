@@ -47,22 +47,45 @@ struct libcthreads_internal_thread_pool
 	TP_POOL *thread_pool;
 
 #else
-	/* The maximum number of threads in the pool
+	/* The number of threads in the pool
 	 */
-	int maximum_number_of_threads;
+	int number_of_threads;
 
+#if defined( WINAPI )
+	/* The thread handles array
+	 */
+	HANDLE *thread_handles_array;
+
+	/* The thread identifiers sttau
+	 */
+	DWORD *thread_identifier_array;
+
+#elif defined( HAVE_PTHREAD_H )
 	/* The threads array
 	 */
-	libcthreads_thread_t **threads_array;
+	pthread_t *threads_array;
 
-	/* The start function
+#else
+#error Missing thread type
+#endif
+
+	/* The queue
 	 */
-	int (*start_function)(
+	libcthreads_queue_t *queue;
+
+	/* The callback function
+	 */
+	int (*callback_function)(
+	       intptr_t *value,
 	       void *arguments );
 
-	/* The start function arguments
+	/* The value function arguments
 	 */
-	void *start_function_arguments;
+	void *callback_function_arguments;
+
+	/* The status
+	 */
+	uint8_t status;
 #endif
 };
 
@@ -70,10 +93,23 @@ LIBCTHREADS_EXTERN \
 int libcthreads_thread_pool_create(
      libcthreads_thread_pool_t **thread_pool,
      const libcthreads_thread_attributes_t *thread_attributes,
-     int maximum_number_of_threads,
-     int (*start_function)(
+     int number_of_threads,
+     int maximum_number_of_values,
+     int (*callback_function)(
+            intptr_t *value,
             void *arguments ),
-     void *start_function_arguments,
+     void *callback_function_arguments,
+     libcerror_error_t **error );
+
+LIBCTHREADS_EXTERN \
+int libcthreads_thread_pool_push(
+     libcthreads_thread_pool_t *thread_pool,
+     intptr_t *value,
+     libcerror_error_t **error );
+
+LIBCTHREADS_EXTERN \
+int libcthreads_thread_pool_join(
+     libcthreads_thread_pool_t **thread_pool,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

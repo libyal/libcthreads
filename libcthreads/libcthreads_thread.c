@@ -41,24 +41,24 @@
 /* Start function helper function for WINAPI
  * Returns 0 if successful or 1 on error
  */
-DWORD WINAPI libcthreads_thread_start_function_helper(
+DWORD WINAPI libcthreads_thread_callback_function_helper(
               void *arguments )
 {
 	libcthreads_internal_thread_t *internal_thread = NULL;
 	DWORD result                                   = 1;
-	int start_function_result                      = 0;
+	int callback_function_result                   = 0;
 
 	if( arguments != NULL )
 	{
 		internal_thread = (libcthreads_internal_thread_t *) arguments;
 
 		if( ( internal_thread != NULL )
-		 && ( internal_thread->start_function != NULL ) )
+		 && ( internal_thread->callback_function != NULL ) )
 		{
-			start_function_result = internal_thread->start_function(
-			                         internal_thread->start_function_arguments );
+			callback_function_result = internal_thread->callback_function(
+			                            internal_thread->callback_function_arguments );
 		}
-		result = (DWORD) ( start_function_result != 1 );
+		result = (DWORD) ( callback_function_result != 1 );
 	}
 	ExitThread(
 	 result );
@@ -66,32 +66,33 @@ DWORD WINAPI libcthreads_thread_start_function_helper(
 
 #elif defined( HAVE_PTHREAD_H )
 /* Start function helper function for pthread
- * Returns a pointer to the start function result if successful or NULL on error
+ * Returns a pointer to the callback function result if successful or NULL on error
  */
-void *libcthreads_thread_start_function_helper(
+void *libcthreads_thread_callback_function_helper(
        void *arguments )
 {
 	libcthreads_internal_thread_t *internal_thread = NULL;
-	int start_function_result                      = 0;
-	void *result                                   = NULL;
+	int *result                                    = NULL;
 
 	if( arguments != NULL )
 	{
 		internal_thread = (libcthreads_internal_thread_t *) arguments;
 
 		if( ( internal_thread != NULL )
-  		 && ( internal_thread->start_function != NULL ) )
+  		 && ( internal_thread->callback_function != NULL ) )
 		{
-			start_function_result = internal_thread->start_function(
-			                         internal_thread->start_function_arguments );
+			result = (int *) memory_allocate(
+			                  sizeof( int ) );
 
-			internal_thread->start_function_result = start_function_result;
-
-			result = (void *) &( internal_thread->start_function_result );
+			if( result != NULL )
+			{
+				*result = internal_thread->callback_function(
+				           internal_thread->callback_function_arguments );
+			}
 		}
 	}
 	pthread_exit(
-	 result );
+	 (void *) result );
 }
 
 #endif
@@ -99,15 +100,15 @@ void *libcthreads_thread_start_function_helper(
 /* Creates a thread
  * Make sure the value thread is referencing, is set to NULL
  *
- * The start_function should return 1 if successful and -1 on error
+ * The callback_function should return 1 if successful and -1 on error
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_thread_create(
      libcthreads_thread_t **thread,
      const libcthreads_thread_attributes_t *thread_attributes,
-     int (*start_function)(
+     int (*callback_function)(
             void *arguments ),
-     void *start_function_arguments,
+     void *callback_function_arguments,
      libcerror_error_t **error )
 {
 	libcthreads_internal_thread_t *internal_thread = NULL;
@@ -115,6 +116,7 @@ int libcthreads_thread_create(
 
 #if defined( WINAPI )
 	SECURITY_ATTRIBUTES *security_attributes       = NULL;
+	HANDLE thread_handle                           = NULL;
 	DWORD error_code                               = 0;
 
 #elif defined( HAVE_PTHREAD_H )
@@ -144,13 +146,13 @@ int libcthreads_thread_create(
 
 		return( -1 );
 	}
-	if( start_function == NULL )
+	if( callback_function == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid start function.",
+		 "%s: invalid callback function.",
 		 function );
 
 		return( -1 );
@@ -183,23 +185,23 @@ int libcthreads_thread_create(
 
 		goto on_error;
 	}
-	internal_thread->start_function           = start_function;
-	internal_thread->start_function_arguments = start_function_arguments;
+	internal_thread->callback_function           = callback_function;
+	internal_thread->callback_function_arguments = callback_function_arguments;
 
 #if defined( WINAPI )
 	if( thread_attributes != NULL )
 	{
 		security_attributes = &( ( (libcthreads_internal_thread_attributes_t *) thread_attributes )->security_attributes );
 	}
-	internal_thread->thread_handle = CreateThread(
-	                                  security_attributes,
-	                                  0, /* stack size */
-	                                  &libcthreads_thread_start_function_helper,
-	                                  (void *) internal_thread,
-	                                  0, /* creation flags */
-	                                  &( internal_thread->thread_identifier ) );
+	thread_handle = CreateThread(
+	                 security_attributes,
+	                 0, /* stack size */
+	                 &libcthreads_thread_callback_function_helper,
+	                 (void *) internal_thread,
+	                 0, /* creation flags */
+	                 &( internal_thread->thread_identifier ) );
 
-	if( internal_thread->thread_handle == NULL )
+	if( thread_handle == NULL )
 	{
 		error_code = GetLastError();
 
@@ -213,6 +215,8 @@ int libcthreads_thread_create(
 
 		goto on_error;
 	}
+	internal_thread->thread_handle = thread_handle;
+
 #elif defined( HAVE_PTHREAD_H )
 	if( thread_attributes != NULL )
 	{
@@ -221,7 +225,7 @@ int libcthreads_thread_create(
 	pthread_result = pthread_create(
 		          &( internal_thread->thread ),
 	                  attributes,
-	                  &libcthreads_thread_start_function_helper,
+	                  &libcthreads_thread_callback_function_helper,
 	                  (void *) internal_thread );
 
 	if( pthread_result != 0 )
@@ -333,8 +337,7 @@ int libcthreads_thread_join(
 
 		result = -1;
 	}
-	else if( ( thread_return_value == NULL )
-	      || ( thread_return_value != &( internal_thread->start_function_result ) ) )
+	else if( thread_return_value == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -351,11 +354,16 @@ int libcthreads_thread_join(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: thread returned an error status.",
+		 "%s: thread returned an error status of: %d.",
 		 function,
 		 *thread_return_value );
 
 		result = -1;
+	}
+	if( thread_return_value != NULL )
+	{
+		memory_free(
+		 thread_return_value );
 	}
 #endif
 	memory_free(

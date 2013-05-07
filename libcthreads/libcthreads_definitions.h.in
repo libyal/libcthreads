@@ -43,5 +43,12 @@
 
 #endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) */
 
+/* The status definitions
+ */
+enum LIBCTHREADS_STATUS
+{
+	LIBCTHREADS_STATUS_EXIT			= 1
+};
+
 #endif
 

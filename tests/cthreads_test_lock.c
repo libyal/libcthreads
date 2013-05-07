@@ -118,14 +118,14 @@ int cthreads_test_lock_initialize(
 libcthreads_lock_t *cthreads_test_lock = NULL;
 int cthreads_test_locked_value         = 0;
 
-/* The thread1 start function
+/* The thread1 callback function
  * Returns 1 if successful or -1 on error
  */
-int cthreads_test_lock_start_function1(
+int cthreads_test_lock_callback_function1(
      void *arguments )
 {
 	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_lock_start_function1";
+	static char *function    = "cthreads_test_lock_callback_function1";
 	int result               = 0;
 
 	result = libcthreads_lock_grab(
@@ -175,14 +175,14 @@ on_error:
 	return( -1 );
 }
 
-/* The thread2 start function
+/* The thread2 callback function
  * Returns 1 if successful or -1 on error
  */
-int cthreads_test_lock_start_function2(
+int cthreads_test_lock_callback_function2(
      void *arguments )
 {
 	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_lock_start_function2";
+	static char *function    = "cthreads_test_lock_callback_function2";
 	int result               = 0;
 
 	result = libcthreads_lock_grab(
@@ -293,7 +293,7 @@ int cthreads_test_lock_locking(
 		if( libcthreads_thread_create(
 		     &thread1,
 		     NULL,
-		     cthreads_test_lock_start_function1,
+		     cthreads_test_lock_callback_function1,
 		     NULL,
 		     &error ) != 1 )
 		{
@@ -309,7 +309,7 @@ int cthreads_test_lock_locking(
 		if( libcthreads_thread_create(
 		     &thread2,
 		     NULL,
-		     cthreads_test_lock_start_function2,
+		     cthreads_test_lock_callback_function2,
 		     NULL,
 		     &error ) != 1 )
 		{
