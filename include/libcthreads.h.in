@@ -391,8 +391,8 @@ int libcthreads_thread_pool_create(
  * Returns 1 if successful or -1 on error
  */
 LIBCTHREADS_EXTERN \
-int libcthreads_queue_push(
-     libcthreads_queue_t *queue,
+int libcthreads_thread_pool_push(
+     libcthreads_thread_pool_t *thread_pool,
      intptr_t *value,
      libcthreads_error_t **error );
 
