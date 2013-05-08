@@ -75,9 +75,9 @@ struct libcthreads_internal_repeating_thread
 	 */
 	libcthreads_mutex_t *condition_mutex;
 
-	/* The idle condition
+	/* The status condition
 	 */
-	libcthreads_condition_t *idle_condition;
+	libcthreads_condition_t *status_condition;
 
 	/* The status
 	 */

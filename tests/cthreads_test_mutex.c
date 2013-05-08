@@ -414,18 +414,22 @@ int cthreads_test_mutex_locking(
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
+
+		result = 0;
 	}
 	else
 	{
 		fprintf(
 		 stdout,
 		 "(PASS)" );
+
+		result = 1;
 	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	return( 1 );
+	return( result );
 
 on_error:
 	if( error != NULL )

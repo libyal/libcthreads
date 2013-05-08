@@ -162,6 +162,8 @@ int libcthreads_queue_initialize(
 
 		goto on_error;
 	}
+	internal_queue->allocated_number_of_values = maximum_number_of_values;
+
 	if( libcthreads_mutex_initialize(
 	     &( internal_queue->condition_mutex ),
 	     error ) != 1 )
@@ -201,8 +203,6 @@ int libcthreads_queue_initialize(
 
 		goto on_error;
 	}
-	internal_queue->allocated_number_of_values = maximum_number_of_values;
-
 	*queue = (libcthreads_queue_t *) internal_queue;
 
 	return( 1 );
@@ -305,6 +305,89 @@ int libcthreads_queue_free(
 	return( result );
 }
 
+/* Empties a queue
+ * Returns 1 if successful or -1 on error
+ */
+int libcthreads_queue_empty(
+     libcthreads_queue_t *queue,
+     libcerror_error_t **error )
+{
+	libcthreads_internal_queue_t *internal_queue = NULL;
+	static char *function                        = "libcthreads_queue_empty";
+	int result                                   = 1;
+
+	if( queue == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid queue.",
+		 function );
+
+		return( -1 );
+	}
+	internal_queue = (libcthreads_internal_queue_t *) queue;
+
+	if( internal_queue->values_array == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid queue - missing values array.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcthreads_mutex_grab(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab condition mutex.",
+		 function );
+
+		return( -1 );
+	}
+	while( internal_queue->number_of_values != 0 )
+	{
+		if( libcthreads_condition_wait(
+		     internal_queue->full_condition,
+		     internal_queue->condition_mutex,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to wait for full condition.",
+			 function );
+
+			result = -1;
+
+			break;
+		}
+	}
+	if( libcthreads_mutex_release(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release condition mutex.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* Pops a value off the queue
  * Returns 1 if successful or -1 on error
  */
@@ -314,7 +397,7 @@ int libcthreads_queue_pop(
      libcerror_error_t **error )
 {
 	libcthreads_internal_queue_t *internal_queue = NULL;
-	static char *function                        = "libcthreads_queue_free";
+	static char *function                        = "libcthreads_queue_pop";
 	int result                                   = 1;
 
 	if( queue == NULL )
@@ -379,7 +462,9 @@ int libcthreads_queue_pop(
 			 "%s: unable to wait for empty condition.",
 			 function );
 
-			return( -1 );
+			result = -1;
+
+			break;
 		}
 	}
 	if( result == 1 )
@@ -426,6 +511,112 @@ int libcthreads_queue_pop(
 	return( result );
 }
 
+/* Tries to pop a value off the queue
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int libcthreads_queue_try_pop(
+     libcthreads_queue_t *queue,
+     intptr_t **value,
+     libcerror_error_t **error )
+{
+	libcthreads_internal_queue_t *internal_queue = NULL;
+	static char *function                        = "libcthreads_queue_try_pop";
+	int result                                   = 0;
+
+	if( queue == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid queue.",
+		 function );
+
+		return( -1 );
+	}
+	internal_queue = (libcthreads_internal_queue_t *) queue;
+
+	if( internal_queue->values_array == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid queue - missing values array.",
+		 function );
+
+		return( -1 );
+	}
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcthreads_mutex_grab(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab condition mutex.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_queue->number_of_values != 0 )
+	{
+		*value = internal_queue->values_array[ internal_queue->pop_index ];
+
+		internal_queue->pop_index += 1;
+
+		if( internal_queue->pop_index >= internal_queue->allocated_number_of_values )
+		{
+			internal_queue->pop_index = 0;
+		}
+		internal_queue->number_of_values -= 1;
+
+		result = 1;
+	}
+	if( libcthreads_mutex_release(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release condition mutex.",
+		 function );
+
+		return( -1 );
+	}
+	if( result == 1 )
+	{
+		if( libcthreads_condition_broadcast(
+		     internal_queue->full_condition,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to broadcast full condition.",
+			 function );
+
+			result = -1;
+		}
+	}
+	return( result );
+}
+
 /* Pushes a value onto the queue
  * Returns 1 if successful or -1 on error
  */
@@ -435,7 +626,7 @@ int libcthreads_queue_push(
      libcerror_error_t **error )
 {
 	libcthreads_internal_queue_t *internal_queue = NULL;
-	static char *function                        = "libcthreads_queue_free";
+	static char *function                        = "libcthreads_queue_push";
 	int result                                   = 1;
 
 	if( queue == NULL )
@@ -501,6 +692,8 @@ int libcthreads_queue_push(
 			 function );
 
 			result = -1;
+
+			break;
 		}
 	}
 	if( result == 1 )
@@ -514,6 +707,112 @@ int libcthreads_queue_push(
 			internal_queue->push_index = 0;
 		}
 		internal_queue->number_of_values += 1;
+	}
+	if( libcthreads_mutex_release(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release condition mutex.",
+		 function );
+
+		return( -1 );
+	}
+	if( result == 1 )
+	{
+		if( libcthreads_condition_broadcast(
+		     internal_queue->empty_condition,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to broadcast empty condition.",
+			 function );
+
+			result = -1;
+		}
+	}
+	return( result );
+}
+
+/* Tries to push a value onto the queue
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int libcthreads_queue_try_push(
+     libcthreads_queue_t *queue,
+     intptr_t *value,
+     libcerror_error_t **error )
+{
+	libcthreads_internal_queue_t *internal_queue = NULL;
+	static char *function                        = "libcthreads_queue_try_push";
+	int result                                   = 0;
+
+	if( queue == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid queue.",
+		 function );
+
+		return( -1 );
+	}
+	internal_queue = (libcthreads_internal_queue_t *) queue;
+
+	if( internal_queue->values_array == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid queue - missing values array.",
+		 function );
+
+		return( -1 );
+	}
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcthreads_mutex_grab(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab condition mutex.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_queue->number_of_values < internal_queue->allocated_number_of_values )
+	{
+		internal_queue->values_array[ internal_queue->push_index ] = value;
+
+		internal_queue->push_index += 1;
+
+		if( internal_queue->push_index >= internal_queue->allocated_number_of_values )
+		{
+			internal_queue->push_index = 0;
+		}
+		internal_queue->number_of_values += 1;
+
+		result = 1;
 	}
 	if( libcthreads_mutex_release(
 	     internal_queue->condition_mutex,

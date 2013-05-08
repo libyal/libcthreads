@@ -145,8 +145,8 @@ int cthreads_test_queue_pop_callback_function(
 			libcerror_error_set(
 			 &error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to get value from queue.",
+			 LIBCERROR_RUNTIME_ERROR_REMOVE_FAILED,
+			 "%s: unable to pop value off queue.",
 			 function );
 
 			goto on_error;
@@ -176,31 +176,50 @@ int cthreads_test_queue_push_callback_function(
 {
 	libcerror_error_t *error = NULL;
 	static char *function    = "cthreads_test_queue_push_callback_function";
+	int *queued_values       = NULL;
 	int iterator             = 0;
-	int queued_value         = 0;
 
+	queued_values = (int *) memory_allocate(
+	                         sizeof( int ) * cthreads_test_number_of_iterations );
+
+	if( queued_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create queued values.",
+		 function );
+
+		goto on_error;
+	}
 	for( iterator = 0;
 	     iterator < cthreads_test_number_of_iterations;
 	     iterator++ )
 	{
-		queued_value = ( 98 * iterator ) % 45;
+		queued_values[ iterator ] = ( 98 * iterator ) % 45;
 
 		if( libcthreads_queue_push(
 		     cthreads_test_queue,
-		     (intptr_t *) &queued_value,
+		     (intptr_t *) &( queued_values[ iterator ] ),
 		     &error ) == -1 )
 		{
 			libcerror_error_set(
 			 &error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 			 "%s: unable to get value from queue.",
 			 function );
 
 			goto on_error;
 		}
-		cthreads_test_expected_queued_value += queued_value;
+		cthreads_test_expected_queued_value += queued_values[ iterator ];
 	}
+	memory_free(
+	 queued_values );
+
+	queued_values = NULL;
+
 	return( 1 );
 
 on_error:
@@ -212,6 +231,11 @@ on_error:
 
 		libcerror_error_free(
 		 &error );
+	}
+	if( queued_values != NULL )
+	{
+		memory_free(
+		 queued_values );
 	}
 	return( -1 );
 }
@@ -303,6 +327,19 @@ int cthreads_test_queue_queuing(
 
 		goto on_error;
 	}
+	if( libcthreads_queue_empty(
+	     cthreads_test_queue,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty queue.",
+		 function );
+
+		goto on_error;
+	}
 	if( libcthreads_queue_free(
 	     &cthreads_test_queue,
 	     &error ) != 1 )
@@ -325,18 +362,22 @@ int cthreads_test_queue_queuing(
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
+
+		result = 0;
 	}
 	else
 	{
 		fprintf(
 		 stdout,
 		 "(PASS)" );
+
+		result = 1;
 	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	return( 1 );
+	return( result );
 
 on_error:
 	if( error != NULL )

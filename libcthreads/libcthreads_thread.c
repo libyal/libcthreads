@@ -364,6 +364,8 @@ int libcthreads_thread_join(
 	{
 		memory_free(
 		 thread_return_value );
+
+		thread_return_value = NULL;
 	}
 #endif
 	memory_free(

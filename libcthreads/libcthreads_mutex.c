@@ -317,6 +317,86 @@ int libcthreads_mutex_grab(
 	return( 1 );
 }
 
+/* Tries to grabs a mutex
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int libcthreads_mutex_try_grab(
+     libcthreads_mutex_t *mutex,
+     libcerror_error_t **error )
+{
+	libcthreads_internal_mutex_t *internal_mutex = NULL;
+	static char *function                        = "libcthreads_mutex_try_grab";
+	int result                                   = 1;
+
+#if defined( WINAPI )
+	DWORD error_code                             = 0;
+	DWORD wait_status                            = 0;
+
+#elif defined( HAVE_PTHREAD_H )
+	int pthread_result                           = 0;
+#endif
+
+	if( mutex == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid mutex.",
+		 function );
+
+		return( -1 );
+	}
+	internal_mutex = (libcthreads_internal_mutex_t *) mutex;
+
+#if defined( WINAPI )
+	wait_status = WaitForSingleObject(
+	               internal_mutex->mutex_handle,
+	               0 );
+
+	if( wait_status == WAIT_TIMEOUT )
+	{
+		result = 0;
+	}
+	else if( wait_status == WAIT_FAILED )
+	{
+		error_code = GetLastError();
+
+		libcerror_system_set_error(
+		 error,
+		 error_code,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: wait for mutex handle failed.",
+		 function );
+
+		return( -1 );
+	}
+
+#elif defined( HAVE_PTHREAD_H )
+	pthread_result = pthread_mutex_trylock(
+	                  &( internal_mutex->mutex ) );
+
+	if( pthread_result == EBUSY )
+	{
+		result = 0;
+	}
+	else if( pthread_result != 0 )
+	{
+		libcerror_system_set_error(
+		 error,
+		 pthread_result,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to lock mutex.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
 /* Releases a mutex
  * Returns 1 if successful or -1 on error
  */

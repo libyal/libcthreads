@@ -72,7 +72,7 @@ DWORD WINAPI libcthreads_repeating_thread_start_function_helper(
 				while( internal_repeating_thread->status != LIBCTHREADS_STATUS_EXIT )
 				{
 					libcthreads_condition_wait(
-					 internal_repeating_thread->idle_condition,
+					 internal_repeating_thread->status_condition,
 					 internal_repeating_thread->condition_mutex,
 					 NULL );
 				}
@@ -128,7 +128,7 @@ void *libcthreads_repeating_thread_start_function_helper(
 				while( internal_repeating_thread->status != LIBCTHREADS_STATUS_EXIT )
 				{
 					libcthreads_condition_wait(
-					 internal_repeating_thread->idle_condition,
+					 internal_repeating_thread->status_condition,
 					 internal_repeating_thread->condition_mutex,
 					 NULL );
 				}
@@ -257,14 +257,14 @@ int libcthreads_repeating_thread_create(
 		goto on_error;
 	}
 	if( libcthreads_condition_initialize(
-	     &( internal_repeating_thread->idle_condition ),
+	     &( internal_repeating_thread->status_condition ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create idle condition.",
+		 "%s: unable to create status condition.",
 		 function );
 
 		goto on_error;
@@ -330,10 +330,10 @@ int libcthreads_repeating_thread_create(
 on_error:
 	if( internal_repeating_thread != NULL )
 	{
-		if( internal_repeating_thread->idle_condition != NULL )
+		if( internal_repeating_thread->status_condition != NULL )
 		{
 			libcthreads_condition_free(
-			 &( internal_repeating_thread->idle_condition ),
+			 &( internal_repeating_thread->status_condition ),
 			 NULL );
 		}
 		if( internal_repeating_thread->condition_mutex != NULL )
@@ -388,14 +388,14 @@ int libcthreads_repeating_thread_push(
 		return( -1 );
 	}
 	if( libcthreads_condition_signal(
-	     internal_repeating_thread->idle_condition,
+	     internal_repeating_thread->status_condition,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to signal idle condition.",
+		 "%s: unable to signal status condition.",
 		 function );
 
 		result = -1;
@@ -478,14 +478,14 @@ int libcthreads_repeating_thread_join(
 	internal_repeating_thread->status = LIBCTHREADS_STATUS_EXIT;
 
 	if( libcthreads_condition_signal(
-	     internal_repeating_thread->idle_condition,
+	     internal_repeating_thread->status_condition,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to signal idle condition.",
+		 "%s: unable to signal status condition.",
 		 function );
 
 		result = -1;
@@ -570,14 +570,14 @@ int libcthreads_repeating_thread_join(
 	}
 #endif
 	if( libcthreads_condition_free(
-	     &( internal_repeating_thread->idle_condition ),
+	     &( internal_repeating_thread->status_condition ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free idle condition.",
+		 "%s: unable to free status condition.",
 		 function );
 
 		result = -1;

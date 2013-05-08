@@ -82,13 +82,30 @@ int libcthreads_queue_free(
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
+int libcthreads_queue_empty(
+     libcthreads_queue_t *queue,
+     libcerror_error_t **error );
+
+LIBCTHREADS_EXTERN \
 int libcthreads_queue_pop(
      libcthreads_queue_t *queue,
      intptr_t **value,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
+int libcthreads_queue_try_pop(
+     libcthreads_queue_t *queue,
+     intptr_t **value,
+     libcerror_error_t **error );
+
+LIBCTHREADS_EXTERN \
 int libcthreads_queue_push(
+     libcthreads_queue_t *queue,
+     intptr_t *value,
+     libcerror_error_t **error );
+
+LIBCTHREADS_EXTERN \
+int libcthreads_queue_try_push(
      libcthreads_queue_t *queue,
      intptr_t *value,
      libcerror_error_t **error );

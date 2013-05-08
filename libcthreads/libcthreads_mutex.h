@@ -72,6 +72,11 @@ int libcthreads_mutex_grab(
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
+int libcthreads_mutex_try_grab(
+     libcthreads_mutex_t *mutex,
+     libcerror_error_t **error );
+
+LIBCTHREADS_EXTERN \
 int libcthreads_mutex_release(
      libcthreads_mutex_t *mutex,
      libcerror_error_t **error );

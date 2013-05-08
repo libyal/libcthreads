@@ -248,6 +248,14 @@ int libcthreads_mutex_grab(
      libcthreads_mutex_t *mutex,
      libcthreads_error_t **error );
 
+/* Tries to grab a mutex
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_mutex_try_grab(
+     libcthreads_mutex_t *mutex,
+     libcthreads_error_t **error );
+
 /* Releases a mutex
  * Returns 1 if successful or -1 on error
  */
@@ -329,6 +337,14 @@ int libcthreads_queue_initialize(
 LIBCTHREADS_EXTERN \
 int libcthreads_queue_free(
      libcthreads_queue_t **queue,
+     libcthreads_error_t **error );
+
+/* Empties a queue
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_queue_empty(
+     libcthreads_queue_t *queue,
      libcthreads_error_t **error );
 
 /* Pops a value off the queue
