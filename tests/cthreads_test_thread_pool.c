@@ -75,7 +75,6 @@ int cthreads_test_thread_pool_callback_function(
 
 		goto on_error;
 	}
-fprintf( stderr, "C: %d\n", *value );
 	cthreads_test_queued_value += *value;
 
 	result = libcthreads_lock_release(
@@ -355,18 +354,22 @@ int cthreads_test_thread_pool_push(
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
+
+		result = 0;
 	}
 	else
 	{
 		fprintf(
 		 stdout,
 		 "(PASS)" );
+
+		result = 1;
 	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	return( 1 );
+	return( result );
 
 on_error:
 	if( error != NULL )
@@ -393,9 +396,11 @@ on_error:
 		 &cthreads_test_lock,
 		 NULL );
 	}
-	memory_free(
-	 queued_values );
-
+	if( queued_values != NULL )
+	{
+		memory_free(
+		 queued_values );
+	}
 	return( -1 );
 }
 

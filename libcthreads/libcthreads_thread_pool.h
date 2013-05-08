@@ -69,10 +69,6 @@ struct libcthreads_internal_thread_pool
 #error Missing thread type
 #endif
 
-	/* The queue
-	 */
-	libcthreads_queue_t *queue;
-
 	/* The callback function
 	 */
 	int (*callback_function)(
@@ -82,6 +78,38 @@ struct libcthreads_internal_thread_pool
 	/* The value function arguments
 	 */
 	void *callback_function_arguments;
+
+	/* The (current) pop index
+	 */
+	int pop_index;
+
+	/* The (current) push index
+	 */
+	int push_index;
+
+	/* The number of values
+	 */
+	int number_of_values;
+
+	/* The allocated number of values
+	 */
+	int allocated_number_of_values;
+
+	/* The values array
+	 */
+	intptr_t **values_array;
+
+	/* The condition mutex
+	 */
+	libcthreads_mutex_t *condition_mutex;
+
+	/* The queue empty condition
+	 */
+	libcthreads_condition_t *empty_condition;
+
+	/* The queue full condition
+	 */
+	libcthreads_condition_t *full_condition;
 
 	/* The status
 	 */
@@ -100,6 +128,15 @@ int libcthreads_thread_pool_create(
             void *arguments ),
      void *callback_function_arguments,
      libcerror_error_t **error );
+
+#if !( defined( WINAPI ) && ( WINVER >= 0x0600 ) )
+
+int libcthreads_internal_thread_pool_pop(
+     libcthreads_internal_thread_pool_t *internal_thread_pool,
+     intptr_t **value,
+     libcerror_error_t **error );
+
+#endif
 
 LIBCTHREADS_EXTERN \
 int libcthreads_thread_pool_push(
