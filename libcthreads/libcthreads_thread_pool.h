@@ -56,9 +56,9 @@ struct libcthreads_internal_thread_pool
 	 */
 	HANDLE *thread_handles_array;
 
-	/* The thread identifiers sttau
+	/* The thread identifiers array
 	 */
-	DWORD *thread_identifier_array;
+	DWORD *thread_identifiers_array;
 
 #elif defined( HAVE_PTHREAD_H )
 	/* The threads array

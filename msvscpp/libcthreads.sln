@@ -49,6 +49,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cthreads_test_mutex", "cthr
 		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cthreads_test_thread_pool", "cthreads_test_thread_pool\cthreads_test_thread_pool.vcproj", "{DAFA82CC-4B04-4AF2-9338-6B55C3141DC6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5225323-AC67-411D-8FBA-199E9467FAB5} = {B5225323-AC67-411D-8FBA-199E9467FAB5}
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Win32 = Release|Win32
@@ -87,6 +94,10 @@ Global
 		{5BFA25FF-8041-4B99-BC72-755E5ED10D3C}.Release|Win32.Build.0 = Release|Win32
 		{5BFA25FF-8041-4B99-BC72-755E5ED10D3C}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
 		{5BFA25FF-8041-4B99-BC72-755E5ED10D3C}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{DAFA82CC-4B04-4AF2-9338-6B55C3141DC6}.Release|Win32.ActiveCfg = Release|Win32
+		{DAFA82CC-4B04-4AF2-9338-6B55C3141DC6}.Release|Win32.Build.0 = Release|Win32
+		{DAFA82CC-4B04-4AF2-9338-6B55C3141DC6}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{DAFA82CC-4B04-4AF2-9338-6B55C3141DC6}.VSDebug|Win32.Build.0 = VSDebug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

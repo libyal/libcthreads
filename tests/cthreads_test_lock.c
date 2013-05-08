@@ -30,6 +30,7 @@
 #include "cthreads_test_libcthreads.h"
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
+#include "cthreads_test_unused.h"
 
 /* Tests initializing a lock
  * Make sure the value lock is referencing, is set to NULL
@@ -122,11 +123,13 @@ int cthreads_test_locked_value         = 0;
  * Returns 1 if successful or -1 on error
  */
 int cthreads_test_lock_callback_function1(
-     void *arguments )
+     void *arguments CTHREADS_TEST_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	static char *function    = "cthreads_test_lock_callback_function1";
 	int result               = 0;
+
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( arguments )
 
 	result = libcthreads_lock_grab(
 	          cthreads_test_lock,
@@ -179,11 +182,13 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int cthreads_test_lock_callback_function2(
-     void *arguments )
+     void *arguments CTHREADS_TEST_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	static char *function    = "cthreads_test_lock_callback_function2";
 	int result               = 0;
+
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( arguments )
 
 	result = libcthreads_lock_grab(
 	          cthreads_test_lock,
@@ -468,12 +473,14 @@ on_error:
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] )
+int wmain( int argc, wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #else
-int main( int argc, char * const argv[] )
+int main( int argc, char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
 	libcthreads_lock_t *lock = NULL;
+
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( argv )
 
 	if( argc != 1 )
 	{

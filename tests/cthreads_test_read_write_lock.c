@@ -30,6 +30,7 @@
 #include "cthreads_test_libcthreads.h"
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
+#include "cthreads_test_unused.h"
 
 /* Tests initializing a read/write lock
  * Make sure the value read_write_lock is referencing, is set to NULL
@@ -118,12 +119,14 @@ int cthreads_test_read_write_lock_initialize(
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] )
+int wmain( int argc, wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #else
-int main( int argc, char * const argv[] )
+int main( int argc, char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
 	libcthreads_read_write_lock_t *read_write_lock = NULL;
+
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( argv )
 
 	if( argc != 1 )
 	{

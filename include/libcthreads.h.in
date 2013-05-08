@@ -387,6 +387,15 @@ int libcthreads_thread_pool_create(
      void *callback_function_arguments,
      libcthreads_error_t **error );
 
+/* Pushes a value onto the queue of the thread pool
+ * Returns 1 if successful or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_queue_push(
+     libcthreads_queue_t *queue,
+     intptr_t *value,
+     libcthreads_error_t **error );
+
 /* Joins the current thread with a specified thread pool
  * The the thread is freed after join
  * Returns 1 if successful or -1 on error

@@ -82,9 +82,9 @@ DWORD WINAPI libcthreads_thread_pool_callback_function_helper(
 								    internal_thread_pool->callback_function_arguments );
 
 					if( ( callback_function_result != 1 )
-					 && ( *result == 1 ) )
+					 && ( result == 1 ) )
 					{
-						*result = callback_function_result;
+						result = callback_function_result;
 					}
 				}
 				else if( internal_thread_pool->status == LIBCTHREADS_STATUS_EXIT )
@@ -646,9 +646,9 @@ on_error:
 			 internal_thread_pool->thread_identifiers_array );
 		}
 #endif
-		if( internal_thread_pool->threads_array != NULL )
-		{
 #if defined( WINAPI )
+		if( internal_thread_pool->thread_handles_array != NULL )
+		{
 			while( thread_index >= 0 )
 			{
 				WaitForSingleObject(
@@ -657,8 +657,12 @@ on_error:
 
 				thread_index--;
 			}
-
+			memory_free(
+			 internal_thread_pool->thread_handles_array );
+		}
 #elif defined( HAVE_PTHREAD_H )
+		if( internal_thread_pool->threads_array != NULL )
+		{
 			while( thread_index >= 0 )
 			{
 				pthread_join(
@@ -674,10 +678,10 @@ on_error:
 				}
 				thread_index--;
 			}
-#endif
 			memory_free(
 			 internal_thread_pool->threads_array );
 		}
+#endif
 		if( internal_thread_pool->full_condition != NULL )
 		{
 			libcthreads_condition_free(
@@ -1193,9 +1197,14 @@ int libcthreads_thread_pool_join(
 #if defined( WINAPI )
 	memory_free(
 	 internal_thread_pool->thread_identifiers_array );
-#endif
+
+	memory_free(
+	 internal_thread_pool->thread_handles_array );
+
+#elif defined( HAVE_PTHREAD_H )
 	memory_free(
 	 internal_thread_pool->threads_array );
+#endif
 
 #endif /* defined( WINAPI ) && ( WINVER >= 0x0600 ) */
 

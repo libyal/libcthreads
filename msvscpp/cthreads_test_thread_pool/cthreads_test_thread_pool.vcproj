@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="cthreads_test_mutex"
-	ProjectGUID="{5BFA25FF-8041-4B99-BC72-755E5ED10D3C}"
-	RootNamespace="cthreads_test_mutex"
+	Name="cthreads_test_thread_pool"
+	ProjectGUID="{DAFA82CC-4B04-4AF2-9338-6B55C3141DC6}"
+	RootNamespace="cthreads_test_thread_pool"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -185,7 +185,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\cthreads_test_mutex.c"
+				RelativePath="..\..\tests\cthreads_test_thread_pool.c"
 				>
 			</File>
 		</Filter>

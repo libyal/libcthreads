@@ -49,7 +49,8 @@ cthreads_test_lock_SOURCES = \
 	cthreads_test_libcerror.h \
 	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
-	cthreads_test_lock.c
+	cthreads_test_lock.c \
+	cthreads_test_unused.h
 
 cthreads_test_lock_LDADD = \
 	@LIBCSTRING_LIBADD@ \
@@ -60,7 +61,8 @@ cthreads_test_mutex_SOURCES = \
 	cthreads_test_libcerror.h \
 	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
-	cthreads_test_mutex.c
+	cthreads_test_mutex.c \
+	cthreads_test_unused.h
 
 cthreads_test_mutex_LDADD = \
 	@LIBCSTRING_LIBADD@ \
@@ -71,7 +73,8 @@ cthreads_test_queue_SOURCES = \
 	cthreads_test_libcerror.h \
 	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
-	cthreads_test_queue.c
+	cthreads_test_queue.c \
+	cthreads_test_unused.h
 
 cthreads_test_queue_LDADD = \
 	@LIBCSTRING_LIBADD@ \
@@ -82,7 +85,8 @@ cthreads_test_read_write_lock_SOURCES = \
 	cthreads_test_libcerror.h \
 	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
-	cthreads_test_read_write_lock.c
+	cthreads_test_read_write_lock.c \
+	cthreads_test_unused.h
 
 cthreads_test_read_write_lock_LDADD = \
 	@LIBCSTRING_LIBADD@ \
@@ -93,7 +97,8 @@ cthreads_test_thread_SOURCES = \
 	cthreads_test_libcerror.h \
 	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
-	cthreads_test_thread.c
+	cthreads_test_thread.c \
+	cthreads_test_unused.h
 
 cthreads_test_thread_LDADD = \
 	@LIBCSTRING_LIBADD@ \
@@ -104,7 +109,8 @@ cthreads_test_thread_pool_SOURCES = \
 	cthreads_test_libcerror.h \
 	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
-	cthreads_test_thread_pool.c
+	cthreads_test_thread_pool.c \
+	cthreads_test_unused.h
 
 cthreads_test_thread_pool_LDADD = \
 	@LIBCSTRING_LIBADD@ \

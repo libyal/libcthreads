@@ -30,13 +30,16 @@
 #include "cthreads_test_libcthreads.h"
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
+#include "cthreads_test_unused.h"
 
 /* The thread callback function
  * Returns 1 if successful or -1 on error
  */
 int cthreads_test_thread_callback_function(
-     void *arguments )
+     void *arguments CTHREADS_TEST_ATTRIBUTE_UNUSED )
 {
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( arguments )
+
 	return( 1 );
 }
 
@@ -164,12 +167,14 @@ int cthreads_test_thread_join(
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] )
+int wmain( int argc, wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #else
-int main( int argc, char * const argv[] )
+int main( int argc, char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
 	libcthreads_thread_t *thread = NULL;
+
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( argv )
 
 	if( argc != 1 )
 	{

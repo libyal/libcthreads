@@ -5,6 +5,7 @@ MSVSCPP_FILES = \
 	cthreads_test_queue/cthreads_test_queue.vcproj \
 	cthreads_test_read_write_lock/cthreads_test_read_write_lock.vcproj \
 	cthreads_test_thread/cthreads_test_thread.vcproj \
+	cthreads_test_thread_pool/cthreads_test_thread_pool.vcproj \
 	libcerror/libcerror.vcproj \
 	libcthreads_dll/libcthreads_dll.vcproj \
 	libcstring/libcstring.vcproj \
