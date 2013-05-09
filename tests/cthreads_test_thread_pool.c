@@ -102,7 +102,7 @@ on_error:
 	{
 		libcerror_error_backtrace_fprint(
 		 error,
-		 stdout );
+		 stderr );
 
 		libcerror_error_free(
 		 &error );
@@ -147,36 +147,36 @@ int cthreads_test_thread_pool_create(
 		 "%s: unable to create thread pool.",
 		 function );
 	}
-	if( result != expected_result )
-	{
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
-	}
-	else
+	result = ( expected_result == result );
+
+	if( result == 1 )
 	{
 		fprintf(
 		 stdout,
 		 "(PASS)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(FAIL)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result == -1 )
+	if( error != NULL )
 	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
-
+		if( result != 1 )
+		{
+			libcerror_error_backtrace_fprint(
+			 error,
+			 stderr );
+		}
 		libcerror_error_free(
 		 &error );
 	}
-	if( result != expected_result )
-	{
-		return( 0 );
-	}
-	return( 1 );
+	return( result );
 }
 
 /* Tests joining a thread pool
@@ -205,33 +205,37 @@ int cthreads_test_thread_pool_join(
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to join thread pool.",
 		 function );
-
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
 	}
-	else
+	result = ( result == 1 );
+
+	if( result == 1 )
 	{
 		fprintf(
 		 stdout,
 		 "(PASS)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(FAIL)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result == -1 )
+	if( error != NULL )
 	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
-
+		if( result != 1 )
+		{
+			libcerror_error_backtrace_fprint(
+			 error,
+			 stderr );
+		}
 		libcerror_error_free(
 		 &error );
-
-		return( 0 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Tests thread pool push
@@ -309,8 +313,8 @@ int cthreads_test_thread_pool_push(
 			libcerror_error_set(
 			 &error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to get value from queue.",
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to push value onto queue.",
 			 function );
 
 			goto on_error;
@@ -352,21 +356,19 @@ int cthreads_test_thread_pool_push(
 	 stdout,
 	 "Testing queued value\t" );
 
-	if( cthreads_test_queued_value != cthreads_test_expected_queued_value )
+	result = ( cthreads_test_queued_value == cthreads_test_expected_queued_value );
+
+	if( result == 1 )
 	{
 		fprintf(
 		 stdout,
-		 "(FAIL)" );
-
-		result = 0;
+		 "(PASS)" );
 	}
 	else
 	{
 		fprintf(
 		 stdout,
-		 "(PASS)" );
-
-		result = 1;
+		 "(FAIL)" );
 	}
 	fprintf(
 	 stdout,
@@ -379,7 +381,7 @@ on_error:
 	{
 		libcerror_error_backtrace_fprint(
 		 error,
-		 stdout );
+		 stderr );
 
 		libcerror_error_free(
 		 &error );

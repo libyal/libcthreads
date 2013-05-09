@@ -1,4 +1,6 @@
 TODO
+* tests
+  - clean up stdout/stderr
 * thread pool
   - fix winapi version
   - add winapi TP_POOL implemenation
