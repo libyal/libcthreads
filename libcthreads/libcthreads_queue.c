@@ -29,6 +29,8 @@
 #include "libcthreads_queue.h"
 #include "libcthreads_types.h"
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 /* Creates a queue
  * Make sure the value queue is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
@@ -849,4 +851,6 @@ int libcthreads_queue_try_push(
 	}
 	return( result );
 }
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 

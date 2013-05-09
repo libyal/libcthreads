@@ -37,6 +37,8 @@
 #include "libcthreads_thread_attributes.h"
 #include "libcthreads_types.h"
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 #if defined( WINAPI )
 /* Start function helper function for WINAPI
  * Returns 0 if successful or 1 on error
@@ -366,4 +368,6 @@ int libcthreads_thread_join(
 
 	return( result );
 }
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 

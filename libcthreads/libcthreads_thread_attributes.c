@@ -31,6 +31,8 @@
 #include "libcthreads_thread_attributes.h"
 #include "libcthreads_types.h"
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 /* Creates thread attributes
  * Make sure the value thread_attributes is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
@@ -139,4 +141,6 @@ int libcthreads_thread_attributes_free(
 	}
 	return( result );
 }
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 

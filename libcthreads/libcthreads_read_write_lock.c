@@ -37,6 +37,8 @@
 #include "libcthreads_read_write_lock.h"
 #include "libcthreads_types.h"
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 /* Creates a read/write lock
  * Make sure the value read_write_lock is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
@@ -592,4 +594,6 @@ int libcthreads_read_write_lock_release_for_write(
 #endif
 	return( 1 );
 }
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 

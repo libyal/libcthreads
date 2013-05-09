@@ -41,6 +41,8 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 typedef struct libcthreads_internal_condition libcthreads_internal_condition_t;
 
 struct libcthreads_internal_condition
@@ -107,6 +109,8 @@ int libcthreads_condition_wait(
      libcthreads_condition_t *condition,
      libcthreads_mutex_t *mutex,
      libcerror_error_t **error );
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 #if defined( __cplusplus )
 }

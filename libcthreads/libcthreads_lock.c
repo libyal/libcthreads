@@ -33,6 +33,8 @@
 #include "libcthreads_lock.h"
 #include "libcthreads_types.h"
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 /* Creates a lock
  * Make sure the value lock is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
@@ -307,4 +309,6 @@ int libcthreads_lock_release(
 #endif
 	return( 1 );
 }
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 

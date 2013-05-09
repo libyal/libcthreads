@@ -37,6 +37,8 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 typedef struct libcthreads_internal_lock libcthreads_internal_lock_t;
 
 struct libcthreads_internal_lock
@@ -75,6 +77,8 @@ LIBCTHREADS_EXTERN \
 int libcthreads_lock_release(
      const libcthreads_lock_t *lock,
      libcerror_error_t **error );
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 #if defined( __cplusplus )
 }

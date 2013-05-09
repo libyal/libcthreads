@@ -41,6 +41,8 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 typedef struct libcthreads_internal_read_write_lock libcthreads_internal_read_write_lock_t;
 
 struct libcthreads_internal_read_write_lock
@@ -111,6 +113,8 @@ LIBCTHREADS_EXTERN \
 int libcthreads_read_write_lock_release_for_write(
      libcthreads_read_write_lock_t *read_write_lock,
      libcerror_error_t **error );
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 #if defined( __cplusplus )
 }

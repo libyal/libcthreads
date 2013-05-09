@@ -37,6 +37,8 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 typedef struct libcthreads_internal_thread_attributes libcthreads_internal_thread_attributes_t;
 
 struct libcthreads_internal_thread_attributes
@@ -65,6 +67,8 @@ LIBCTHREADS_EXTERN \
 int libcthreads_thread_attributes_free(
      libcthreads_thread_attributes_t **thread_attributes,
      libcerror_error_t **error );
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 #if defined( __cplusplus )
 }

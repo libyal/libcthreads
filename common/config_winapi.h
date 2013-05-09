@@ -22,6 +22,10 @@
 #if !defined( _CONFIG_WINAPI_H )
 #define _CONFIG_WINAPI_H
 
+/* Define the earliest supported WINAPI version
+#define WINVER				0x0501
+ */
+
 /* If necessary make sure WINAPI is defined
  */
 #if defined( HAVE_WINDOWS_H ) || defined( __BORLANDC__ ) || defined( _MSC_VER )

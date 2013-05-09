@@ -29,7 +29,7 @@
  * The definitions in <libcthreads/types.h> are copied here
  * for local use of libcthreads
  */
-#if defined( HAVE_LOCAL_LIBCTHREADS )
+#if defined( HAVE_LOCAL_LIBCTHREADS ) && defined( HAVE_MULTI_THREAD_SUPPORT )
 
 /* The following type definitions hide internal data structures
  */

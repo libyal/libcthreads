@@ -33,6 +33,8 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 typedef struct libcthreads_internal_queue libcthreads_internal_queue_t;
 
 struct libcthreads_internal_queue
@@ -109,6 +111,8 @@ int libcthreads_queue_try_push(
      libcthreads_queue_t *queue,
      intptr_t *value,
      libcerror_error_t **error );
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 #if defined( __cplusplus )
 }

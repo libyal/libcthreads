@@ -37,6 +37,8 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 typedef struct libcthreads_internal_mutex libcthreads_internal_mutex_t;
 
 struct libcthreads_internal_mutex
@@ -85,6 +87,8 @@ LIBCTHREADS_EXTERN \
 int libcthreads_mutex_release(
      libcthreads_mutex_t *mutex,
      libcerror_error_t **error );
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 #if defined( __cplusplus )
 }

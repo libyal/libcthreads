@@ -37,6 +37,8 @@
 #include "libcthreads_thread_pool.h"
 #include "libcthreads_types.h"
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 #if defined( WINAPI ) && ( WINVER >= 0x0602 )
 /* TODO */
 #error TP_POOL support not implemented yet
@@ -1224,4 +1226,6 @@ int libcthreads_thread_pool_join(
 
 	return( result );
 }
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 

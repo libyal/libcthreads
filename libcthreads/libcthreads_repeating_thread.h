@@ -37,6 +37,8 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 typedef struct libcthreads_internal_repeating_thread libcthreads_internal_repeating_thread_t;
 
 struct libcthreads_internal_repeating_thread
@@ -102,6 +104,8 @@ LIBCTHREADS_EXTERN \
 int libcthreads_repeating_thread_join(
      libcthreads_repeating_thread_t **repeating_thread,
      libcerror_error_t **error );
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 #if defined( __cplusplus )
 }

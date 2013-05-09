@@ -38,6 +38,8 @@
 #include "libcthreads_mutex.h"
 #include "libcthreads_types.h"
 
+#if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
+
 /* Creates a condition
  * Make sure the value condition is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
@@ -698,4 +700,6 @@ int libcthreads_condition_wait(
 #endif
 	return( 1 );
 }
+
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
