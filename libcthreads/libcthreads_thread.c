@@ -66,7 +66,8 @@ DWORD WINAPI libcthreads_thread_callback_function_helper(
 
 #elif defined( HAVE_PTHREAD_H )
 /* Start function helper function for pthread
- * Returns a pointer to the callback function result if successful or NULL on error
+ * Returns a pointer to a newly allocate int containing 1 if successful or -1 on errror
+ * NULL is return if the helper function was unable to run the callback
  */
 void *libcthreads_thread_callback_function_helper(
        void *arguments )
@@ -337,18 +338,10 @@ int libcthreads_thread_join(
 
 		result = -1;
 	}
-	else if( thread_return_value == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: invalid thread return value.",
-		 function );
-
-		result = -1;
-	}
-	else if( *thread_return_value != 1 )
+	/* If the thread returns NULL it never got around to launching the callback function
+	 */
+	else if( ( thread_return_value != NULL )
+	      && ( *thread_return_value != 1 ) )
 	{
 		libcerror_error_set(
 		 error,

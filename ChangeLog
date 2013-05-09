@@ -1,4 +1,7 @@
 TODO
+* thread pool
+  - fix winapi version
+  - add winapi TP_POOL implemenation
 * condition
   - add more tests
 * have local library be dependent on HAVE_MULTI_THREAD_SUPPORT
@@ -9,6 +12,9 @@ TODO
 * reimplement repeating thread as a queued thread?
 * update man pages
 * add glib support
+
+20130509
+* worked on thread pool
 
 20130508
 * worked on queue

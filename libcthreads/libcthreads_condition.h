@@ -25,6 +25,10 @@
 #include <common.h>
 #include <types.h>
 
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
+#include <Synchapi.h>
+#endif
+
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 #include <pthread.h>
 #endif
@@ -41,7 +45,13 @@ typedef struct libcthreads_internal_condition libcthreads_internal_condition_t;
 
 struct libcthreads_internal_condition
 {
-#if defined( WINAPI )
+
+#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+	/* The condition variable
+	 */
+	CONDITION_VARIABLE condition_variable;
+
+#elif defined( WINAPI )
 	/* The number of waiting threads
 	 */
 	int number_of_waiting_threads;

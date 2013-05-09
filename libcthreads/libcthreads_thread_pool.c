@@ -48,6 +48,7 @@
 DWORD WINAPI libcthreads_thread_pool_callback_function_helper(
               void *arguments )
 {
+	libcerror_error_t *error                                 = NULL;
 	libcthreads_internal_thread_pool_t *internal_thread_pool = NULL;
 	intptr_t *value                                          = NULL;
 	DWORD result                                             = 1;
@@ -68,7 +69,7 @@ DWORD WINAPI libcthreads_thread_pool_callback_function_helper(
 				pop_result = libcthreads_internal_thread_pool_pop(
 					      internal_thread_pool,
 					      &value,
-					      NULL );
+					      &error );
 
 				if( pop_result == -1 )
 				{
@@ -76,7 +77,6 @@ DWORD WINAPI libcthreads_thread_pool_callback_function_helper(
 				}
 				else if( pop_result != 0 )
 				{
-
 					callback_function_result = internal_thread_pool->callback_function(
 								    value,
 								    internal_thread_pool->callback_function_arguments );
@@ -98,6 +98,16 @@ DWORD WINAPI libcthreads_thread_pool_callback_function_helper(
 			{
 				result = 1;
 			}
+			if( error != NULL )
+			{
+#if defined( HAVE_VERBOSE_OUTPUT )
+				libcerror_error_backtrace_fprint(
+				 error,
+				 stdout );
+#endif
+				libcerror_error_free(
+				 &error );
+			}
 		}
 	}
 	ExitThread(
@@ -106,11 +116,13 @@ DWORD WINAPI libcthreads_thread_pool_callback_function_helper(
 
 #elif defined( HAVE_PTHREAD_H )
 /* Start function helper function for pthread
- * Returns a pointer to the callback function result if successful or NULL on error
+ * Returns a pointer to a newly allocate int containing 1 if successful or -1 on errror
+ * NULL is return if the helper function was unable to run the callback
  */
 void *libcthreads_thread_pool_callback_function_helper(
        void *arguments )
 {
+	libcerror_error_t *error                                 = NULL;
 	libcthreads_internal_thread_pool_t *internal_thread_pool = NULL;
 	intptr_t *value                                          = NULL;
 	int *result                                              = NULL;
@@ -122,7 +134,7 @@ void *libcthreads_thread_pool_callback_function_helper(
 		internal_thread_pool = (libcthreads_internal_thread_pool_t *) arguments;
 
 		if( ( internal_thread_pool != NULL )
-  		 && ( internal_thread_pool->callback_function != NULL ) )
+		 && ( internal_thread_pool->callback_function != NULL ) )
 		{
 			result = (int *) memory_allocate(
 			                  sizeof( int ) );
@@ -136,7 +148,7 @@ void *libcthreads_thread_pool_callback_function_helper(
 					pop_result = libcthreads_internal_thread_pool_pop(
 					              internal_thread_pool,
 					              &value,
-					              NULL );
+					              &error );
 
 					if( pop_result == -1 )
 					{
@@ -144,7 +156,6 @@ void *libcthreads_thread_pool_callback_function_helper(
 					}
 					else if( pop_result != 0 )
 					{
-
 						callback_function_result = internal_thread_pool->callback_function(
 									    value,
 									    internal_thread_pool->callback_function_arguments );
@@ -164,10 +175,17 @@ void *libcthreads_thread_pool_callback_function_helper(
 
 				if( pop_result == -1 )
 				{
-					memory_free(
-					 result );
-
-					result = NULL;
+					*result = -1;
+				}
+				if( error != NULL )
+				{
+#if defined( HAVE_VERBOSE_OUTPUT )
+					libcerror_error_backtrace_fprint(
+					 error,
+					 stdout );
+#endif
+					libcerror_error_free(
+					 &error );
 				}
 			}
 		}
@@ -482,6 +500,8 @@ int libcthreads_thread_pool_create(
 
 		goto on_error;
 	}
+	internal_thread_pool->number_of_threads = number_of_threads;
+
 	array_size = sizeof( DWORD ) * number_of_threads;
 
 	if( array_size > (size_t) SSIZE_MAX )
@@ -599,6 +619,8 @@ int libcthreads_thread_pool_create(
 
 		goto on_error;
 	}
+	internal_thread_pool->number_of_threads = number_of_threads;
+
 	if( thread_attributes != NULL )
 	{
 		attributes = &( ( (libcthreads_internal_thread_attributes_t *) thread_attributes )->attributes );
@@ -796,22 +818,7 @@ int libcthreads_internal_thread_pool_pop(
 			internal_thread_pool->pop_index = 0;
 		}
 		internal_thread_pool->number_of_values -= 1;
-	}
-	if( libcthreads_mutex_release(
-	     internal_thread_pool->condition_mutex,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release condition mutex.",
-		 function );
 
-		return( -1 );
-	}
-	if( result == 1 )
-	{
 		if( libcthreads_condition_broadcast(
 		     internal_thread_pool->full_condition,
 		     error ) != 1 )
@@ -825,6 +832,19 @@ int libcthreads_internal_thread_pool_pop(
 
 			result = -1;
 		}
+	}
+	if( libcthreads_mutex_release(
+	     internal_thread_pool->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release condition mutex.",
+		 function );
+
+		return( -1 );
 	}
 	return( result );
 }
@@ -921,22 +941,7 @@ int libcthreads_thread_pool_push(
 			internal_thread_pool->push_index = 0;
 		}
 		internal_thread_pool->number_of_values += 1;
-	}
-	if( libcthreads_mutex_release(
-	     internal_thread_pool->condition_mutex,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release condition mutex.",
-		 function );
 
-		return( -1 );
-	}
-	if( result == 1 )
-	{
 		if( libcthreads_condition_broadcast(
 		     internal_thread_pool->empty_condition,
 		     error ) != 1 )
@@ -950,6 +955,19 @@ int libcthreads_thread_pool_push(
 
 			result = -1;
 		}
+	}
+	if( libcthreads_mutex_release(
+	     internal_thread_pool->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release condition mutex.",
+		 function );
+
+		return( -1 );
 	}
 	return( result );
 }
@@ -1123,19 +1141,10 @@ int libcthreads_thread_pool_join(
 
 			result = -1;
 		}
-		else if( thread_return_value == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: invalid thread: %d return value.",
-			 function,
-			 thread_index );
-
-			result = -1;
-		}
-		else if( *thread_return_value != 1 )
+		/* If the thread returns NULL it never got around to launching the callback function
+		 */
+		else if( ( thread_return_value != NULL )
+		      && ( *thread_return_value != 1 ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -1152,6 +1161,8 @@ int libcthreads_thread_pool_join(
 		{
 			memory_free(
 			 thread_return_value );
+
+			thread_return_value = NULL;
 		}
 	}
 #endif

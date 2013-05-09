@@ -25,6 +25,10 @@
 
 #include <errno.h>
 
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
+#include <Synchapi.h>
+#endif
+
 #if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 #include <pthread.h>
 #endif
@@ -45,10 +49,10 @@ int libcthreads_condition_initialize(
 	libcthreads_internal_condition_t *internal_condition = NULL;
 	static char *function                                = "libcthreads_condition_initialize";
 
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER < 0x0600 )
 	DWORD error_code                                     = 0;
 
-#elif defined( HAVE_PTHREAD_H )
+#elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 	int pthread_result                                   = 0;
 #endif
 
@@ -102,7 +106,11 @@ int libcthreads_condition_initialize(
 
 		goto on_error;
 	}
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+	InitializeConditionVariable(
+	 &( internal_condition->condition_variable ) );
+
+#elif defined( WINAPI )
 	InitializeCriticalSection(
 	 &( internal_condition->wait_critical_section ) );
 
@@ -198,10 +206,10 @@ int libcthreads_condition_free(
 	static char *function                                = "libcthreads_condition_free";
 	int result                                           = 1;
 
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER < 0x0600 )
 	DWORD error_code                                     = 0;
 
-#elif defined( HAVE_PTHREAD_H )
+#elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 	int pthread_result                                   = 0;
 #endif
 
@@ -221,7 +229,9 @@ int libcthreads_condition_free(
 		internal_condition = (libcthreads_internal_condition_t *) *condition;
 		*condition         = NULL;
 
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+
+#elif defined( WINAPI )
 		if( CloseHandle(
 		     internal_condition->signal_event_handle ) == 0 )
 		{
@@ -294,6 +304,8 @@ int libcthreads_condition_free(
 }
 
 /* Broadcasts a condition
+ * The of this function must be locked by the same mutex as used to wait
+ * This is necessary for the WINAPI pre Vista (0x0600) implementation
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_condition_broadcast(
@@ -303,13 +315,13 @@ int libcthreads_condition_broadcast(
 	libcthreads_internal_condition_t *internal_condition = NULL;
 	static char *function                                = "libcthreads_condition_broadcast";
 
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER < 0x0600 )
 	DWORD error_code                                     = 0;
 	DWORD wait_status                                    = 0;
-	BOOL result                                          = 0;
+	BOOL result                                          = 1;
 	int number_of_waiting_threads                        = 0;
 
-#elif defined( HAVE_PTHREAD_H )
+#elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 	int pthread_result                                   = 0;
 #endif
 
@@ -326,7 +338,11 @@ int libcthreads_condition_broadcast(
 	}
 	internal_condition = (libcthreads_internal_condition_t *) condition;
 
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+	WakeAllConditionVariable(
+	 &( internal_condition->condition_variable ) );
+
+#elif defined( WINAPI )
 	EnterCriticalSection(
 	 &( internal_condition->wait_critical_section ) );
 
@@ -379,7 +395,7 @@ int libcthreads_condition_broadcast(
 			 error,
 			 error_code,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: wait for no read event handle failed.",
 			 function );
 
@@ -409,6 +425,8 @@ int libcthreads_condition_broadcast(
 }
 
 /* Signals a condition
+ * The of this function must be locked by the same mutex as used to wait
+ * This is necessary for the WINAPI pre Vista (0x0600) implementation
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_condition_signal(
@@ -418,12 +436,12 @@ int libcthreads_condition_signal(
 	libcthreads_internal_condition_t *internal_condition = NULL;
 	static char *function                                = "libcthreads_condition_signal";
 
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER < 0x0600 )
 	DWORD error_code                                     = 0;
-	BOOL result                                          = 0;
+	BOOL result                                          = 1;
 	int number_of_waiting_threads                        = 0;
 
-#elif defined( HAVE_PTHREAD_H )
+#elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
 	int pthread_result                                   = 0;
 #endif
 
@@ -440,7 +458,11 @@ int libcthreads_condition_signal(
 	}
 	internal_condition = (libcthreads_internal_condition_t *) condition;
 
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+	WakeConditionVariable(
+	 &( internal_condition->condition_variable ) );
+
+#elif defined( WINAPI )
 	EnterCriticalSection(
 	 &( internal_condition->wait_critical_section ) );
 
@@ -506,8 +528,13 @@ int libcthreads_condition_wait(
 
 #if defined( WINAPI )
 	DWORD error_code                                     = 0;
+
+#if ( WINVER >= 0x0600 )
+	BOOL result                                          = 0;
+#else
 	DWORD wait_status                                    = 0;
 	int is_last_waiting_thread                           = 0;
+#endif
 
 #elif defined( HAVE_PTHREAD_H )
 	int pthread_result                                   = 0;
@@ -539,7 +566,28 @@ int libcthreads_condition_wait(
 	}
 	internal_mutex = (libcthreads_internal_mutex_t *) mutex;
 
-#if defined( WINAPI ) && ( WINVER >= 0x0400 )
+#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+	result = SleepConditionVariableCS(
+	          &( internal_condition->condition_varible ),
+	          &( internal_mutex->critical_section ),
+	          INFINITE );
+
+	if( wait_status == WAIT_FAILED )
+	{
+		error_code = GetLastError();
+
+		libcerror_system_set_error(
+		 error,
+		 error_code,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to sleep on condition variable.",
+		 function );
+
+		return( -1 );
+	}
+
+#elif defined( WINAPI ) && ( WINVER >= 0x0400 )
 	EnterCriticalSection(
 	 &( internal_condition->wait_critical_section ) );
 
@@ -562,7 +610,7 @@ int libcthreads_condition_wait(
 		 error,
 		 error_code,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable signal mutex handle and wait for signal semaphore handle.",
 		 function );
 
@@ -597,7 +645,7 @@ int libcthreads_condition_wait(
 			 error,
 			 error_code,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to signal signal event handle and wait for mutex handle.",
 			 function );
 
@@ -618,7 +666,7 @@ int libcthreads_condition_wait(
 			 error,
 			 error_code,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: wait for mutex handle failed.",
 			 function );
 

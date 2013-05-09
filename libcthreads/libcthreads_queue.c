@@ -478,22 +478,9 @@ int libcthreads_queue_pop(
 			internal_queue->pop_index = 0;
 		}
 		internal_queue->number_of_values -= 1;
-	}
-	if( libcthreads_mutex_release(
-	     internal_queue->condition_mutex,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release condition mutex.",
-		 function );
 
-		return( -1 );
-	}
-	if( result == 1 )
-	{
+		/* The condition broadcast must be protected by the mutex for the WINAPI version
+		 */
 		if( libcthreads_condition_broadcast(
 		     internal_queue->full_condition,
 		     error ) != 1 )
@@ -508,6 +495,19 @@ int libcthreads_queue_pop(
 			result = -1;
 		}
 	}
+	if( libcthreads_mutex_release(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release condition mutex.",
+		 function );
+
+		return( -1 );
+	}
 	return( result );
 }
 
@@ -521,7 +521,7 @@ int libcthreads_queue_try_pop(
 {
 	libcthreads_internal_queue_t *internal_queue = NULL;
 	static char *function                        = "libcthreads_queue_try_pop";
-	int result                                   = 0;
+	int result                                   = 1;
 
 	if( queue == NULL )
 	{
@@ -583,23 +583,8 @@ int libcthreads_queue_try_pop(
 		}
 		internal_queue->number_of_values -= 1;
 
-		result = 1;
-	}
-	if( libcthreads_mutex_release(
-	     internal_queue->condition_mutex,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release condition mutex.",
-		 function );
-
-		return( -1 );
-	}
-	if( result == 1 )
-	{
+		/* The condition broadcast must be protected by the mutex for the WINAPI version
+		 */
 		if( libcthreads_condition_broadcast(
 		     internal_queue->full_condition,
 		     error ) != 1 )
@@ -613,6 +598,23 @@ int libcthreads_queue_try_pop(
 
 			result = -1;
 		}
+	}
+	else
+	{
+		result = 0;
+	}
+	if( libcthreads_mutex_release(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release condition mutex.",
+		 function );
+
+		return( -1 );
 	}
 	return( result );
 }
@@ -707,22 +709,9 @@ int libcthreads_queue_push(
 			internal_queue->push_index = 0;
 		}
 		internal_queue->number_of_values += 1;
-	}
-	if( libcthreads_mutex_release(
-	     internal_queue->condition_mutex,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release condition mutex.",
-		 function );
 
-		return( -1 );
-	}
-	if( result == 1 )
-	{
+		/* The condition broadcast must be protected by the mutex for the WINAPI version
+		 */
 		if( libcthreads_condition_broadcast(
 		     internal_queue->empty_condition,
 		     error ) != 1 )
@@ -737,6 +726,19 @@ int libcthreads_queue_push(
 			result = -1;
 		}
 	}
+	if( libcthreads_mutex_release(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release condition mutex.",
+		 function );
+
+		return( -1 );
+	}
 	return( result );
 }
 
@@ -750,7 +752,7 @@ int libcthreads_queue_try_push(
 {
 	libcthreads_internal_queue_t *internal_queue = NULL;
 	static char *function                        = "libcthreads_queue_try_push";
-	int result                                   = 0;
+	int result                                   = 1;
 
 	if( queue == NULL )
 	{
@@ -812,23 +814,8 @@ int libcthreads_queue_try_push(
 		}
 		internal_queue->number_of_values += 1;
 
-		result = 1;
-	}
-	if( libcthreads_mutex_release(
-	     internal_queue->condition_mutex,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release condition mutex.",
-		 function );
-
-		return( -1 );
-	}
-	if( result == 1 )
-	{
+		/* The condition broadcast must be protected by the mutex for the WINAPI version
+		 */
 		if( libcthreads_condition_broadcast(
 		     internal_queue->empty_condition,
 		     error ) != 1 )
@@ -842,6 +829,23 @@ int libcthreads_queue_try_push(
 
 			result = -1;
 		}
+	}
+	else
+	{
+		result = 0;
+	}
+	if( libcthreads_mutex_release(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release condition mutex.",
+		 function );
+
+		return( -1 );
 	}
 	return( result );
 }

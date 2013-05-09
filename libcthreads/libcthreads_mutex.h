@@ -41,7 +41,12 @@ typedef struct libcthreads_internal_mutex libcthreads_internal_mutex_t;
 
 struct libcthreads_internal_mutex
 {
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+	/* The critical section
+	 */
+	CRITICAL_SECTION critical_section;
+
+#elif defined( WINAPI )
 	/* The mutex handle
 	 */
 	HANDLE mutex_handle;
