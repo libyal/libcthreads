@@ -33,12 +33,12 @@ typedef intptr_t libcthreads_error_t;
 enum LIBCTHREADS_ERROR_DOMAINS
 {
 	LIBCTHREADS_ERROR_DOMAIN_ARGUMENTS			= (int) 'a',
-	LIBCTHREADS_ERROR_DOMAIN_CONVERSION		= (int) 'c',
-	LIBCTHREADS_ERROR_DOMAIN_COMPRESSION		= (int) 'C',
-	LIBCTHREADS_ERROR_DOMAIN_IO			= (int) 'I',
-	LIBCTHREADS_ERROR_DOMAIN_INPUT			= (int) 'i',
-	LIBCTHREADS_ERROR_DOMAIN_MEMORY			= (int) 'm',
-	LIBCTHREADS_ERROR_DOMAIN_OUTPUT			= (int) 'o',
+	LIBCTHREADS_ERROR_DOMAIN_CONVERSION			= (int) 'c',
+	LIBCTHREADS_ERROR_DOMAIN_COMPRESSION			= (int) 'C',
+	LIBCTHREADS_ERROR_DOMAIN_IO				= (int) 'I',
+	LIBCTHREADS_ERROR_DOMAIN_INPUT				= (int) 'i',
+	LIBCTHREADS_ERROR_DOMAIN_MEMORY				= (int) 'm',
+	LIBCTHREADS_ERROR_DOMAIN_OUTPUT				= (int) 'o',
 	LIBCTHREADS_ERROR_DOMAIN_RUNTIME			= (int) 'r',
 };
 
@@ -55,11 +55,11 @@ enum LIBCTHREADS_ARGUMENT_ERROR
 
 	/* The argument contains a value less than zero
 	 */
-	LIBCTHREADS_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO	= 2,
+	LIBCTHREADS_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO		= 2,
 
 	/* The argument contains a value zero or less
 	 */
-	LIBCTHREADS_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS	= 3,
+	LIBCTHREADS_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS		= 3,
 
 	/* The argument contains a value that exceeds the maximum
 	 * for the specific type
@@ -76,15 +76,15 @@ enum LIBCTHREADS_ARGUMENT_ERROR
 
 	/* The argument contains a value that is out of bounds
 	 */
-	LIBCTHREADS_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS	= 7,
+	LIBCTHREADS_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS		= 7,
 
 	/* The argument contains a value that is not supported
 	 */
-	LIBCTHREADS_ARGUMENT_ERROR_UNSUPPORTED_VALUE	= 8,
+	LIBCTHREADS_ARGUMENT_ERROR_UNSUPPORTED_VALUE		= 8,
 
 	/* The argument contains a value that conficts with another argument
 	 */
-	LIBCTHREADS_ARGUMENT_ERROR_CONFLICTING_VALUE	= 9
+	LIBCTHREADS_ARGUMENT_ERROR_CONFLICTING_VALUE		= 9
 };
 
 /* The conversion error codes
@@ -92,7 +92,7 @@ enum LIBCTHREADS_ARGUMENT_ERROR
  */
 enum LIBCTHREADS_CONVERSION_ERROR
 {
-	LIBCTHREADS_CONVERSION_ERROR_GENERIC		= 0,
+	LIBCTHREADS_CONVERSION_ERROR_GENERIC			= 0,
 
 	/* The conversion failed on the input
 	 */
@@ -108,15 +108,15 @@ enum LIBCTHREADS_CONVERSION_ERROR
  */
 enum LIBCTHREADS_COMPRESSION_ERROR
 {
-	LIBCTHREADS_COMPRESSION_ERROR_GENERIC		= 0,
+	LIBCTHREADS_COMPRESSION_ERROR_GENERIC			= 0,
 
 	/* The compression failed
 	 */
-	LIBCTHREADS_COMPRESSION_ERROR_COMPRESS_FAILED	= 1,
+	LIBCTHREADS_COMPRESSION_ERROR_COMPRESS_FAILED		= 1,
 
 	/* The decompression failed
 	 */
-	LIBCTHREADS_COMPRESSION_ERROR_DECOMPRESS_FAILED	= 2
+	LIBCTHREADS_COMPRESSION_ERROR_DECOMPRESS_FAILED		= 2
 };
 
 /* The input/output error codes
@@ -124,7 +124,7 @@ enum LIBCTHREADS_COMPRESSION_ERROR
  */
 enum LIBCTHREADS_IO_ERROR
 {
-	LIBCTHREADS_IO_ERROR_GENERIC			= 0,
+	LIBCTHREADS_IO_ERROR_GENERIC				= 0,
 
 	/* The open failed
 	 */
@@ -152,7 +152,7 @@ enum LIBCTHREADS_IO_ERROR
 
 	/* The resource is invalid i.e. a missing file
 	 */
-	LIBCTHREADS_IO_ERROR_INVALID_RESOURCE		= 7,
+	LIBCTHREADS_IO_ERROR_INVALID_RESOURCE			= 7,
 
 	/* The ioctl failed
 	 */
@@ -168,11 +168,11 @@ enum LIBCTHREADS_IO_ERROR
  */
 enum LIBCTHREADS_INPUT_ERROR
 {
-	LIBCTHREADS_INPUT_ERROR_GENERIC			= 0,
+	LIBCTHREADS_INPUT_ERROR_GENERIC				= 0,
 
 	/* The input contains invalid data
 	 */
-	LIBCTHREADS_INPUT_ERROR_INVALID_DATA		= 1,
+	LIBCTHREADS_INPUT_ERROR_INVALID_DATA			= 1,
 
 	/* The input contains an unsupported signature
 	 */
@@ -185,7 +185,7 @@ enum LIBCTHREADS_INPUT_ERROR
 	/* A value in the input did not match a previously
 	 * read value or calculated value
 	 */
-	LIBCTHREADS_INPUT_ERROR_VALUE_MISMATCH		= 4
+	LIBCTHREADS_INPUT_ERROR_VALUE_MISMATCH			= 4
 };
 
 /* The memory error codes
@@ -197,15 +197,15 @@ enum LIBCTHREADS_MEMORY_ERROR
 
 	/* There is insufficient memory available
 	 */
-	LIBCTHREADS_MEMORY_ERROR_INSUFFICIENT		= 1,
+	LIBCTHREADS_MEMORY_ERROR_INSUFFICIENT			= 1,
 
 	/* The memory failed to be copied
 	 */
-	LIBCTHREADS_MEMORY_ERROR_COPY_FAILED		= 2,
+	LIBCTHREADS_MEMORY_ERROR_COPY_FAILED			= 2,
 
 	/* The memory failed to be set
 	 */
-	LIBCTHREADS_MEMORY_ERROR_SET_FAILED		= 3
+	LIBCTHREADS_MEMORY_ERROR_SET_FAILED			= 3
 };
 
 /* The runtime error codes
@@ -217,19 +217,19 @@ enum LIBCTHREADS_RUNTIME_ERROR
 
 	/* The value is missing
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_VALUE_MISSING		= 1,
+	LIBCTHREADS_RUNTIME_ERROR_VALUE_MISSING			= 1,
 
 	/* The value was already set
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_VALUE_ALREADY_SET	= 2,
+	LIBCTHREADS_RUNTIME_ERROR_VALUE_ALREADY_SET		= 2,
 
 	/* The creation and/or initialization of an internal structure failed
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_INITIALIZE_FAILED	= 3,
+	LIBCTHREADS_RUNTIME_ERROR_INITIALIZE_FAILED		= 3,
 
 	/* The resize of an internal structure failed
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_RESIZE_FAILED		= 4,
+	LIBCTHREADS_RUNTIME_ERROR_RESIZE_FAILED			= 4,
 
 	/* The free and/or finalization of an internal structure failed
 	 */
@@ -237,39 +237,39 @@ enum LIBCTHREADS_RUNTIME_ERROR
 
 	/* The value could not be determined
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_GET_FAILED		= 6,
+	LIBCTHREADS_RUNTIME_ERROR_GET_FAILED			= 6,
 
 	/* The value could not be set
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_SET_FAILED		= 7,
+	LIBCTHREADS_RUNTIME_ERROR_SET_FAILED			= 7,
 
 	/* The value could not be appended/prepended
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_APPEND_FAILED		= 8,
+	LIBCTHREADS_RUNTIME_ERROR_APPEND_FAILED			= 8,
 
 	/* The value could not be copied
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_COPY_FAILED		= 9,
+	LIBCTHREADS_RUNTIME_ERROR_COPY_FAILED			= 9,
 
 	/* The value could not be removed
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_REMOVE_FAILED		= 10,
+	LIBCTHREADS_RUNTIME_ERROR_REMOVE_FAILED			= 10,
 
 	/* The value could not be printed
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_PRINT_FAILED		= 11,
+	LIBCTHREADS_RUNTIME_ERROR_PRINT_FAILED			= 11,
 
 	/* The value was out of bounds
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS	= 12,
+	LIBCTHREADS_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS		= 12,
 
 	/* The value exceeds the maximum for its specific type
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM	= 13,
+	LIBCTHREADS_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM		= 13,
 
 	/* The value is unsupported
 	 */
-	LIBCTHREADS_RUNTIME_ERROR_UNSUPPORTED_VALUE	= 14,
+	LIBCTHREADS_RUNTIME_ERROR_UNSUPPORTED_VALUE		= 14,
 
 	/* An abort was requested
 	 */
@@ -284,7 +284,7 @@ enum LIBCTHREADS_OUTPUT_ERROR
 
 	/* There is insuficient space to write the output
 	 */
-	LIBCTHREADS_OUTPUT_ERROR_INSUFFICIENT_SPACE	= 1
+	LIBCTHREADS_OUTPUT_ERROR_INSUFFICIENT_SPACE		= 1
 };
 
 #endif
