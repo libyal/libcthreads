@@ -15,6 +15,9 @@ TODO
 * update man pages
 * add glib support
 
+20130723
+* bug fixes for Vista build
+
 20130609
 * fix in .pc.in file
 

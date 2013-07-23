@@ -182,7 +182,7 @@ int libcthreads_condition_initialize(
 on_error:
 	if( internal_condition != NULL )
 	{
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER < 0x0600 )
 		if( internal_condition->signal_semaphore_handle != NULL )
 		{
 			CloseHandle(
@@ -530,11 +530,11 @@ int libcthreads_condition_wait(
 
 #if defined( WINAPI )
 	DWORD error_code                                     = 0;
+	DWORD wait_status                                    = 0;
 
 #if ( WINVER >= 0x0600 )
 	BOOL result                                          = 0;
 #else
-	DWORD wait_status                                    = 0;
 	int is_last_waiting_thread                           = 0;
 #endif
 
@@ -570,7 +570,7 @@ int libcthreads_condition_wait(
 
 #if defined( WINAPI ) && ( WINVER >= 0x0600 )
 	result = SleepConditionVariableCS(
-	          &( internal_condition->condition_varible ),
+	          &( internal_condition->condition_variable ),
 	          &( internal_mutex->critical_section ),
 	          INFINITE );
 

@@ -43,7 +43,7 @@ typedef struct libcthreads_internal_thread_pool libcthreads_internal_thread_pool
 
 struct libcthreads_internal_thread_pool
 {
-#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
 	/* The thread pool
 	 */
 	TP_POOL *thread_pool;
@@ -131,7 +131,7 @@ int libcthreads_thread_pool_create(
      void *callback_function_arguments,
      libcerror_error_t **error );
 
-#if !( defined( WINAPI ) && ( WINVER >= 0x0600 ) )
+#if !( defined( WINAPI ) && ( WINVER >= 0x0602 ) )
 
 int libcthreads_internal_thread_pool_pop(
      libcthreads_internal_thread_pool_t *internal_thread_pool,

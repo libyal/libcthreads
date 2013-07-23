@@ -221,7 +221,7 @@ int libcthreads_thread_pool_create(
 #if defined( WINAPI )
 	DWORD error_code                                         = 0;
 #endif
-#if !( defined( WINAPI ) && ( WINVER >= 0x0600 ) )
+#if !( defined( WINAPI ) && ( WINVER >= 0x0602 ) )
 	size_t array_size                                        = 0;
 	int thread_index                                         = 0;
 
@@ -234,7 +234,7 @@ int libcthreads_thread_pool_create(
 	int *thread_return_value                                 = NULL;
 	int pthread_result                                       = 0;
 #endif
-#endif /* !( defined( WINAPI ) && ( WINVER >= 0x0600 ) ) */
+#endif /* !( defined( WINAPI ) && ( WINVER >= 0x0602 ) ) */
 
 	if( thread_pool == NULL )
 	{
@@ -269,7 +269,7 @@ int libcthreads_thread_pool_create(
 
 		return( -1 );
 	}
-#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
 #if SIZEOF_INT > 4
 	if( number_of_threads > (int) UINT32_MAX )
 	{
@@ -354,7 +354,7 @@ int libcthreads_thread_pool_create(
 
 		goto on_error;
 	}
-#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
 /* TODO */
 	internal_thread_pool->thread_pool = CreateThreadpool(
 	                                     NULL );
@@ -662,7 +662,7 @@ int libcthreads_thread_pool_create(
 on_error:
 	if( internal_thread_pool != NULL )
 	{
-#if !( defined( WINAPI ) && ( WINVER >= 0x0600 ) )
+#if !( defined( WINAPI ) && ( WINVER >= 0x0602 ) )
 #if defined( WINAPI )
 		if( internal_thread_pool->thread_identifiers_array != NULL )
 		{
@@ -986,7 +986,7 @@ int libcthreads_thread_pool_join(
 	static char *function                                    = "libcthreads_thread_pool_join";
 	int result                                               = 1;
 
-#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
 /* TODO */
 
 #else
@@ -1027,7 +1027,7 @@ int libcthreads_thread_pool_join(
 	internal_thread_pool = (libcthreads_internal_thread_pool_t *) *thread_pool;
 	*thread_pool         = NULL;
 
-#if defined( WINAPI ) && ( WINVER >= 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
 /* TODO */
 
 #else
@@ -1219,7 +1219,7 @@ int libcthreads_thread_pool_join(
 	 internal_thread_pool->threads_array );
 #endif
 
-#endif /* defined( WINAPI ) && ( WINVER >= 0x0600 ) */
+#endif /* defined( WINAPI ) && ( WINVER >= 0x0602 ) */
 
 	memory_free(
 	 internal_thread_pool );
