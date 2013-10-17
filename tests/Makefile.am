@@ -41,9 +41,9 @@ cthreads_test_condition_SOURCES = \
 	cthreads_test_condition.c
 
 cthreads_test_condition_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libcthreads/libcthreads.la \
 	@LIBCERROR_LIBADD@ \
-	../libcthreads/libcthreads.la
+	@LIBCSTRING_LIBADD@
 
 cthreads_test_lock_SOURCES = \
 	cthreads_test_libcerror.h \
@@ -53,9 +53,9 @@ cthreads_test_lock_SOURCES = \
 	cthreads_test_unused.h
 
 cthreads_test_lock_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libcthreads/libcthreads.la \
 	@LIBCERROR_LIBADD@ \
-	../libcthreads/libcthreads.la
+	@LIBCSTRING_LIBADD@
 
 cthreads_test_mutex_SOURCES = \
 	cthreads_test_libcerror.h \
@@ -65,9 +65,9 @@ cthreads_test_mutex_SOURCES = \
 	cthreads_test_unused.h
 
 cthreads_test_mutex_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libcthreads/libcthreads.la \
 	@LIBCERROR_LIBADD@ \
-	../libcthreads/libcthreads.la
+	@LIBCSTRING_LIBADD@
 
 cthreads_test_queue_SOURCES = \
 	cthreads_test_libcerror.h \
@@ -77,9 +77,9 @@ cthreads_test_queue_SOURCES = \
 	cthreads_test_unused.h
 
 cthreads_test_queue_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libcthreads/libcthreads.la \
 	@LIBCERROR_LIBADD@ \
-	../libcthreads/libcthreads.la
+	@LIBCSTRING_LIBADD@
 
 cthreads_test_read_write_lock_SOURCES = \
 	cthreads_test_libcerror.h \
@@ -89,9 +89,9 @@ cthreads_test_read_write_lock_SOURCES = \
 	cthreads_test_unused.h
 
 cthreads_test_read_write_lock_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libcthreads/libcthreads.la \
 	@LIBCERROR_LIBADD@ \
-	../libcthreads/libcthreads.la
+	@LIBCSTRING_LIBADD@
 
 cthreads_test_thread_SOURCES = \
 	cthreads_test_libcerror.h \
@@ -101,9 +101,9 @@ cthreads_test_thread_SOURCES = \
 	cthreads_test_unused.h
 
 cthreads_test_thread_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libcthreads/libcthreads.la \
 	@LIBCERROR_LIBADD@ \
-	../libcthreads/libcthreads.la
+	@LIBCSTRING_LIBADD@
 
 cthreads_test_thread_pool_SOURCES = \
 	cthreads_test_libcerror.h \
@@ -113,9 +113,9 @@ cthreads_test_thread_pool_SOURCES = \
 	cthreads_test_unused.h
 
 cthreads_test_thread_pool_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libcthreads/libcthreads.la \
 	@LIBCERROR_LIBADD@ \
-	../libcthreads/libcthreads.la
+	@LIBCSTRING_LIBADD@
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
