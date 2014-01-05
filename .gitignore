@@ -108,6 +108,7 @@ stamp-h1
 /tests/cthreads_test_read_write_lock
 /tests/cthreads_test_thread
 /tests/cthreads_test_thread_pool
+/tests/tmp
 
 # Local library dependencies specific files
 /libcerror
