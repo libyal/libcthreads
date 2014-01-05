@@ -12,11 +12,15 @@ TODO
   - lock ?
   - read/write
 * reimplement repeating thread as a queued thread?
-* update man pages
 * add glib support
 
+20140105
+* updated dependencies
+* 2014 update
+* updated man pages
+
 20131017
-* updated libcstring
+* updated dependencies
 
 20131003
 * Bug fixes for RW lock XP version, with thanks to Phillip Hellewell
