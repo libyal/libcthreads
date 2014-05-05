@@ -185,7 +185,7 @@ int cthreads_test_queue_push_callback_function(
 	if( queued_values == NULL )
 	{
 		libcerror_error_set(
-		 error,
+		 &error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create queued values.",
