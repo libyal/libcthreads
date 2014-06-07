@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\cthreadstools\cthreads_test_queue.c"
+				RelativePath="..\..\tests\cthreads_test_queue.c"
 				>
 			</File>
 		</Filter>
@@ -186,19 +186,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\cthreadstools\cthreads_test_libcerror.h"
+				RelativePath="..\..\tests\cthreads_test_libcerror.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\cthreadstools\cthreads_test_libcstring.h"
+				RelativePath="..\..\tests\cthreads_test_libcstring.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\cthreadstools\cthreads_test_libcthreads.h"
+				RelativePath="..\..\tests\cthreads_test_libcthreads.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\cthreadstools\cthreads_test_unused.h"
+				RelativePath="..\..\tests\cthreads_test_unused.h"
 				>
 			</File>
 		</Filter>
