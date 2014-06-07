@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
-	Name="libcthreads_dll"
-	ProjectGUID="{B5225323-AC67-411D-8FBA-199E9467FAB5}"
+	Version="9,00"
+	Name="libcthreads"
+	ProjectGUID="{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}"
 	RootNamespace="libcthreads"
 	TargetFrameworkVersion="131072"
 	>
@@ -20,6 +20,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -40,9 +41,9 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;LIBCTHREADS_DLL_EXPORT"
-				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
 				WarningLevel="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -56,10 +57,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\libcthreads.dll"
-				AdditionalLibraryDirectories=""
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
 				TargetMachine="1"
+				ImportLibrary="$(OutDir)\libcthreads.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -88,6 +90,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -114,6 +117,7 @@
 				RuntimeLibrary="3"
 				WarningLevel="4"
 				DebugInformationFormat="3"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -127,11 +131,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\libcthreads.dll"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
+				DataExecutionPrevention="1"
 				TargetMachine="1"
+				ImportLibrary="$(OutDir)\libcthreads.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -190,6 +195,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libcthreads\libcthreads_read_write_lock.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcthreads\libcthreads_repeating_thread.c"
 				>
 			</File>
 			<File
@@ -252,6 +261,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libcthreads\libcthreads_read_write_lock.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcthreads\libcthreads_repeating_thread.h"
 				>
 			</File>
 			<File

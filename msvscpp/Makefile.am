@@ -7,7 +7,7 @@ MSVSCPP_FILES = \
 	cthreads_test_thread/cthreads_test_thread.vcproj \
 	cthreads_test_thread_pool/cthreads_test_thread_pool.vcproj \
 	libcerror/libcerror.vcproj \
-	libcthreads_dll/libcthreads_dll.vcproj \
+	libcthreads/libcthreads.vcproj \
 	libcstring/libcstring.vcproj \
 	libcthreads.sln
 
