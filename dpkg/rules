@@ -7,65 +7,84 @@
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-
 %:
 	dh  $@
 
-install_libcthreads:
-	# Set up libcthreads package directories and files
-	mkdir -p debian/libcthreads/usr/lib
-	install -p -m755 debian/tmp/usr/lib/lib*.so.*.*.* debian/libcthreads/usr/lib
+.PHONY: override_dh_auto_configure
+override_dh_auto_configure:
+	dh_auto_configure -- CFLAGS="-g"
 
-install_libcthreads_dev:
-	# Set up libcthreads-dev package directories and files
-	mkdir -p debian/libcthreads-dev/usr/include
-	mkdir -p debian/libcthreads-dev/usr/include/libcthreads
-	mkdir -p debian/libcthreads-dev/usr/lib
-	mkdir -p debian/libcthreads-dev/usr/lib/pkgconfig
-	mkdir -p debian/libcthreads-dev/usr/share/man/man3
-	install -p -m755 debian/tmp/usr/include/*.h debian/libcthreads-dev/usr/include
-	install -p -m755 debian/tmp/usr/include/libcthreads/*.h debian/libcthreads-dev/usr/include/libcthreads
-	install -p -m755 debian/tmp/usr/lib/*.la debian/libcthreads-dev/usr/lib
-	install -p -m755 debian/tmp/usr/lib/lib*.a debian/libcthreads-dev/usr/lib
-	install -p -m755 debian/tmp/usr/lib/lib*.so debian/libcthreads-dev/usr/lib
-	install -p -m755 debian/tmp/usr/lib/pkgconfig/* debian/libcthreads-dev/usr/lib/pkgconfig
-	install -p -m755 debian/tmp/usr/share/man/man3/* debian/libcthreads-dev/usr/share/man/man3
-
+.PHONY: override_dh_auto_test
 override_dh_auto_test:
 
-override_dh_installinit: install_libcthreads install_libcthreads_dev
+.PHONY: override_dh_install
+override_dh_install:
+	# Create the libcthreads package.
+	dh_install "debian/tmp/usr/lib/lib*.so.*.*.*" -p libcthreads
+	# Create the libcthreads-dev package.
+	dh_install "debian/tmp/usr/include/*.h" -p libcthreads-dev
+	dh_install "debian/tmp/usr/include/lib*/*.h" -p libcthreads-dev
+	dh_install "debian/tmp/usr/lib/*.a" -p libcthreads-dev
+	dh_install "debian/tmp/usr/lib/*.la" -p libcthreads-dev
+	dh_install "debian/tmp/usr/lib/*.so" -p libcthreads-dev
+	dh_install "debian/tmp/usr/lib/pkgconfig/*" -p libcthreads-dev
+	dh_install "debian/tmp/usr/share/man/man3/*" -p libcthreads-dev
+	# The libcthreads-dbg package is created by dh_strip.
+	dh_install
 
+.PHONY: override_dh_installmenu
 override_dh_installmenu:
 
+.PHONY: override_dh_installmime
 override_dh_installmime:
 
+.PHONY: override_dh_installmodules
 override_dh_installmodules:
 
+.PHONY: override_dh_installlogcheck
 override_dh_installlogcheck:
 
+.PHONY: override_dh_installlogrotate
 override_dh_installlogrotate:
 
+.PHONY: override_dh_installpam
 override_dh_installpam:
 
+.PHONY: override_dh_installppp
 override_dh_installppp:
 
+.PHONY: override_dh_installudev
 override_dh_installudev:
 
+.PHONY: override_dh_installwm
 override_dh_installwm:
 
+.PHONY: override_dh_installxfonts
 override_dh_installxfonts:
 
+.PHONY: override_dh_gconf
 override_dh_gconf:
 
+.PHONY: override_dh_icons
 override_dh_icons:
 
+.PHONY: override_dh_perl
 override_dh_perl:
 
+.PHONY: override_dh_pysupport
 override_dh_pysupport:
 
+.PHONY: override_dh_strip
+override_dh_strip:
+ifeq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
+	dh_strip -plibcthreads --dbg-package=libcthreads-dbg
+endif
+
+.PHONY: override_dh_shlibdeps
 override_dh_shlibdeps:
 	dh_shlibdeps -Llibcthreads -l${PWD}/debian/tmp/usr/lib
 
+.PHONY: override_dh_makeshlibs
 override_dh_makeshlibs:
 	dh_makeshlibs -Xlibcthreads-dev
 

@@ -14,6 +14,9 @@ TODO
 * reimplement repeating thread as a queued thread?
 * add glib support
 
+20140730
+* updated dpkg files
+
 20140505
 * fixes to build static library with mingw and cygwin
 

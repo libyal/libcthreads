@@ -10,8 +10,16 @@ Package: libcthreads
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: libcthreads-dbg
 Description: Library to support cross-platform C threads functions
  libcthreads is a library to support cross-platform C threads functions.
+
+Package: libcthreads-dbg
+Architecture: any
+Section: debug
+Depends: libcthreads (= ${Source-Version}), ${misc:Depends}
+Description: Debugging symbols for libcthreads
+ Debugging symbols for libcthreads.
 
 Package: libcthreads-dev
 Section: libdevel
