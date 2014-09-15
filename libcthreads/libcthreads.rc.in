@@ -28,7 +28,7 @@ BEGIN
       VALUE "OriginalFilename",		"libcthreads.dll\0"
       VALUE "ProductName",		"libcthreads\0"
       VALUE "ProductVersion",		"@VERSION@" "\0"
-      VALUE "Comments",			"For more information visit http://code.google.com/p/libcthreads/\0"
+      VALUE "Comments",			"For more information visit https://github.com/libyal/libcthreads/\0"
     END
   END
   BLOCK "VarFileInfo"

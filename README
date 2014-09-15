@@ -1,4 +1,6 @@
-See:
-* http://code.google.com/p/libcthreads/wiki/Building
-* README.macosx
+libcthreads is a library for cross-platform C threads functions.
+
+For more information see:
+* Project documentation: https://github.com/libyal/libcthreads/wiki/Home
+* How to build from source: https://github.com/libyal/libcthreads/wiki/Building
 
