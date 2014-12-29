@@ -14,6 +14,9 @@ TODO
 * reimplement repeating thread as a queued thread?
 * add glib support
 
+20141229
+* updated dpkg files
+
 20141014
 * changes for deployment
 

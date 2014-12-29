@@ -1,13 +1,12 @@
 Source: libcthreads
-Section: unknown
+Section: libs
 Priority: extra
 Maintainer: Joachim Metz <joachim.metz@gmail.com>
 Build-Depends: debhelper (>= 7), autotools-dev
-Standards-Version: 3.8.3
+Standards-Version: 3.9.5
 Homepage: https://github.com/libyal/libcthreads/
 
 Package: libcthreads
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: libcthreads-dbg
@@ -17,14 +16,14 @@ Description: Library to support cross-platform C threads functions
 Package: libcthreads-dbg
 Architecture: any
 Section: debug
-Depends: libcthreads (= ${Source-Version}), ${misc:Depends}
+Depends: libcthreads (= ${binary:Version}), ${misc:Depends}
 Description: Debugging symbols for libcthreads
  Debugging symbols for libcthreads.
 
 Package: libcthreads-dev
 Section: libdevel
 Architecture: any
-Depends: libcthreads (= ${Source-Version})
+Depends: libcthreads (= ${binary:Version}), ${misc:Depends}
 Description: Header files and libraries for developing applications for libcthreads
  Header files and libraries for developing applications for libcthreads.
 
