@@ -265,7 +265,7 @@ int libcthreads_mutex_release(
      libcthreads_error_t **error );
 
 /* -------------------------------------------------------------------------
- * Read/Write locks functions
+ * Read/Write lock functions
  * ------------------------------------------------------------------------- */
 
 /* Creates a read/write lock
