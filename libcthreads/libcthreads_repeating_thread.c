@@ -43,6 +43,7 @@
 #if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
 
 #if defined( WINAPI )
+
 /* Start function helper function for WINAPI
  * Returns 0 if successful or 1 on error
  */
@@ -50,7 +51,7 @@ DWORD WINAPI libcthreads_repeating_thread_start_function_helper(
               void *arguments )
 {
 	libcthreads_internal_repeating_thread_t *internal_repeating_thread = NULL;
-	DWORD result                                                       = 1;
+	DWORD result                                                       = 0;
 	int start_function_result                                          = 0;
 
 	if( arguments != NULL )
@@ -60,7 +61,7 @@ DWORD WINAPI libcthreads_repeating_thread_start_function_helper(
 		if( ( internal_repeating_thread != NULL )
 		 && ( internal_repeating_thread->start_function != NULL ) )
 		{
-			result = 0;
+			internal_repeating_thread->start_function_result = 1;
 
 			do
 			{
@@ -86,12 +87,17 @@ DWORD WINAPI libcthreads_repeating_thread_start_function_helper(
 				                         internal_repeating_thread->start_function_arguments );
 
 				if( ( start_function_result != 1 )
-				 && ( result == 0 ) )
+				 && ( internal_repeating_thread->start_function_result == 1 ) )
 				{
-					start_function_result = 0;
+					internal_repeating_thread->start_function_result = start_function_result;
 				}
 			}
 			while( internal_repeating_thread->status != LIBCTHREADS_STATUS_EXIT );
+
+			if( internal_repeating_thread->start_function_result != 1 )
+			{
+				result = 1;
+			}
 		}
 	}
 	ExitThread(
@@ -99,6 +105,7 @@ DWORD WINAPI libcthreads_repeating_thread_start_function_helper(
 }
 
 #elif defined( HAVE_PTHREAD_H )
+
 /* Start function helper function for pthread
  * Returns a pointer to the start function result if successful or NULL on error
  */
@@ -156,7 +163,7 @@ void *libcthreads_repeating_thread_start_function_helper(
 	 result );
 }
 
-#endif
+#endif /* defined( WINAPI ) else defined( HAVE_PTHREAD_H ) */
 
 /* Creates a repeating thread
  * Make sure the value repeating_thread is referencing, is set to NULL

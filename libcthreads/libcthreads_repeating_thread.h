@@ -56,10 +56,6 @@ struct libcthreads_internal_repeating_thread
 	/* The thread
 	 */
 	pthread_t thread;
-
-	/* The start functions return value
-	 */
-	int start_function_result;
 #else
 #error Missing thread type
 #endif
@@ -72,6 +68,10 @@ struct libcthreads_internal_repeating_thread
 	/* The start function arguments
 	 */
 	void *start_function_arguments;
+
+	/* The start functions return value
+	 */
+	int start_function_result;
 
 	/* The condition mutex
 	 */
