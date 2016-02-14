@@ -55,9 +55,9 @@ typedef intptr_t libcthreads_thread_t;
 typedef intptr_t libcthreads_thread_attributes_t;
 typedef intptr_t libcthreads_thread_pool_t;
 
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI ) */
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBCTHREADS ) && defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
-#endif
+#endif /* !defined( _LIBCTHREADS_INTERNAL_TYPES_H ) */
 

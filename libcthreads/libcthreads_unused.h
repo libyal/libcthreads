@@ -40,5 +40,5 @@
 	/* parameter */
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_INTERNAL_UNUSED_H ) */
 
