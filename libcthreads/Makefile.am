@@ -27,7 +27,7 @@ libcthreads_la_SOURCES = \
 	libcthreads_types.h \
 	libcthreads_unused.h
 
-libcthreads_la_LIBADD  = \
+libcthreads_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@PTHREAD_LIBADD@
