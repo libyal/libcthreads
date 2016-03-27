@@ -1,60 +1,74 @@
 #!/bin/bash
+# Library type testing script
 #
-# Library read/write lock type testing script
-#
-# Copyright (C) 2012-2016, Joachim Metz <joachim.metz@gmail.com>
-#
-# Refer to AUTHORS for acknowledgements.
-#
-# This software is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
-#
+# Version: 20160327
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-test_read_write_lock()
-{ 
-	echo "Testing read/write lock type";
+TEST_PREFIX=`dirname ${PWD}`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
+TEST_TYPE="read_write_lock";
 
-	./${CTHREADS_TEST_READ_WRITE_LOCK};
+TEST_PROFILE="lib${TEST_PREFIX}";
+TEST_DESCRIPTION="${TEST_TYPE} type";
+OPTION_SETS="";
 
-	RESULT=$?;
+TEST_TOOL_DIRECTORY=".";
+TEST_TOOL="${TEST_PREFIX}_test_${TEST_TYPE}";
+
+test_type()
+{
+	local TEST_EXECUTABLE=$1;
+
+	echo "Testing ${TEST_TYPE} type:";
+
+	run_test_with_arguments ${TEST_EXECUTABLE};
+	local RESULT=$?;
 
 	echo "";
 
 	return ${RESULT};
 }
 
-CTHREADS_TEST_READ_WRITE_LOCK="cthreads_test_read_write_lock";
-
-if ! test -x ${CTHREADS_TEST_READ_WRITE_LOCK};
+if ! test -z ${SKIP_LIBRARY_TESTS};
 then
-	CTHREADS_TEST_READ_WRITE_LOCK="cthreads_test_read_write_lock.exe";
+	exit ${EXIT_IGNORE};
 fi
 
-if ! test -x ${CTHREADS_TEST_READ_WRITE_LOCK};
+TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}";
+
+if ! test -x "${TEST_EXECUTABLE}";
 then
-	echo "Missing executable: ${CTHREADS_TEST_READ_WRITE_LOCK}";
+	TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}.exe";
+fi
+
+if ! test -x "${TEST_EXECUTABLE}";
+then
+	echo "Missing test executable: ${TEST_EXECUTABLE}";
 
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_read_write_lock;
+TEST_RUNNER="tests/test_runner.sh";
+
+if ! test -f "${TEST_RUNNER}";
 then
+	TEST_RUNNER="./test_runner.sh";
+fi
+
+if ! test -f "${TEST_RUNNER}";
+then
+	echo "Missing test runner: ${TEST_RUNNER}";
+
 	exit ${EXIT_FAILURE};
 fi
 
-exit ${EXIT_SUCCESS};
+source ${TEST_RUNNER};
+
+test_type "${TEST_EXECUTABLE}";
+RESULT=$?;
+
+exit ${RESULT};
 

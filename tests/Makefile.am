@@ -20,6 +20,7 @@ check_SCRIPTS = \
 	test_mutex.sh \
 	test_queue.sh \
 	test_read_write_lock.sh \
+	test_runner.sh \
 	test_thread.sh \
 	test_thread_pool.sh
 
