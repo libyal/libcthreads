@@ -19,16 +19,16 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _CDATA_TEST_LIBCDATA_H )
-#define _CDATA_TEST_LIBCDATA_H
+#if !defined( _CTHREADS_TEST_LIBCTHREADS_H )
+#define _CTHREADS_TEST_LIBCTHREADS_H
 
 #include <common.h>
 
-/* If Cygwin libtool DLL support is enabled set LIBCDATA_DLL_IMPORT
+/* If Cygwin libtool DLL support is enabled set LIBCTHREADS_DLL_IMPORT
  * before including libcthreads.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBCDATA_DLL_IMPORT
+#define LIBCTHREADS_DLL_IMPORT
 #endif
 
 #include <libcthreads.h>

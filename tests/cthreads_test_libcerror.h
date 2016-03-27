@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _CDATA_TEST_LIBCERROR_H )
-#define _CDATA_TEST_LIBCERROR_H
+#if !defined( _CTHREADS_TEST_LIBCERROR_H )
+#define _CTHREADS_TEST_LIBCERROR_H
 
 #include <common.h>
 
