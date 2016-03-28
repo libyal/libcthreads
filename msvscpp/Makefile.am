@@ -1,5 +1,6 @@
 MSVSCPP_FILES = \
 	cthreads_test_condition/cthreads_test_condition.vcproj \
+	cthreads_test_get_version/cthreads_test_get_version.vcproj \
 	cthreads_test_lock/cthreads_test_lock.vcproj \
 	cthreads_test_mutex/cthreads_test_mutex.vcproj \
 	cthreads_test_queue/cthreads_test_queue.vcproj \

@@ -6,29 +6,20 @@ AM_CPPFLAGS = \
 	@LIBCTHREADS_DLL_IMPORT@
 
 TESTS = \
-	test_thread.sh \
-	test_lock.sh \
-	test_mutex.sh \
-	test_read_write_lock.sh \
-	test_condition.sh \
-	test_queue.sh \
-	test_thread_pool.sh
+	test_api_functions.sh \
+	test_api_types.sh
 
 check_SCRIPTS = \
-	test_condition.sh \
-	test_lock.sh \
-	test_mutex.sh \
-	test_queue.sh \
-	test_read_write_lock.sh \
-	test_runner.sh \
-	test_thread.sh \
-	test_thread_pool.sh
+	test_api_functions.sh \
+	test_api_types.sh \
+	test_runner.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
 	cthreads_test_condition \
+	cthreads_test_get_version \
 	cthreads_test_lock \
 	cthreads_test_mutex \
 	cthreads_test_queue \
@@ -45,6 +36,15 @@ cthreads_test_condition_SOURCES = \
 cthreads_test_condition_LDADD = \
 	../libcthreads/libcthreads.la \
 	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@
+
+cthreads_test_get_version_SOURCES = \
+	cthreads_test_libcstring.h \
+	cthreads_test_libcthreads.h \
+	cthreads_test_get_version.c
+
+cthreads_test_get_version_LDADD = \
+	../libcthreads/libcthreads.la \
 	@LIBCSTRING_LIBADD@
 
 cthreads_test_lock_SOURCES = \

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160327
+# Version: 20160328
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -41,7 +41,7 @@ check_availability_binary()
 #
 # Arguments:
 #   a string containing the path of the test input directory
-#   a string containing newline separated ignore list
+#   a string containing space separated ignore list
 #
 # Returns:
 #   an integer containing the exit status to indicate the input directory
@@ -54,9 +54,9 @@ check_for_directory_in_ignore_list()
 
 	local INPUT_BASENAME=`basename ${INPUT_DIRECTORY}`;
 
-	for LIST_ELEMENT in "${IGNORE_LIST}";
+	for LIST_ELEMENT in `echo "${IGNORE_LIST}" | tr ' ' '\n'`;
 	do
-		if test "${IGNORE_LIST_ELEMENT}" = "${INPUT_BASENAME}";
+		if test "${LIST_ELEMENT}" = "${INPUT_BASENAME}";
 		then
 			return ${EXIT_SUCCESS};
 		fi
@@ -126,7 +126,7 @@ find_binary_library_path()
 	return ${LIBRARY};
 }
 
-# Determines the test input files. 
+# Determines the test input files.
 #
 # Arguments:
 #   a string containing the path of the test input directory
@@ -230,7 +230,7 @@ get_test_set_directory()
 #   a string containing the path of the test profile directory
 #
 # Returns:
-#   a string containing the ignore list
+#   a string containing a space separated ignore list
 #
 read_ignore_list()
 {
@@ -242,7 +242,7 @@ read_ignore_list()
 	then
 		IGNORE_LIST=`cat ${IGNORE_FILE} | sed '/^#/d'`;
 	fi
-	return ${IGNORE_LIST};
+	echo ${IGNORE_LIST};
 }
 
 # Reads the test set option file
@@ -284,7 +284,7 @@ read_option_file()
 #   an integer containg the exit status of the test executable
 #
 run_test_with_arguments()
-{ 
+{
 	local TEST_EXECUTABLE=$1;
 	shift 1;
 	local ARGUMENTS=$@;
@@ -350,7 +350,7 @@ run_test_with_arguments()
 #   an integer containg the exit status of the test executable
 #
 run_test_on_input_file()
-{ 
+{
 	local TEST_SET_DIRECTORY=$1;
 	local TEST_DESCRIPTION=$2;
 	local OPTION_SET=$3;
@@ -528,8 +528,7 @@ run_test_on_input_directory()
 
 	local TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "${TEST_INPUT_DIRECTORY}" "${TEST_PROFILE}");
 
-	read_ignore_list "${TEST_PROFILE_DIRECTORY}"; 
-	local IGNORE_LIST=$?;
+	local IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
 
 	for TEST_SET_INPUT_DIRECTORY in ${TEST_INPUT_DIRECTORY}/*;
 	do
