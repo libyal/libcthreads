@@ -148,6 +148,17 @@ int libcthreads_thread_pool_push(
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
+int libcthreads_thread_pool_push_sorted(
+     libcthreads_thread_pool_t *thread_pool,
+     intptr_t *value,
+     int (*value_compare_function)(
+            intptr_t *first_value,
+            intptr_t *second_value,
+            libcerror_error_t **error ),
+     uint8_t sort_flags,
+     libcerror_error_t **error );
+
+LIBCTHREADS_EXTERN \
 int libcthreads_thread_pool_join(
      libcthreads_thread_pool_t **thread_pool,
      libcerror_error_t **error );

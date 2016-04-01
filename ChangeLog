@@ -15,9 +15,11 @@ TODO
 Tests
 * clean up stdout/stderr
 * add tests of libcthreads_queue_push_sorted
+* add tests of libcthreads_queue_push_sorted
 
 20160401
 * worked on queue sorted push
+* worked on thread pool sorted push
 
 20160105
 * 2016 update

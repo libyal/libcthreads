@@ -391,6 +391,7 @@ int libcthreads_queue_push(
  *
  * Returns 1 if successful, 0 if the value already exists or -1 on error
  */
+LIBCTHREADS_EXTERN \
 int libcthreads_queue_push_sorted(
      libcthreads_queue_t *queue,
      intptr_t *value,
@@ -430,6 +431,25 @@ LIBCTHREADS_EXTERN \
 int libcthreads_thread_pool_push(
      libcthreads_thread_pool_t *thread_pool,
      intptr_t *value,
+     libcthreads_error_t **error );
+
+/* Pushes a value onto the queue of the thread pool in sorted order
+ *
+ * Uses the value_compare_function to determine the similarity of the values
+ * The value_compare_function should return LIBCTHREADS_COMPARE_LESS,
+ * LIBCTHREADS_COMPARE_EQUAL, LIBCTHREADS_COMPARE_GREATER if successful or -1 on error
+ *
+ * Returns 1 if successful, 0 if the value already exists or -1 on error
+ */
+LIBCTHREADS_EXTERN \
+int libcthreads_thread_pool_push_sorted(
+     libcthreads_thread_pool_t *thread_pool,
+     intptr_t *value,
+     int (*value_compare_function)(
+            intptr_t *first_value,
+            intptr_t *second_value,
+            libcthreads_error_t **error ),
+     uint8_t sort_flags,
      libcthreads_error_t **error );
 
 /* Joins the current thread with a specified thread pool
