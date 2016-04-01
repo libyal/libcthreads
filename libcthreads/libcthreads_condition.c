@@ -593,7 +593,7 @@ int libcthreads_condition_wait(
 	EnterCriticalSection(
 	 &( internal_condition->wait_critical_section ) );
 
-	internal_condition->number_of_waiting_threads += 1;
+	internal_condition->number_of_waiting_threads++;
 
 	LeaveCriticalSection(
 	 &( internal_condition->wait_critical_section ) );
@@ -621,7 +621,7 @@ int libcthreads_condition_wait(
 	EnterCriticalSection(
 	 &( internal_condition->wait_critical_section ) );
 
-	internal_condition->number_of_waiting_threads -= 1;
+	internal_condition->number_of_waiting_threads--;
 
 	if( ( internal_condition->number_of_waiting_threads == 0 )
 	 && ( internal_condition->signal_is_broadcast != 0 ) )

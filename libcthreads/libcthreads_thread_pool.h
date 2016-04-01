@@ -116,7 +116,8 @@ struct libcthreads_internal_thread_pool
 	/* The status
 	 */
 	uint8_t status;
-#endif
+
+#endif /* !( defined( WINAPI ) && ( WINVER >= 0x0602 ) ) */
 };
 
 LIBCTHREADS_EXTERN \
@@ -138,7 +139,7 @@ int libcthreads_internal_thread_pool_pop(
      intptr_t **value,
      libcerror_error_t **error );
 
-#endif
+#endif /* !( defined( WINAPI ) && ( WINVER >= 0x0602 ) ) */
 
 LIBCTHREADS_EXTERN \
 int libcthreads_thread_pool_push(
@@ -157,5 +158,5 @@ int libcthreads_thread_pool_join(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_INTERNAL_THREAD_POOL_H ) */
 

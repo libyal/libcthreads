@@ -35,11 +35,41 @@
  */
 #else
 
-#define LIBCTHREADS_VERSION			@VERSION@
+#define LIBCTHREADS_VERSION				@VERSION@
 
 /* The libcthreads version string
  */
-#define LIBCTHREADS_VERSION_STRING		"@VERSION@"
+#define LIBCTHREADS_VERSION_STRING			"@VERSION@"
+
+/* The comparison function definitions
+ */
+enum LIBCTHREADS_COMPARE_DEFINITIONS
+{
+	/* The first value is less than the second value
+	 */
+        LIBCTHREADS_COMPARE_LESS,
+
+	/* The first and second values are equal
+	 */
+        LIBCTHREADS_COMPARE_EQUAL,
+
+	/* The first value is greater than the second value
+	 */
+        LIBCTHREADS_COMPARE_GREATER
+};
+
+/* The sort flag definitions
+ */
+enum LIBCTHREADS_SORT_FLAGS
+{
+	/* Allow duplicate values
+	 */
+	LIBCTHREADS_SORT_FLAG_NON_UNIQUE_VALUES		= 0x00,
+
+	/* Only allow unique values, no duplicates
+	 */
+	LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES		= 0x01
+};
 
 #endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) */
 
@@ -47,8 +77,8 @@
  */
 enum LIBCTHREADS_STATUS
 {
-	LIBCTHREADS_STATUS_EXIT			= 1
+	LIBCTHREADS_STATUS_EXIT				= 1
 };
 
-#endif
+#endif /* !defined( LIBCTHREADS_INTERNAL_DEFINITIONS_H ) */
 

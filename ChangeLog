@@ -1,6 +1,4 @@
 TODO
-* tests
-  - clean up stdout/stderr
 * thread pool
   - fix winapi version
   - add winapi TP_POOL implemenation
@@ -13,6 +11,13 @@ TODO
   - read/write
 * reimplement repeating thread as a queued thread?
 * add glib support
+
+Tests
+* clean up stdout/stderr
+* add tests of libcthreads_queue_push_sorted
+
+20160401
+* worked on queue sorted push
 
 20160105
 * 2016 update

@@ -24,6 +24,7 @@
 #include <types.h>
 
 #include "libcthreads_condition.h"
+#include "libcthreads_definitions.h"
 #include "libcthreads_libcerror.h"
 #include "libcthreads_mutex.h"
 #include "libcthreads_queue.h"
@@ -369,9 +370,7 @@ int libcthreads_queue_empty(
 			 "%s: unable to wait for full condition.",
 			 function );
 
-			result = -1;
-
-			break;
+			goto on_error;
 		}
 	}
 	if( libcthreads_mutex_release(
@@ -388,6 +387,128 @@ int libcthreads_queue_empty(
 		return( -1 );
 	}
 	return( result );
+
+on_error:
+	libcthreads_mutex_release(
+	 internal_queue->condition_mutex,
+	 NULL );
+
+	return( -1 );
+}
+
+/* Tries to pop a value off the queue
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int libcthreads_queue_try_pop(
+     libcthreads_queue_t *queue,
+     intptr_t **value,
+     libcerror_error_t **error )
+{
+	libcthreads_internal_queue_t *internal_queue = NULL;
+	static char *function                        = "libcthreads_queue_try_pop";
+	int result                                   = 1;
+
+	if( queue == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid queue.",
+		 function );
+
+		return( -1 );
+	}
+	internal_queue = (libcthreads_internal_queue_t *) queue;
+
+	if( internal_queue->values_array == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid queue - missing values array.",
+		 function );
+
+		return( -1 );
+	}
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcthreads_mutex_grab(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab condition mutex.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_queue->number_of_values == 0 )
+	{
+		result = 0;
+	}
+	else
+	{
+		*value = internal_queue->values_array[ internal_queue->pop_index ];
+
+		internal_queue->pop_index++;
+
+		if( internal_queue->pop_index >= internal_queue->allocated_number_of_values )
+		{
+			internal_queue->pop_index = 0;
+		}
+		internal_queue->number_of_values--;
+
+		/* The condition broadcast must be protected by the mutex for the WINAPI version
+		 */
+		if( libcthreads_condition_broadcast(
+		     internal_queue->full_condition,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to broadcast full condition.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libcthreads_mutex_release(
+	     internal_queue->condition_mutex,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release condition mutex.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+
+on_error:
+	libcthreads_mutex_release(
+	 internal_queue->condition_mutex,
+	 NULL );
+
+	return( -1 );
 }
 
 /* Pops a value off the queue
@@ -464,22 +585,20 @@ int libcthreads_queue_pop(
 			 "%s: unable to wait for empty condition.",
 			 function );
 
-			result = -1;
-
-			break;
+			goto on_error;
 		}
 	}
 	if( result == 1 )
 	{
 		*value = internal_queue->values_array[ internal_queue->pop_index ];
 
-		internal_queue->pop_index += 1;
+		internal_queue->pop_index++;
 
 		if( internal_queue->pop_index >= internal_queue->allocated_number_of_values )
 		{
 			internal_queue->pop_index = 0;
 		}
-		internal_queue->number_of_values -= 1;
+		internal_queue->number_of_values--;
 
 		/* The condition broadcast must be protected by the mutex for the WINAPI version
 		 */
@@ -494,7 +613,7 @@ int libcthreads_queue_pop(
 			 "%s: unable to broadcast full condition.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
 	}
 	if( libcthreads_mutex_release(
@@ -511,18 +630,25 @@ int libcthreads_queue_pop(
 		return( -1 );
 	}
 	return( result );
+
+on_error:
+	libcthreads_mutex_release(
+	 internal_queue->condition_mutex,
+	 NULL );
+
+	return( -1 );
 }
 
-/* Tries to pop a value off the queue
+/* Tries to push a value onto the queue
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int libcthreads_queue_try_pop(
+int libcthreads_queue_try_push(
      libcthreads_queue_t *queue,
-     intptr_t **value,
+     intptr_t *value,
      libcerror_error_t **error )
 {
 	libcthreads_internal_queue_t *internal_queue = NULL;
-	static char *function                        = "libcthreads_queue_try_pop";
+	static char *function                        = "libcthreads_queue_try_push";
 	int result                                   = 1;
 
 	if( queue == NULL )
@@ -573,37 +699,37 @@ int libcthreads_queue_try_pop(
 
 		return( -1 );
 	}
-	if( internal_queue->number_of_values != 0 )
+	if( internal_queue->number_of_values == internal_queue->allocated_number_of_values )
 	{
-		*value = internal_queue->values_array[ internal_queue->pop_index ];
+		result = 0;
+	}
+	else
+	{
+		internal_queue->values_array[ internal_queue->push_index ] = value;
 
-		internal_queue->pop_index += 1;
+		internal_queue->push_index++;
 
-		if( internal_queue->pop_index >= internal_queue->allocated_number_of_values )
+		if( internal_queue->push_index >= internal_queue->allocated_number_of_values )
 		{
-			internal_queue->pop_index = 0;
+			internal_queue->push_index = 0;
 		}
-		internal_queue->number_of_values -= 1;
+		internal_queue->number_of_values++;
 
 		/* The condition broadcast must be protected by the mutex for the WINAPI version
 		 */
 		if( libcthreads_condition_broadcast(
-		     internal_queue->full_condition,
+		     internal_queue->empty_condition,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to broadcast full condition.",
+			 "%s: unable to broadcast empty condition.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
-	}
-	else
-	{
-		result = 0;
 	}
 	if( libcthreads_mutex_release(
 	     internal_queue->condition_mutex,
@@ -619,6 +745,13 @@ int libcthreads_queue_try_pop(
 		return( -1 );
 	}
 	return( result );
+
+on_error:
+	libcthreads_mutex_release(
+	 internal_queue->condition_mutex,
+	 NULL );
+
+	return( -1 );
 }
 
 /* Pushes a value onto the queue
@@ -695,22 +828,20 @@ int libcthreads_queue_push(
 			 "%s: unable to wait for full condition.",
 			 function );
 
-			result = -1;
-
-			break;
+			goto on_error;
 		}
 	}
 	if( result == 1 )
 	{
 		internal_queue->values_array[ internal_queue->push_index ] = value;
 
-		internal_queue->push_index += 1;
+		internal_queue->push_index++;
 
 		if( internal_queue->push_index >= internal_queue->allocated_number_of_values )
 		{
 			internal_queue->push_index = 0;
 		}
-		internal_queue->number_of_values += 1;
+		internal_queue->number_of_values++;
 
 		/* The condition broadcast must be protected by the mutex for the WINAPI version
 		 */
@@ -725,7 +856,7 @@ int libcthreads_queue_push(
 			 "%s: unable to broadcast empty condition.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
 	}
 	if( libcthreads_mutex_release(
@@ -742,19 +873,40 @@ int libcthreads_queue_push(
 		return( -1 );
 	}
 	return( result );
+
+on_error:
+	libcthreads_mutex_release(
+	 internal_queue->condition_mutex,
+	 NULL );
+
+	return( -1 );
 }
 
-/* Tries to push a value onto the queue
- * Returns 1 if successful, 0 if not or -1 on error
+/* Pushes a value onto the queue in sorted order
+ *
+ * Uses the value_compare_function to determine the similarity of the values
+ * The value_compare_function should return LIBCTHREADS_COMPARE_LESS,
+ * LIBCTHREADS_COMPARE_EQUAL, LIBCTHREADS_COMPARE_GREATER if successful or -1 on error
+ *
+ * Returns 1 if successful, 0 if the value already exists or -1 on error
  */
-int libcthreads_queue_try_push(
+int libcthreads_queue_push_sorted(
      libcthreads_queue_t *queue,
      intptr_t *value,
+     int (*value_compare_function)(
+            intptr_t *first_value,
+            intptr_t *second_value,
+            libcerror_error_t **error ),
+     uint8_t sort_flags,
      libcerror_error_t **error )
 {
 	libcthreads_internal_queue_t *internal_queue = NULL;
-	static char *function                        = "libcthreads_queue_try_push";
-	int result                                   = 1;
+	static char *function                        = "libcthreads_queue_push_sorted";
+	int compare_result                           = 0;
+	int pop_index                                = 0;
+	int push_index                               = 0;
+	int result                                   = 0;
+	int value_index                              = 0;
 
 	if( queue == NULL )
 	{
@@ -791,6 +943,29 @@ int libcthreads_queue_try_push(
 
 		return( -1 );
 	}
+	if( value_compare_function == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value compare function.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( sort_flags & ~( LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES ) ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported sort flags: 0x%02" PRIx8 ".",
+		 function,
+		 sort_flags );
+
+		return( -1 );
+	}
 	if( libcthreads_mutex_grab(
 	     internal_queue->condition_mutex,
 	     error ) != 1 )
@@ -804,17 +979,101 @@ int libcthreads_queue_try_push(
 
 		return( -1 );
 	}
-	if( internal_queue->number_of_values < internal_queue->allocated_number_of_values )
+	while( internal_queue->number_of_values == internal_queue->allocated_number_of_values )
 	{
-		internal_queue->values_array[ internal_queue->push_index ] = value;
+		if( libcthreads_condition_wait(
+		     internal_queue->full_condition,
+		     internal_queue->condition_mutex,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to wait for full condition.",
+			 function );
 
-		internal_queue->push_index += 1;
+			goto on_error;
+		}
+	}
+	if( result == 1 )
+	{
+		pop_index = internal_queue->pop_index;
+
+		for( value_index = 0;
+		     value_index < internal_queue->number_of_values;
+		     value_index++ )
+		{
+			compare_result = value_compare_function(
+			                  value,
+			                  internal_queue->values_array[ pop_index ],
+			                  error );
+
+			if( compare_result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to compare value: %d.",
+				 function,
+				 value_index );
+
+				goto on_error;
+			}
+			else if( compare_result == LIBCTHREADS_COMPARE_EQUAL )
+			{
+				if( ( sort_flags & LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES ) != 0 )
+				{
+					result = 0;
+
+					break;
+				}
+			}
+			else if( compare_result == LIBCTHREADS_COMPARE_LESS )
+			{
+				result = 1;
+
+				break;
+			}
+			else if( compare_result != LIBCTHREADS_COMPARE_GREATER )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported value compare function return value: %d.",
+				 function,
+				 compare_result );
+
+				goto on_error;
+			}
+		}
+	}
+	if( result != 0 )
+	{
+		if( compare_result == LIBCTHREADS_COMPARE_LESS )
+		{
+			for( push_index = internal_queue->number_of_values - 1;
+			     push_index > pop_index;
+			     push_index-- )
+			{
+				internal_queue->values_array[ push_index ] = internal_queue->values_array[ push_index - 1 ];
+			}
+		}
+		else
+		{
+			push_index = pop_index;
+		}
+		internal_queue->values_array[ push_index ] = value;
+
+		internal_queue->push_index++;
 
 		if( internal_queue->push_index >= internal_queue->allocated_number_of_values )
 		{
 			internal_queue->push_index = 0;
 		}
-		internal_queue->number_of_values += 1;
+		internal_queue->number_of_values++;
 
 		/* The condition broadcast must be protected by the mutex for the WINAPI version
 		 */
@@ -829,12 +1088,8 @@ int libcthreads_queue_try_push(
 			 "%s: unable to broadcast empty condition.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
-	}
-	else
-	{
-		result = 0;
 	}
 	if( libcthreads_mutex_release(
 	     internal_queue->condition_mutex,
@@ -850,6 +1105,13 @@ int libcthreads_queue_try_push(
 		return( -1 );
 	}
 	return( result );
+
+on_error:
+	libcthreads_mutex_release(
+	 internal_queue->condition_mutex,
+	 NULL );
+
+	return( -1 );
 }
 
 #endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */

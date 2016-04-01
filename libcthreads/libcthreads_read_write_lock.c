@@ -315,7 +315,7 @@ int libcthreads_read_write_lock_grab_for_read(
 	EnterCriticalSection(
 	 &( internal_read_write_lock->read_critical_section ) );
 
-	internal_read_write_lock->number_of_readers += 1;
+	internal_read_write_lock->number_of_readers++;
 
 	if( internal_read_write_lock->number_of_readers == 1 )
 	{
@@ -326,7 +326,7 @@ int libcthreads_read_write_lock_grab_for_read(
 		{
 			error_code = GetLastError();
 
-			internal_read_write_lock->number_of_readers -= 1;
+			internal_read_write_lock->number_of_readers--;
 		}
 	}
 	else
@@ -492,7 +492,7 @@ int libcthreads_read_write_lock_release_for_read(
 	EnterCriticalSection(
 	 &( internal_read_write_lock->read_critical_section ) );
 
-	internal_read_write_lock->number_of_readers -= 1;
+	internal_read_write_lock->number_of_readers--;
 
 	if( internal_read_write_lock->number_of_readers == 0 )
 	{
@@ -503,7 +503,7 @@ int libcthreads_read_write_lock_release_for_read(
 		{
 			error_code = GetLastError();
 
-			internal_read_write_lock->number_of_readers += 1;
+			internal_read_write_lock->number_of_readers++;
 		}
 	}
 	else

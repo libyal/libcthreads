@@ -89,15 +89,21 @@ int libcthreads_queue_empty(
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
+int libcthreads_queue_try_pop(
+     libcthreads_queue_t *queue,
+     intptr_t **value,
+     libcerror_error_t **error );
+
+LIBCTHREADS_EXTERN \
 int libcthreads_queue_pop(
      libcthreads_queue_t *queue,
      intptr_t **value,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
-int libcthreads_queue_try_pop(
+int libcthreads_queue_try_push(
      libcthreads_queue_t *queue,
-     intptr_t **value,
+     intptr_t *value,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
@@ -107,9 +113,14 @@ int libcthreads_queue_push(
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
-int libcthreads_queue_try_push(
+int libcthreads_queue_push_sorted(
      libcthreads_queue_t *queue,
      intptr_t *value,
+     int (*value_compare_function)(
+            intptr_t *first_value,
+            intptr_t *second_value,
+            libcerror_error_t **error ),
+     uint8_t sort_flags,
      libcerror_error_t **error );
 
 #endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT ) */
@@ -118,5 +129,5 @@ int libcthreads_queue_try_push(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_INTERNAL_QUEUE_H ) */
 

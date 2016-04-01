@@ -824,13 +824,13 @@ int libcthreads_internal_thread_pool_pop(
 	{
 		*value = internal_thread_pool->values_array[ internal_thread_pool->pop_index ];
 
-		internal_thread_pool->pop_index += 1;
+		internal_thread_pool->pop_index++;
 
 		if( internal_thread_pool->pop_index >= internal_thread_pool->allocated_number_of_values )
 		{
 			internal_thread_pool->pop_index = 0;
 		}
-		internal_thread_pool->number_of_values -= 1;
+		internal_thread_pool->number_of_values--;
 
 		if( libcthreads_condition_broadcast(
 		     internal_thread_pool->full_condition,
@@ -947,13 +947,13 @@ int libcthreads_thread_pool_push(
 	{
 		internal_thread_pool->values_array[ internal_thread_pool->push_index ] = value;
 
-		internal_thread_pool->push_index += 1;
+		internal_thread_pool->push_index++;
 
 		if( internal_thread_pool->push_index >= internal_thread_pool->allocated_number_of_values )
 		{
 			internal_thread_pool->push_index = 0;
 		}
-		internal_thread_pool->number_of_values += 1;
+		internal_thread_pool->number_of_values++;
 
 		if( libcthreads_condition_broadcast(
 		     internal_thread_pool->empty_condition,
