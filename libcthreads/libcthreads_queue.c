@@ -521,7 +521,6 @@ int libcthreads_queue_pop(
 {
 	libcthreads_internal_queue_t *internal_queue = NULL;
 	static char *function                        = "libcthreads_queue_pop";
-	int result                                   = 1;
 
 	if( queue == NULL )
 	{
@@ -588,33 +587,30 @@ int libcthreads_queue_pop(
 			goto on_error;
 		}
 	}
-	if( result == 1 )
+	*value = internal_queue->values_array[ internal_queue->pop_index ];
+
+	internal_queue->pop_index++;
+
+	if( internal_queue->pop_index >= internal_queue->allocated_number_of_values )
 	{
-		*value = internal_queue->values_array[ internal_queue->pop_index ];
+		internal_queue->pop_index = 0;
+	}
+	internal_queue->number_of_values--;
 
-		internal_queue->pop_index++;
+	/* The condition broadcast must be protected by the mutex for the WINAPI version
+	 */
+	if( libcthreads_condition_broadcast(
+	     internal_queue->full_condition,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to broadcast full condition.",
+		 function );
 
-		if( internal_queue->pop_index >= internal_queue->allocated_number_of_values )
-		{
-			internal_queue->pop_index = 0;
-		}
-		internal_queue->number_of_values--;
-
-		/* The condition broadcast must be protected by the mutex for the WINAPI version
-		 */
-		if( libcthreads_condition_broadcast(
-		     internal_queue->full_condition,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to broadcast full condition.",
-			 function );
-
-			goto on_error;
-		}
+		goto on_error;
 	}
 	if( libcthreads_mutex_release(
 	     internal_queue->condition_mutex,
@@ -629,7 +625,7 @@ int libcthreads_queue_pop(
 
 		return( -1 );
 	}
-	return( result );
+	return( 1 );
 
 on_error:
 	libcthreads_mutex_release(
@@ -764,7 +760,6 @@ int libcthreads_queue_push(
 {
 	libcthreads_internal_queue_t *internal_queue = NULL;
 	static char *function                        = "libcthreads_queue_push";
-	int result                                   = 1;
 
 	if( queue == NULL )
 	{
@@ -831,33 +826,30 @@ int libcthreads_queue_push(
 			goto on_error;
 		}
 	}
-	if( result == 1 )
+	internal_queue->values_array[ internal_queue->push_index ] = value;
+
+	internal_queue->push_index++;
+
+	if( internal_queue->push_index >= internal_queue->allocated_number_of_values )
 	{
-		internal_queue->values_array[ internal_queue->push_index ] = value;
+		internal_queue->push_index = 0;
+	}
+	internal_queue->number_of_values++;
 
-		internal_queue->push_index++;
+	/* The condition broadcast must be protected by the mutex for the WINAPI version
+	 */
+	if( libcthreads_condition_broadcast(
+	     internal_queue->empty_condition,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to broadcast empty condition.",
+		 function );
 
-		if( internal_queue->push_index >= internal_queue->allocated_number_of_values )
-		{
-			internal_queue->push_index = 0;
-		}
-		internal_queue->number_of_values++;
-
-		/* The condition broadcast must be protected by the mutex for the WINAPI version
-		 */
-		if( libcthreads_condition_broadcast(
-		     internal_queue->empty_condition,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to broadcast empty condition.",
-			 function );
-
-			goto on_error;
-		}
+		goto on_error;
 	}
 	if( libcthreads_mutex_release(
 	     internal_queue->condition_mutex,
@@ -872,7 +864,7 @@ int libcthreads_queue_push(
 
 		return( -1 );
 	}
-	return( result );
+	return( 1 );
 
 on_error:
 	libcthreads_mutex_release(
@@ -904,8 +896,9 @@ int libcthreads_queue_push_sorted(
 	static char *function                        = "libcthreads_queue_push_sorted";
 	int compare_result                           = 0;
 	int pop_index                                = 0;
+	int previous_push_index                      = 0;
 	int push_index                               = 0;
-	int result                                   = 0;
+	int result                                   = 1;
 	int value_index                              = 0;
 
 	if( queue == NULL )
@@ -996,74 +989,83 @@ int libcthreads_queue_push_sorted(
 			goto on_error;
 		}
 	}
-	if( result == 1 )
+	pop_index = internal_queue->pop_index;
+
+	for( value_index = 0;
+	     value_index < internal_queue->number_of_values;
+	     value_index++ )
 	{
-		pop_index = internal_queue->pop_index;
+		compare_result = value_compare_function(
+				  value,
+				  internal_queue->values_array[ pop_index ],
+				  error );
 
-		for( value_index = 0;
-		     value_index < internal_queue->number_of_values;
-		     value_index++ )
+		if( compare_result == -1 )
 		{
-			compare_result = value_compare_function(
-			                  value,
-			                  internal_queue->values_array[ pop_index ],
-			                  error );
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to compare value: %d.",
+			 function,
+			 value_index );
 
-			if( compare_result == -1 )
+			goto on_error;
+		}
+		else if( compare_result == LIBCTHREADS_COMPARE_EQUAL )
+		{
+			if( ( sort_flags & LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES ) != 0 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to compare value: %d.",
-				 function,
-				 value_index );
-
-				goto on_error;
-			}
-			else if( compare_result == LIBCTHREADS_COMPARE_EQUAL )
-			{
-				if( ( sort_flags & LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES ) != 0 )
-				{
-					result = 0;
-
-					break;
-				}
-			}
-			else if( compare_result == LIBCTHREADS_COMPARE_LESS )
-			{
-				result = 1;
+				result = 0;
 
 				break;
 			}
-			else if( compare_result != LIBCTHREADS_COMPARE_GREATER )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-				 "%s: unsupported value compare function return value: %d.",
-				 function,
-				 compare_result );
+		}
+		else if( compare_result == LIBCTHREADS_COMPARE_LESS )
+		{
+			result = 1;
 
-				goto on_error;
-			}
+			break;
+		}
+		else if( compare_result != LIBCTHREADS_COMPARE_GREATER )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported value compare function return value: %d.",
+			 function,
+			 compare_result );
+
+			goto on_error;
+		}
+		pop_index++;
+
+		if( pop_index >= internal_queue->allocated_number_of_values )
+		{
+			pop_index = 0;
 		}
 	}
 	if( result != 0 )
 	{
+		push_index = internal_queue->push_index;
+
 		if( compare_result == LIBCTHREADS_COMPARE_LESS )
 		{
-			for( push_index = internal_queue->number_of_values - 1;
-			     push_index > pop_index;
-			     push_index-- )
+			previous_push_index = push_index - 1;
+
+			while( push_index != pop_index )
 			{
-				internal_queue->values_array[ push_index ] = internal_queue->values_array[ push_index - 1 ];
+				if( previous_push_index < 0 )
+				{
+					previous_push_index = internal_queue->allocated_number_of_values - 1;
+				}
+				internal_queue->values_array[ push_index ] = internal_queue->values_array[ previous_push_index ];
+
+				push_index = previous_push_index;
+
+				previous_push_index--;
 			}
-		}
-		else
-		{
-			push_index = pop_index;
 		}
 		internal_queue->values_array[ push_index ] = value;
 
