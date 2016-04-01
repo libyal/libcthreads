@@ -33,5 +33,5 @@
 
 #include <libcthreads.h>
 
-#endif
+#endif /* !defined( _CTHREADS_TEST_LIBCTHREADS_H ) */
 
