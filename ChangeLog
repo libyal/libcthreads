@@ -17,6 +17,9 @@ Tests
 * add tests of libcthreads_queue_push_sorted
 * add tests of libcthreads_queue_push_sorted
 
+20160402
+* fixes for race in of thread pool helper threads
+
 20160401
 * worked on queue sorted push
 * worked on thread pool sorted push

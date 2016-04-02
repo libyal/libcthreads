@@ -284,7 +284,7 @@ int libcthreads_thread_pool_create(
 
 		return( -1 );
 	}
-#endif
+#endif /* SIZEOF_INT > 4 */
 #else
 #if SIZEOF_INT <= SIZEOF_SIZE_T
 	if( (size_t) number_of_threads > (size_t) ( SSIZE_MAX / sizeof( libcthreads_thread_t * ) ) )
@@ -301,7 +301,7 @@ int libcthreads_thread_pool_create(
 
 		return( -1 );
 	}
-#endif
+#endif /* defined( WINAPI ) && ( WINVER >= 0x0602 ) */
 	if( maximum_number_of_values <= 0 )
 	{
 		libcerror_error_set(
@@ -433,6 +433,10 @@ int libcthreads_thread_pool_create(
 		goto on_error;
 	}
 	internal_thread_pool->allocated_number_of_values = maximum_number_of_values;
+
+	/* The callback must be set before the callback function helper threads are created */
+	internal_thread_pool->callback_function           = callback_function;
+	internal_thread_pool->callback_function_arguments = callback_function_arguments;
 
 	if( libcthreads_mutex_initialize(
 	     &( internal_thread_pool->condition_mutex ),
@@ -664,10 +668,8 @@ int libcthreads_thread_pool_create(
 			goto on_error;
 		}
 	}
-#endif
-	internal_thread_pool->callback_function           = callback_function;
-	internal_thread_pool->callback_function_arguments = callback_function_arguments;
-#endif
+#endif /* defined( WINAPI ) */
+#endif /* defined( WINAPI ) && ( WINVER >= 0x0602 ) */
 	*thread_pool = (libcthreads_thread_pool_t *) internal_thread_pool;
 
 	return( 1 );
@@ -760,7 +762,7 @@ int libcthreads_internal_thread_pool_pop(
      libcerror_error_t **error )
 {
 	static char *function = "libcthreads_internal_thread_pool_pop";
-	int result            = 1;
+	int result            = 0;
 
 	if( internal_thread_pool == NULL )
 	{
@@ -801,8 +803,6 @@ int libcthreads_internal_thread_pool_pop(
 	{
 		if( internal_thread_pool->status == LIBCTHREADS_STATUS_EXIT )
 		{
-			result = 0;
-
 			break;
 		}
 		if( libcthreads_condition_wait(
@@ -817,12 +817,10 @@ int libcthreads_internal_thread_pool_pop(
 			 "%s: unable to wait for empty condition.",
 			 function );
 
-			result = -1;
-
-			break;
+			goto on_error;
 		}
 	}
-	if( result == 1 )
+	if( internal_thread_pool->number_of_values > 0 )
 	{
 		*value = internal_thread_pool->values_array[ internal_thread_pool->pop_index ];
 
@@ -833,6 +831,8 @@ int libcthreads_internal_thread_pool_pop(
 			internal_thread_pool->pop_index = 0;
 		}
 		internal_thread_pool->number_of_values--;
+
+		result = 1;
 
 		if( libcthreads_condition_broadcast(
 		     internal_thread_pool->full_condition,
@@ -845,7 +845,7 @@ int libcthreads_internal_thread_pool_pop(
 			 "%s: unable to broadcast full condition.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
 	}
 	if( libcthreads_mutex_release(
@@ -862,6 +862,13 @@ int libcthreads_internal_thread_pool_pop(
 		return( -1 );
 	}
 	return( result );
+
+on_error:
+	libcthreads_mutex_release(
+	 internal_thread_pool->condition_mutex,
+	 NULL );
+
+	return( -1 );
 }
 
 #endif /* !( defined( WINAPI ) && ( WINVER >= 0x0602 ) ) */
