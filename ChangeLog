@@ -17,6 +17,9 @@ Tests
 * add tests of libcthreads_queue_push_sorted
 * add tests of libcthreads_queue_push_sorted
 
+20160403
+* fixed values array not being freed after join of thread pool
+
 20160402
 * fixes for race in of thread pool helper threads
 
