@@ -1486,11 +1486,8 @@ int libcthreads_thread_pool_join(
 
 #endif /* defined( WINAPI ) && ( WINVER >= 0x0602 ) */
 
-	if( internal_thread_pool->values_array != NULL )
-	{
-		memory_free(
-		 internal_thread_pool->values_array );
-	}
+	memory_free(
+	 internal_thread_pool->values_array );
 	memory_free(
 	 internal_thread_pool );
 

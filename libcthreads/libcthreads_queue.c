@@ -237,15 +237,20 @@ on_error:
 }
 
 /* Frees a queue
+ * Uses the value_free_function to free the value
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_queue_free(
      libcthreads_queue_t **queue,
+     int (*value_free_function)(
+            intptr_t **value,
+            libcerror_error_t **error ),
      libcerror_error_t **error )
 {
 	libcthreads_internal_queue_t *internal_queue = NULL;
 	static char *function                        = "libcthreads_queue_free";
 	int result                                   = 1;
+	int value_index                              = 0;
 
 	if( queue == NULL )
 	{
@@ -262,6 +267,31 @@ int libcthreads_queue_free(
 	{
 		internal_queue = (libcthreads_internal_queue_t *) *queue;
 		*queue         = NULL;
+
+		if( value_free_function != NULL )
+		{
+			for( value_index = 0;
+			     value_index < internal_queue->number_of_values;
+			     value_index++ )
+			{
+				if( value_free_function(
+				     &( internal_queue->values_array[ value_index ] ),
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free value: %d.",
+					 function,
+					 value_index );
+
+					result = -1;
+				}
+			}
+		}
+		memory_free(
+		 internal_queue->values_array );
 
 		if( libcthreads_condition_free(
 		     &( internal_queue->full_condition ),

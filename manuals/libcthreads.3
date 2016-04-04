@@ -1,4 +1,4 @@
-.Dd January  4, 2015
+.Dd April  4, 2015
 .Dt libcthreads 3
 .Os libcthreads
 .Sh NAME
@@ -89,7 +89,7 @@ Queue functions
 .Ft int
 .Fn libcthreads_queue_initialize "libcthreads_queue_t **queue, int maximum_number_of_values, libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_queue_free "libcthreads_queue_t **queue, libcthreads_error_t **error"
+.Fn libcthreads_queue_free "libcthreads_queue_t **queue, int (*value_free_function)( intptr_t **value, libcthreads_error_t **error ), libcthreads_error_t **error"
 .Ft int
 .Fn libcthreads_queue_empty "libcthreads_queue_t *queue, libcthreads_error_t **error"
 .Ft int

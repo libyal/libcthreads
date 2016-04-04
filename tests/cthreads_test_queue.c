@@ -90,6 +90,7 @@ int cthreads_test_queue_initialize(
 	{
 		if( libcthreads_queue_free(
 		     queue,
+		     NULL,
 		     &error ) == -1 )
 		{
 			libcerror_error_set(
@@ -342,6 +343,7 @@ int cthreads_test_queue_queuing(
 	}
 	if( libcthreads_queue_free(
 	     &cthreads_test_queue,
+	     NULL,
 	     &error ) != 1 )
 	{
 		libcerror_error_set(
@@ -405,6 +407,7 @@ on_error:
 	{
 		libcthreads_queue_free(
 		 &cthreads_test_queue,
+		 NULL,
 		 NULL );
 	}
 	return( -1 );

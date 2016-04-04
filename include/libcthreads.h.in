@@ -332,11 +332,15 @@ int libcthreads_queue_initialize(
      libcthreads_error_t **error );
 
 /* Frees a queue
+ * Uses the value_free_function to free the value
  * Returns 1 if successful or -1 on error
  */
 LIBCTHREADS_EXTERN \
 int libcthreads_queue_free(
      libcthreads_queue_t **queue,
+     int (*value_free_function)(
+            intptr_t **value,
+            libcthreads_error_t **error ),
      libcthreads_error_t **error );
 
 /* Empties a queue

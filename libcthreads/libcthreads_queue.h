@@ -81,6 +81,9 @@ int libcthreads_queue_initialize(
 LIBCTHREADS_EXTERN \
 int libcthreads_queue_free(
      libcthreads_queue_t **queue,
+     int (*value_free_function)(
+            intptr_t **value,
+            libcerror_error_t **error ),
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
