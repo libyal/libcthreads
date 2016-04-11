@@ -1,4 +1,4 @@
-.Dd April  4, 2015
+.Dd April 11, 2016
 .Dt libcthreads 3
 .Os libcthreads
 .Sh NAME
@@ -27,7 +27,7 @@ Error functions
 .Pp
 Thread functions
 .Ft int
-.Fn libcthreads_thread_create "libcthreads_thread_t **thread, const libcthreads_thread_attributes_t *thread_attributes, int (*callback_function)( void *arguments), void *callback_function_arguments, libcthreads_error_t **error"
+.Fn libcthreads_thread_create "libcthreads_thread_t **thread, const libcthreads_thread_attributes_t *thread_attributes, int (*callback_function)( void *arguments ), void *callback_function_arguments, libcthreads_error_t **error"
 .Ft int
 .Fn libcthreads_thread_join "libcthreads_thread_t **thread, libcthreads_error_t **error"
 .Pp
@@ -93,15 +93,23 @@ Queue functions
 .Ft int
 .Fn libcthreads_queue_empty "libcthreads_queue_t *queue, libcthreads_error_t **error"
 .Ft int
+.Fn libcthreads_queue_try_pop "libcthreads_queue_t *queue, intptr_t **value, libcthreads_error_t **error"
+.Ft int
 .Fn libcthreads_queue_pop "libcthreads_queue_t *queue, intptr_t **value, libcthreads_error_t **error"
 .Ft int
+.Fn libcthreads_queue_try_push "libcthreads_queue_t *queue, intptr_t *value, libcthreads_error_t **error"
+.Ft int
 .Fn libcthreads_queue_push "libcthreads_queue_t *queue, intptr_t *value, libcthreads_error_t **error"
+.Ft int
+.Fn libcthreads_queue_push_sorted "libcthreads_queue_t *queue, intptr_t *value, int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value, libcthreads_error_t **error ), uint8_t sort_flags, libcthreads_error_t **error"
 .Pp
 Thread pool functions
 .Ft int
 .Fn libcthreads_thread_pool_create "libcthreads_thread_pool_t **thread_pool, const libcthreads_thread_attributes_t *thread_attributes, int number_of_threads, int maximum_number_of_values, int (*callback_function)( intptr_t *value, void *arguments ), void *callback_function_arguments, libcthreads_error_t **error"
 .Ft int
 .Fn libcthreads_thread_pool_push "libcthreads_thread_pool_t *thread_pool, intptr_t *value, libcthreads_error_t **error"
+.Ft int
+.Fn libcthreads_thread_pool_push_sorted "libcthreads_thread_pool_t *thread_pool, intptr_t *value, int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value, libcthreads_error_t **error ), uint8_t sort_flags, libcthreads_error_t **error"
 .Ft int
 .Fn libcthreads_thread_pool_join "libcthreads_thread_pool_t **thread_pool, libcthreads_error_t **error"
 .Sh DESCRIPTION

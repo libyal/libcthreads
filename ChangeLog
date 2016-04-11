@@ -17,6 +17,9 @@ Tests
 * add tests of libcthreads_queue_push_sorted
 * add tests of libcthreads_queue_push_sorted
 
+20160411
+* worked on tests
+
 20160404
 * added value free callback function to queue free
 

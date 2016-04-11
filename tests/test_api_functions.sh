@@ -1,7 +1,7 @@
 #!/bin/bash
 # Library API functions testing script
 #
-# Version: 20160401
+# Version: 20160403
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;

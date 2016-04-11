@@ -102,7 +102,7 @@ int libcthreads_thread_create(
      libcthreads_thread_t **thread,
      const libcthreads_thread_attributes_t *thread_attributes,
      int (*callback_function)(
-            void *arguments),
+            void *arguments ),
      void *callback_function_arguments,
      libcthreads_error_t **error );
 
