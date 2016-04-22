@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160407
+# Version: 20160420
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -129,16 +129,25 @@ find_binary_library_path()
 		LIBRARY_NAME=`dirname ${LIBRARY_NAME}`;
 		LIBRARY_NAME=`basename ${LIBRARY_NAME} | sed 's/\(.*\)tools$/lib\1/'`;
 	else
-		LIBRARY_NAME=`basename ${LIBRARY_NAME} | sed 's/^\(.*\)_test_.*$/lib\1/'`;
+		LIBRARY_NAME=`basename ${LIBRARY_NAME} | sed 's/^\(py\|\)\([^_]*\)_test_.*$/lib\2/'`;
 	fi
 	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
 	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
 	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
 
-	echo "${TEST_EXECUTABLE}/${LIBRARY_NAME}/.libs";
+	local LIBRARY_PATH="${TEST_EXECUTABLE}/${LIBRARY_NAME}/.libs";
+
+	if ! test -d "${LIBRARY_PATH}";
+	then
+		LIBRARY_PATH="../${LIBRARY_NAME}/.libs";
+	fi
+	echo "${LIBRARY_PATH}";
 }
 
 # Searches for the path to the binary variant of the Python module
+#
+# Globals:
+#   PYTHON_VERSION
 #
 # Arguments:
 #   a string containing the path of the test executable
@@ -159,13 +168,29 @@ find_binary_python_module_path()
 		PYTHON_MODULE_NAME=`dirname ${PYTHON_MODULE_NAME}`;
 		PYTHON_MODULE_NAME=`basename ${PYTHON_MODULE_NAME} | sed 's/\(.*\)tools$/py\1/'`;
 	else
-		PYTHON_MODULE_NAME=`basename ${PYTHON_MODULE_NAME} | sed 's/^\(.*\)_test_.*$/py\1/'`;
+		PYTHON_MODULE_NAME=`basename ${PYTHON_MODULE_NAME} | sed 's/^\(py\|\)\(.*\)_test_.*$/py\2/'`;
 	fi
 	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
 	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
 	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
 
-	echo "${TEST_EXECUTABLE}/${PYTHON_MODULE_NAME}/.libs";
+	PYTHON_VERSION=`echo ${PYTHON_VERSION} | cut -c1`;
+
+	local PYTHON_MODULE_PATH="${TEST_EXECUTABLE}/${PYTHON_MODULE_NAME}-python${PYTHON_VERSION}/.libs";
+
+	if ! test -d "${PYTHON_MODULE_PATH}";
+	then
+		PYTHON_MODULE_PATH="../${PYTHON_MODULE_NAME}-python${PYTHON_VERSION}/.libs";
+	fi
+	if ! test -d "${PYTHON_MODULE_PATH}";
+	then
+		PYTHON_MODULE_PATH="${TEST_EXECUTABLE}/${PYTHON_MODULE_NAME}/.libs";
+	fi
+	if ! test -d "${PYTHON_MODULE_PATH}";
+	then
+		PYTHON_MODULE_PATH="../${PYTHON_MODULE_NAME}/.libs";
+	fi
+	echo "${PYTHON_MODULE_PATH}";
 }
 
 # Determines the test option file.
@@ -290,7 +315,7 @@ read_option_file()
 #   CHECK_WITH_GDB
 #   CHECK_WITH_STDERR
 #   CHECK_WITH_VALGRIND
-#   PYTHON
+#   PYTHON_VERSION
 #
 # Arguments:
 #   a string containing the path of the test executable
@@ -320,6 +345,17 @@ run_test_with_arguments()
 	echo "${EXECUTABLE_TYPE}" | grep "text/x-python" > /dev/null 2>&1;
 	local IS_PYTHON_SCRIPT=$?;
 
+	if test ${IS_PYTHON_SCRIPT} -eq 0;
+	then
+		local PYTHON=`which python${PYTHON_VERSION} 2> /dev/null`;
+
+		if ! test -x ${PYTHON};
+		then
+			echo "Missing executable: ${PYTHON}";
+
+			exit ${EXIT_FAILURE};
+		fi
+	fi
 	local RESULT=0;
 
 	if ! test -z ${CHECK_WITH_GDB};
@@ -456,7 +492,7 @@ run_test_with_arguments()
 #   CHECK_WITH_GDB
 #   CHECK_WITH_STDERR
 #   CHECK_WITH_VALGRIND
-#   PYTHON
+#   PYTHON_VERSION
 #
 # Arguments:
 #   a string containing the path of the test executable
@@ -488,6 +524,17 @@ run_test_with_input_and_arguments()
 	echo "${EXECUTABLE_TYPE}" | grep "text/x-python" > /dev/null 2>&1;
 	local IS_PYTHON_SCRIPT=$?;
 
+	if test ${IS_PYTHON_SCRIPT} -eq 0;
+	then
+		local PYTHON=`which python${PYTHON_VERSION} 2> /dev/null`;
+
+		if ! test -x ${PYTHON};
+		then
+			echo "Missing executable: ${PYTHON}";
+
+			exit ${EXIT_FAILURE};
+		fi
+	fi
 	local RESULT=0;
 
 	if ! test -z ${CHECK_WITH_GDB};
@@ -623,10 +670,6 @@ run_test_with_input_and_arguments()
 # Note that this function is not intended to be directly invoked
 # from outside the test runner script.
 #
-# Globals:
-#   CHECK_WITH_GDB
-#   CHECK_WITH_VALGRIND
-#
 # Arguments:
 #   a string containing the path of the test set directory
 #   a string containing the description of the test
@@ -668,12 +711,7 @@ run_test_on_input_file()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	if ! test -z ${CHECK_WITH_GDB} || ! test -z ${CHECK_WITH_VALGRIND};
-	then
-		run_test_with_input_and_arguments "${TEST_EXECUTABLE}" "${INPUT_FILE}" ${ARGUMENTS[@]} ${OPTIONS[@]};
-		RESULT=$?;
-
-	elif test "${TEST_MODE}" = "with_callback";
+	if test "${TEST_MODE}" = "with_callback";
 	then
 		test_callback "${TMPDIR}" "${TEST_SET_DIRECTORY}" "${TEST_OUTPUT}" "${TEST_EXECUTABLE}" "${TEST_INPUT}" ${ARGUMENTS[@]} ${OPTIONS[@]};
 		RESULT=$?;
@@ -774,6 +812,7 @@ run_test_on_input_directory()
 	local ARGUMENTS=$@;
 
 	assert_availability_binary cat;
+	assert_availability_binary cut;
 	assert_availability_binary diff;
 	assert_availability_binary file;
 	assert_availability_binary gzip;
