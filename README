@@ -1,10 +1,12 @@
 libcthreads is a library for cross-platform C threads functions.
 
 Project information:
+
 * Status: alpha
 * Licence: LGPLv3+
 
 For more information see:
+
 * Project documentation: https://github.com/libyal/libcthreads/wiki/Home
 * How to build from source: https://github.com/libyal/libcthreads/wiki/Building
 
