@@ -27,9 +27,9 @@
 
 #include <stdio.h>
 
-#include "cthreads_test_libcthreads.h"
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
+#include "cthreads_test_libcthreads.h"
 
 /* Tests initializing a queue
  * Make sure the value queue is referencing, is set to NULL
@@ -173,27 +173,12 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int cthreads_test_queue_push_callback_function(
-     void *arguments )
+     int *queued_values )
 {
 	libcerror_error_t *error = NULL;
 	static char *function    = "cthreads_test_queue_push_callback_function";
-	int *queued_values       = NULL;
 	int iterator             = 0;
 
-	queued_values = (int *) memory_allocate(
-	                         sizeof( int ) * cthreads_test_number_of_iterations );
-
-	if( queued_values == NULL )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create queued values.",
-		 function );
-
-		goto on_error;
-	}
 	for( iterator = 0;
 	     iterator < cthreads_test_number_of_iterations;
 	     iterator++ )
@@ -216,11 +201,6 @@ int cthreads_test_queue_push_callback_function(
 		}
 		cthreads_test_expected_queued_value += queued_values[ iterator ];
 	}
-	memory_free(
-	 queued_values );
-
-	queued_values = NULL;
-
 	return( 1 );
 
 on_error:
@@ -232,11 +212,6 @@ on_error:
 
 		libcerror_error_free(
 		 &error );
-	}
-	if( queued_values != NULL )
-	{
-		memory_free(
-		 queued_values );
 	}
 	return( -1 );
 }
@@ -250,12 +225,27 @@ int cthreads_test_queue_queuing(
 	libcerror_error_t *error          = NULL;
 	libcthreads_thread_t *pop_thread  = NULL;
 	libcthreads_thread_t *push_thread = NULL;
+	int *queued_values                = NULL;
 	static char *function             = "cthreads_test_queue_queuing";
 	int result                        = 0;
 
 	cthreads_test_expected_queued_value = 0;
 	cthreads_test_queued_value          = 0;
 
+	queued_values = (int *) memory_allocate(
+	                         sizeof( int ) * cthreads_test_number_of_iterations );
+
+	if( queued_values == NULL )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create queued values.",
+		 function );
+
+		goto on_error;
+	}
 	if( libcthreads_queue_initialize(
 	     &cthreads_test_queue,
 	     cthreads_test_number_of_values,
@@ -273,8 +263,8 @@ int cthreads_test_queue_queuing(
 	if( libcthreads_thread_create(
 	     &push_thread,
 	     NULL,
-	     cthreads_test_queue_push_callback_function,
-	     NULL,
+	     (int (*)(void *)) &cthreads_test_queue_push_callback_function,
+	     queued_values,
 	     &error ) != 1 )
 	{
 		libcerror_error_set(
@@ -289,7 +279,7 @@ int cthreads_test_queue_queuing(
 	if( libcthreads_thread_create(
 	     &pop_thread,
 	     NULL,
-	     cthreads_test_queue_pop_callback_function,
+	     (int (*)(void *)) &cthreads_test_queue_pop_callback_function,
 	     NULL,
 	     &error ) != 1 )
 	{
@@ -355,6 +345,11 @@ int cthreads_test_queue_queuing(
 
 		goto on_error;
 	}
+	memory_free(
+	 queued_values );
+
+	queued_values = NULL;
+
 	fprintf(
 	 stdout,
 	 "Testing queued value\t" );
@@ -409,6 +404,11 @@ on_error:
 		 &cthreads_test_queue,
 		 NULL,
 		 NULL );
+	}
+	if( queued_values != NULL )
+	{
+		memory_free(
+		 queued_values );
 	}
 	return( -1 );
 }

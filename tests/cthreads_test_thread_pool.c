@@ -28,9 +28,9 @@
 
 #include <stdio.h>
 
-#include "cthreads_test_libcthreads.h"
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
+#include "cthreads_test_libcthreads.h"
 #include "cthreads_test_unused.h"
 
 libcthreads_lock_t *cthreads_test_lock  = NULL;
@@ -78,7 +78,7 @@ int cthreads_test_thread_pool_callback_function(
 
 		goto on_error;
 	}
-	cthreads_test_queued_value += *value;
+	cthreads_test_queued_value += *( (int *) value );
 
 	result = libcthreads_lock_release(
 		  cthreads_test_lock,
@@ -286,7 +286,7 @@ int cthreads_test_thread_pool_push(
 	     NULL,
 	     8,
 	     cthreads_test_number_of_values,
-	     &cthreads_test_thread_pool_callback_function,
+	     (int (*)(intptr_t *, void *)) &cthreads_test_thread_pool_callback_function,
 	     NULL,
 	     &error ) != 1 )
 	{
@@ -435,7 +435,7 @@ int main( int argc, char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 
 	if( cthreads_test_thread_pool_create(
 	     &thread_pool,
-	     &cthreads_test_thread_pool_callback_function,
+	     (int (*)(intptr_t *, void *)) &cthreads_test_thread_pool_callback_function,
 	     1 ) != 1 )
 	{
 		fprintf(
@@ -470,7 +470,7 @@ int main( int argc, char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 
 	if( cthreads_test_thread_pool_create(
 	     &thread_pool,
-	     &cthreads_test_thread_pool_callback_function,
+	     (int (*)(intptr_t *, void *)) &cthreads_test_thread_pool_callback_function,
 	     -1 ) != 1 )
 	{
 		fprintf(
