@@ -8,6 +8,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cthreads_test_condition", "
 		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cthreads_test_error", "cthreads_test_error\cthreads_test_error.vcproj", "{F4610203-6AAA-41F8-AC59-EF1D0B8792A6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536} = {C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}
+		{20FFC4C9-F44C-45F6-A827-4819B4DF3C9F} = {20FFC4C9-F44C-45F6-A827-4819B4DF3C9F}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cthreads_test_get_version", "cthreads_test_get_version\cthreads_test_get_version.vcproj", "{0FC43622-4D6A-40F7-91AE-601CCDF5CA47}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536} = {C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}
@@ -79,6 +85,10 @@ Global
 		{F65656A3-27DE-4363-AF13-F9457E1B8CDC}.Release|Win32.Build.0 = Release|Win32
 		{F65656A3-27DE-4363-AF13-F9457E1B8CDC}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
 		{F65656A3-27DE-4363-AF13-F9457E1B8CDC}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{F4610203-6AAA-41F8-AC59-EF1D0B8792A6}.Release|Win32.ActiveCfg = Release|Win32
+		{F4610203-6AAA-41F8-AC59-EF1D0B8792A6}.Release|Win32.Build.0 = Release|Win32
+		{F4610203-6AAA-41F8-AC59-EF1D0B8792A6}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{F4610203-6AAA-41F8-AC59-EF1D0B8792A6}.VSDebug|Win32.Build.0 = VSDebug|Win32
 		{0FC43622-4D6A-40F7-91AE-601CCDF5CA47}.Release|Win32.ActiveCfg = Release|Win32
 		{0FC43622-4D6A-40F7-91AE-601CCDF5CA47}.Release|Win32.Build.0 = Release|Win32
 		{0FC43622-4D6A-40F7-91AE-601CCDF5CA47}.VSDebug|Win32.ActiveCfg = VSDebug|Win32

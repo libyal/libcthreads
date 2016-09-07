@@ -120,6 +120,7 @@ stamp-h[1-9]
 /libcthreads/libcthreads.rc
 /libcthreads/libcthreads_definitions.h
 /tests/cthreads_test_condition
+/tests/cthreads_test_error
 /tests/cthreads_test_get_version
 /tests/cthreads_test_lock
 /tests/cthreads_test_mutex

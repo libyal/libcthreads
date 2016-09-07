@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="cthreads_test_get_version"
-	ProjectGUID="{0FC43622-4D6A-40F7-91AE-601CCDF5CA47}"
-	RootNamespace="cthreads_test_get_version"
+	Name="cthreads_test_error"
+	ProjectGUID="{F4610203-6AAA-41F8-AC59-EF1D0B8792A6}"
+	RootNamespace="cthreads_test_error"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\cthreads_test_get_version.c"
+				RelativePath="..\..\tests\cthreads_test_error.c"
 				>
 			</File>
 		</Filter>

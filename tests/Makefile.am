@@ -19,6 +19,7 @@ EXTRA_DIST = \
 
 check_PROGRAMS = \
 	cthreads_test_condition \
+	cthreads_test_error \
 	cthreads_test_get_version \
 	cthreads_test_lock \
 	cthreads_test_mutex \
@@ -38,10 +39,23 @@ cthreads_test_condition_LDADD = \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@
 
-cthreads_test_get_version_SOURCES = \
+cthreads_test_error_SOURCES = \
+	cthreads_test_error.c
 	cthreads_test_libcstring.h \
 	cthreads_test_libcthreads.h \
+	cthreads_test_macros.h \
+	cthreads_test_unused.h
+
+cthreads_test_error_LDADD = \
+	../libcthreads/libcthreads.la \
+	@LIBCSTRING_LIBADD@
+
+cthreads_test_get_version_SOURCES = \
 	cthreads_test_get_version.c
+	cthreads_test_libcstring.h \
+	cthreads_test_libcthreads.h \
+	cthreads_test_macros.h \
+	cthreads_test_unused.h
 
 cthreads_test_get_version_LDADD = \
 	../libcthreads/libcthreads.la \
