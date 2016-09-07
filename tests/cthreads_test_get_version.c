@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -28,6 +27,7 @@
 
 #include "cthreads_test_libcstring.h"
 #include "cthreads_test_libcthreads.h"
+#include "cthreads_test_macros.h"
 #include "cthreads_test_unused.h"
 
 /* Tests retrieving the library version
@@ -46,11 +46,15 @@ int cthreads_test_get_version(
 	          LIBCTHREADS_VERSION_STRING,
 	          9 );
 
-	if( result != 0 )
-	{
-		return( 0 );
-	}
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	return( 1 );
+
+on_error:
+	return( 0 );
 }
 
 /* The main program
@@ -68,10 +72,13 @@ int main(
 	CTHREADS_TEST_UNREFERENCED_PARAMETER( argc )
 	CTHREADS_TEST_UNREFERENCED_PARAMETER( argv )
 
-	if( cthreads_test_get_version() != 1 )
-	{
-		return( EXIT_FAILURE );
-	}
+	CTHREADS_TEST_RUN(
+	 "libcthreads_get_version",
+	 cthreads_test_get_version() )
+
 	return( EXIT_SUCCESS );
+
+on_error:
+	return( EXIT_FAILURE );
 }
 
