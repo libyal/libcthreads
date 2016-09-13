@@ -23,7 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
-#if defined( WINAPI ) && ( WINVER >= 0x0602 ) && !defined( USE_CRT_FUNCTIONS )
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
 #include <Processthreadsapi.h>
 #include <Synchapi.h>
 #endif
