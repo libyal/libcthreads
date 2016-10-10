@@ -20,148 +20,248 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <stdio.h>
-
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
 #include "cthreads_test_libcthreads.h"
+#include "cthreads_test_macros.h"
+#include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
-/* Tests initializing a condition
- * Make sure the value condition is referencing, is set to NULL
- * Returns 1 if successful, 0 if not or -1 on error
+/* Tests the libcthreads_condition_initialize function
+ * Returns 1 if successful or 0 if not
  */
 int cthreads_test_condition_initialize(
-     libcthreads_condition_t **condition,
-     int expected_result )
+     void )
 {
-	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_condition_initialize";
-	int result               = 0;
+	libcerror_error_t *error           = NULL;
+	libcthreads_condition_t *condition = NULL;
+	int result                         = 0;
 
-	fprintf(
-	 stdout,
-	 "Testing initialize\t" );
-
+	/* Test libcthreads_condition_initialize
+	 */
 	result = libcthreads_condition_initialize(
-	          condition,
+	          &condition,
 	          &error );
 
-	if( result == -1 )
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "condition",
+         condition );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcthreads_condition_free(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "condition",
+         condition );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcthreads_condition_initialize(
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	condition = (libcthreads_condition_t *) 0x12345678UL;
+
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	condition = NULL;
+
+#if defined( HAVE_CTHREADS_TEST_MEMORY )
+
+	/* Test libcthreads_condition_initialize with malloc failing
+	 */
+	cthreads_test_malloc_attempts_before_fail = 0;
+
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	if( cthreads_test_malloc_attempts_before_fail != -1 )
 	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create condition.",
-		 function );
-	}
-	if( result != expected_result )
-	{
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
+		cthreads_test_malloc_attempts_before_fail = -1;
 	}
 	else
 	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	if( result == -1 )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "condition",
+		 condition );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
 	}
-	if( result == 1 )
+	/* Test libcthreads_condition_initialize with memset failing
+	 */
+	cthreads_test_memset_attempts_before_fail = 0;
+
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	if( cthreads_test_memset_attempts_before_fail != -1 )
 	{
-		if( libcthreads_condition_free(
-		     condition,
-		     &error ) == -1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free condition.",
-			 function );
-
-			libcerror_error_backtrace_fprint(
-			 error,
-			 stdout );
-
-			libcerror_error_free(
-			 &error );
-
-			return( -1 );
-		}
+		cthreads_test_memset_attempts_before_fail = -1;
 	}
-	if( result != expected_result )
+	else
 	{
-		return( 0 );
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "condition",
+		 condition );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
 	}
+#endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
+
 	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( condition != NULL )
+	{
+		libcthreads_condition_free(
+		 &condition,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libcthreads_condition_free function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_condition_free(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test error cases
+	 */
+	result = libcthreads_condition_free(
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
 }
 
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
+int wmain(
+     int argc CTHREADS_TEST_ATTRIBUTE_UNUSED,
+     wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #else
-int main( int argc, char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
+int main(
+     int argc CTHREADS_TEST_ATTRIBUTE_UNUSED,
+     char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
-	libcthreads_condition_t *condition = NULL;
-
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( argc )
 	CTHREADS_TEST_UNREFERENCED_PARAMETER( argv )
 
-	if( argc != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unsupported number of arguments.\n" );
+	CTHREADS_TEST_RUN(
+	 "libcthreads_condition_initialize",
+	 cthreads_test_condition_initialize );
 
-		return( EXIT_FAILURE );
-	}
-	/* Initialization tests
-	 */
-	condition = NULL;
+	CTHREADS_TEST_RUN(
+	 "libcthreads_condition_free",
+	 cthreads_test_condition_free );
 
-	if( cthreads_test_condition_initialize(
-	     &condition,
-	     1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test initialize.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	condition = (libcthreads_condition_t *) 0x12345678UL;
-
-	if( cthreads_test_condition_initialize(
-	     &condition,
-	     -1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test initialize.\n" );
-
-		return( EXIT_FAILURE );
-	}
 	return( EXIT_SUCCESS );
+
+on_error:
+	return( EXIT_FAILURE );
 }
 

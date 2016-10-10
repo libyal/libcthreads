@@ -29,10 +29,13 @@ check_PROGRAMS = \
 	cthreads_test_thread_pool
 
 cthreads_test_condition_SOURCES = \
+	cthreads_test_condition.c \
 	cthreads_test_libcerror.h \
-	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
-	cthreads_test_condition.c
+	cthreads_test_libcthreads.h \
+	cthreads_test_macros.h \
+	cthreads_test_memory.c cthreads_test_memory.h \
+	cthreads_test_unused.h
 
 cthreads_test_condition_LDADD = \
 	../libcthreads/libcthreads.la \
@@ -52,9 +55,11 @@ cthreads_test_error_LDADD = \
 
 cthreads_test_lock_SOURCES = \
 	cthreads_test_libcerror.h \
-	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
+	cthreads_test_libcthreads.h \
 	cthreads_test_lock.c \
+	cthreads_test_macros.h \
+	cthreads_test_memory.c cthreads_test_memory.h \
 	cthreads_test_unused.h
 
 cthreads_test_lock_LDADD = \
@@ -64,8 +69,8 @@ cthreads_test_lock_LDADD = \
 
 cthreads_test_mutex_SOURCES = \
 	cthreads_test_libcerror.h \
-	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
+	cthreads_test_libcthreads.h \
 	cthreads_test_mutex.c \
 	cthreads_test_unused.h
 
@@ -76,8 +81,8 @@ cthreads_test_mutex_LDADD = \
 
 cthreads_test_queue_SOURCES = \
 	cthreads_test_libcerror.h \
-	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
+	cthreads_test_libcthreads.h \
 	cthreads_test_queue.c \
 	cthreads_test_unused.h
 
@@ -88,8 +93,8 @@ cthreads_test_queue_LDADD = \
 
 cthreads_test_read_write_lock_SOURCES = \
 	cthreads_test_libcerror.h \
-	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
+	cthreads_test_libcthreads.h \
 	cthreads_test_read_write_lock.c \
 	cthreads_test_unused.h
 
@@ -111,8 +116,8 @@ cthreads_test_support_LDADD = \
 
 cthreads_test_thread_SOURCES = \
 	cthreads_test_libcerror.h \
-	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
+	cthreads_test_libcthreads.h \
 	cthreads_test_thread.c \
 	cthreads_test_unused.h
 
@@ -123,8 +128,8 @@ cthreads_test_thread_LDADD = \
 
 cthreads_test_thread_pool_SOURCES = \
 	cthreads_test_libcerror.h \
-	cthreads_test_libcthreads.h \
 	cthreads_test_libcstring.h \
+	cthreads_test_libcthreads.h \
 	cthreads_test_thread_pool.c \
 	cthreads_test_unused.h
 

@@ -179,6 +179,10 @@
 				RelativePath="..\..\tests\cthreads_test_condition.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\tests\cthreads_test_memory.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -195,6 +199,18 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\cthreads_test_libcthreads.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\cthreads_test_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\cthreads_test_memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\cthreads_test_unused.h"
 				>
 			</File>
 		</Filter>
