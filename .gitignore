@@ -121,11 +121,11 @@ stamp-h[1-9]
 /libcthreads/libcthreads_definitions.h
 /tests/cthreads_test_condition
 /tests/cthreads_test_error
-/tests/cthreads_test_get_version
 /tests/cthreads_test_lock
 /tests/cthreads_test_mutex
 /tests/cthreads_test_queue
 /tests/cthreads_test_read_write_lock
+/tests/cthreads_test_support
 /tests/cthreads_test_thread
 /tests/cthreads_test_thread_pool
 /tests/tmp*
