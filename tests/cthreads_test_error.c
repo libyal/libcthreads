@@ -123,23 +123,23 @@ int main(
 
 	CTHREADS_TEST_RUN(
 	 "libcthreads_error_free",
-	 cthreads_test_error_free() )
+	 cthreads_test_error_free );
 
 	CTHREADS_TEST_RUN(
 	 "libcthreads_error_fprint",
-	 cthreads_test_error_fprint() )
+	 cthreads_test_error_fprint );
 
 	CTHREADS_TEST_RUN(
 	 "libcthreads_error_sprint",
-	 cthreads_test_error_sprint() )
+	 cthreads_test_error_sprint );
 
 	CTHREADS_TEST_RUN(
 	 "libcthreads_error_backtrace_fprint",
-	 cthreads_test_error_backtrace_fprint() )
+	 cthreads_test_error_backtrace_fprint );
 
 	CTHREADS_TEST_RUN(
 	 "libcthreads_error_backtrace_sprint",
-	 cthreads_test_error_backtrace_sprint() )
+	 cthreads_test_error_backtrace_sprint );
 
 	return( EXIT_SUCCESS );
 
