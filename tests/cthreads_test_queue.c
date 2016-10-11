@@ -20,101 +20,245 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <stdio.h>
-
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
 #include "cthreads_test_libcthreads.h"
+#include "cthreads_test_macros.h"
+#include "cthreads_test_memory.h"
+#include "cthreads_test_unused.h"
 
-/* Tests initializing a queue
- * Make sure the value queue is referencing, is set to NULL
- * Returns 1 if successful, 0 if not or -1 on error
+/* Tests the libcthreads_queue_initialize function
+ * Returns 1 if successful or 0 if not
  */
 int cthreads_test_queue_initialize(
-     libcthreads_queue_t **queue,
-     int expected_result )
+     void )
 {
-	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_queue_initialize";
-	int result               = 0;
+	libcerror_error_t *error   = NULL;
+	libcthreads_queue_t *queue = NULL;
+	int result                 = 0;
 
-	fprintf(
-	 stdout,
-	 "Testing initialize\t" );
-
+	/* Test libcthreads_queue_initialize
+	 */
 	result = libcthreads_queue_initialize(
-	          queue,
-	          32,
+	          &queue,
+	          0,
 	          &error );
 
-	if( result == -1 )
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "queue",
+         queue );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcthreads_queue_free(
+	          &queue,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "queue",
+         queue );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcthreads_queue_initialize(
+	          NULL,
+	          0,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcthreads_queue_initialize(
+	          &queue,
+	          -1,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	queue = (libcthreads_queue_t *) 0x12345678UL;
+
+	result = libcthreads_queue_initialize(
+	          &queue,
+	          0,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	queue = NULL;
+
+#if defined( HAVE_CTHREADS_TEST_MEMORY )
+
+	/* Test libcthreads_queue_initialize with malloc failing
+	 */
+	cthreads_test_malloc_attempts_before_fail = 0;
+
+	result = libcthreads_queue_initialize(
+	          &queue,
+	          0,
+	          &error );
+
+	if( cthreads_test_malloc_attempts_before_fail != -1 )
 	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create queue.",
-		 function );
-	}
-	if( result != expected_result )
-	{
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
+		cthreads_test_malloc_attempts_before_fail = -1;
 	}
 	else
 	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	if( result == -1 )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "queue",
+		 queue );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
 	}
-	if( result == 1 )
+	/* Test libcthreads_queue_initialize with memset failing
+	 */
+	cthreads_test_memset_attempts_before_fail = 0;
+
+	result = libcthreads_queue_initialize(
+	          &queue,
+	          0,
+	          &error );
+
+	if( cthreads_test_memset_attempts_before_fail != -1 )
 	{
-		if( libcthreads_queue_free(
-		     queue,
-		     NULL,
-		     &error ) == -1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free queue.",
-			 function );
-
-			libcerror_error_backtrace_fprint(
-			 error,
-			 stdout );
-
-			libcerror_error_free(
-			 &error );
-
-			return( -1 );
-		}
+		cthreads_test_memset_attempts_before_fail = -1;
 	}
-	if( result != expected_result )
+	else
 	{
-		return( 0 );
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "queue",
+		 queue );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
 	}
+#endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
+
 	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( queue != NULL )
+	{
+		libcthreads_queue_free(
+		 &queue,
+		 NULL,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libcthreads_queue_free function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_queue_free(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test error cases
+	 */
+	result = libcthreads_queue_free(
+	          NULL,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
 }
 
 libcthreads_queue_t *cthreads_test_queue = NULL;
@@ -216,165 +360,140 @@ on_error:
 	return( -1 );
 }
 
-/* Tests thread queuing
- * Returns 1 if successful or -1 on error
+/* Tests the libcthreads_push function
+ * Returns 1 if successful or 0 if not
  */
-int cthreads_test_queue_queuing(
+int cthreads_test_queue_push(
      void )
 {
 	libcerror_error_t *error          = NULL;
 	libcthreads_thread_t *pop_thread  = NULL;
 	libcthreads_thread_t *push_thread = NULL;
 	int *queued_values                = NULL;
-	static char *function             = "cthreads_test_queue_queuing";
 	int result                        = 0;
 
+	/* Initialize test
+	 */
 	cthreads_test_expected_queued_value = 0;
 	cthreads_test_queued_value          = 0;
 
 	queued_values = (int *) memory_allocate(
 	                         sizeof( int ) * cthreads_test_number_of_iterations );
 
-	if( queued_values == NULL )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create queued values.",
-		 function );
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "queued_values",
+         queued_values );
 
-		goto on_error;
-	}
-	if( libcthreads_queue_initialize(
-	     &cthreads_test_queue,
-	     cthreads_test_number_of_values,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create queue.",
-		 function );
+	result = libcthreads_queue_initialize(
+	          &cthreads_test_queue,
+	          cthreads_test_number_of_values,
+	          &error );
 
-		goto on_error;
-	}
-	if( libcthreads_thread_create(
-	     &push_thread,
-	     NULL,
-	     (int (*)(void *)) &cthreads_test_queue_push_callback_function,
-	     queued_values,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create push thread.",
-		 function );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-		goto on_error;
-	}
-	if( libcthreads_thread_create(
-	     &pop_thread,
-	     NULL,
-	     (int (*)(void *)) &cthreads_test_queue_pop_callback_function,
-	     NULL,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create pop thread.",
-		 function );
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
-		goto on_error;
-	}
-	if( libcthreads_thread_join(
-	     &pop_thread,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to join pop thread.",
-		 function );
+	result = libcthreads_thread_create(
+	          &push_thread,
+	          NULL,
+	          (int (*)(void *)) &cthreads_test_queue_push_callback_function,
+	          queued_values,
+	          &error );
 
-		goto on_error;
-	}
-	if( libcthreads_thread_join(
-	     &push_thread,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to join push thread.",
-		 function );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-		goto on_error;
-	}
-	if( libcthreads_queue_empty(
-	     cthreads_test_queue,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty queue.",
-		 function );
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
-		goto on_error;
-	}
-	if( libcthreads_queue_free(
-	     &cthreads_test_queue,
-	     NULL,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free queue.",
-		 function );
+	result = libcthreads_thread_create(
+	          &pop_thread,
+	          NULL,
+	          (int (*)(void *)) &cthreads_test_queue_pop_callback_function,
+	          NULL,
+	          &error );
 
-		goto on_error;
-	}
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcthreads_thread_join(
+	          &pop_thread,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcthreads_thread_join(
+	          &push_thread,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcthreads_queue_empty(
+	          cthreads_test_queue,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcthreads_queue_free(
+	          &cthreads_test_queue,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
 	memory_free(
 	 queued_values );
 
 	queued_values = NULL;
 
-	fprintf(
-	 stdout,
-	 "Testing queued value\t" );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "cthreads_test_queued_value",
+	 cthreads_test_queued_value,
+	 cthreads_test_expected_queued_value );
 
-	if( cthreads_test_queued_value != cthreads_test_expected_queued_value )
-	{
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
-
-		result = 0;
-	}
-	else
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-
-		result = 1;
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
-
-	return( result );
+	return( 1 );
 
 on_error:
 	if( error != NULL )
@@ -410,63 +529,39 @@ on_error:
 		memory_free(
 		 queued_values );
 	}
-	return( -1 );
+	return( 0 );
 }
 
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] )
+int wmain(
+     int argc CTHREADS_TEST_ATTRIBUTE_UNUSED,
+     wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #else
-int main( int argc, char * const argv[] )
+int main(
+     int argc CTHREADS_TEST_ATTRIBUTE_UNUSED,
+     char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
-	libcthreads_queue_t *queue = NULL;
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( argc )
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( argv )
 
-	if( argc != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unsupported number of arguments.\n" );
+	CTHREADS_TEST_RUN(
+	 "libcthreads_queue_initialize",
+	 cthreads_test_queue_initialize );
 
-		return( EXIT_FAILURE );
-	}
-	/* Initialization tests
-	 */
-	queue = NULL;
+	CTHREADS_TEST_RUN(
+	 "libcthreads_queue_free",
+	 cthreads_test_queue_free );
 
-	if( cthreads_test_queue_initialize(
-	     &queue,
-	     1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test initialize.\n" );
+	CTHREADS_TEST_RUN(
+	 "libcthreads_queue_push",
+	 cthreads_test_queue_push );
 
-		return( EXIT_FAILURE );
-	}
-	queue = (libcthreads_queue_t *) 0x12345678UL;
-
-	if( cthreads_test_queue_initialize(
-	     &queue,
-	     -1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test initialize.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	/* Test: queuing
-	 */
-	if( cthreads_test_queue_queuing() != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test queuing.\n" );
-
-		return( EXIT_FAILURE );
-	}
 	return( EXIT_SUCCESS );
+
+on_error:
+	return( EXIT_FAILURE );
 }
 

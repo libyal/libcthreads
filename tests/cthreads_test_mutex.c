@@ -20,100 +20,220 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <stdio.h>
-
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
 #include "cthreads_test_libcthreads.h"
+#include "cthreads_test_macros.h"
+#include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
-/* Tests initializing a mutex
- * Make sure the value mutex is referencing, is set to NULL
- * Returns 1 if successful, 0 if not or -1 on error
+/* Tests the libcthreads_mutex_initialize function
+ * Returns 1 if successful or 0 if not
  */
 int cthreads_test_mutex_initialize(
-     libcthreads_mutex_t **mutex,
-     int expected_result )
+     void )
 {
-	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_mutex_initialize";
-	int result               = 0;
+	libcerror_error_t *error   = NULL;
+	libcthreads_mutex_t *mutex = NULL;
+	int result                 = 0;
 
-	fprintf(
-	 stdout,
-	 "Testing initialize\t" );
-
+	/* Test libcthreads_mutex_initialize
+	 */
 	result = libcthreads_mutex_initialize(
-	          mutex,
+	          &mutex,
 	          &error );
 
-	if( result == -1 )
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "mutex",
+         mutex );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcthreads_mutex_free(
+	          &mutex,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "mutex",
+         mutex );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcthreads_mutex_initialize(
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	mutex = (libcthreads_mutex_t *) 0x12345678UL;
+
+	result = libcthreads_mutex_initialize(
+	          &mutex,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	mutex = NULL;
+
+#if defined( HAVE_CTHREADS_TEST_MEMORY )
+
+	/* Test libcthreads_mutex_initialize with malloc failing
+	 */
+	cthreads_test_malloc_attempts_before_fail = 0;
+
+	result = libcthreads_mutex_initialize(
+	          &mutex,
+	          &error );
+
+	if( cthreads_test_malloc_attempts_before_fail != -1 )
 	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create mutex.",
-		 function );
-	}
-	if( result != expected_result )
-	{
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
+		cthreads_test_malloc_attempts_before_fail = -1;
 	}
 	else
 	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	if( result == -1 )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "mutex",
+		 mutex );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
 	}
-	if( result == 1 )
+	/* Test libcthreads_mutex_initialize with memset failing
+	 */
+	cthreads_test_memset_attempts_before_fail = 0;
+
+	result = libcthreads_mutex_initialize(
+	          &mutex,
+	          &error );
+
+	if( cthreads_test_memset_attempts_before_fail != -1 )
 	{
-		if( libcthreads_mutex_free(
-		     mutex,
-		     &error ) == -1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free mutex.",
-			 function );
-
-			libcerror_error_backtrace_fprint(
-			 error,
-			 stdout );
-
-			libcerror_error_free(
-			 &error );
-
-			return( -1 );
-		}
+		cthreads_test_memset_attempts_before_fail = -1;
 	}
-	if( result != expected_result )
+	else
 	{
-		return( 0 );
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "mutex",
+		 mutex );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
 	}
+#endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
+
 	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( mutex != NULL )
+	{
+		libcthreads_mutex_free(
+		 &mutex,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libcthreads_mutex_free function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_mutex_free(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test error cases
+	 */
+	result = libcthreads_mutex_free(
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
 }
 
 libcthreads_mutex_t *cthreads_test_mutex = NULL;
@@ -237,204 +357,145 @@ on_error:
 	return( -1 );
 }
 
-/* Tests thread mutex locking
- * Returns 1 if successful or -1 on error
+/* Tests the libcthreads_mutex_grab function
+ * Returns 1 if successful or 0 if not
  */
-int cthreads_test_mutex_locking(
+int cthreads_test_mutex_grab(
      void )
 {
 	libcerror_error_t *error      = NULL;
 	libcthreads_thread_t *thread1 = NULL;
 	libcthreads_thread_t *thread2 = NULL;
-	static char *function         = "cthreads_test_mutex_locking";
 	int result                    = 0;
 
-	if( libcthreads_mutex_initialize(
-	     &cthreads_test_mutex,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create mutex.",
-		 function );
+	/* Initialize test
+	 */
+	result = libcthreads_mutex_initialize(
+	          &cthreads_test_mutex,
+	          &error );
 
-		goto on_error;
-	}
-	fprintf(
-	 stdout,
-	 "Testing grab\t" );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test grab
+	 */
 	result = libcthreads_mutex_grab(
 	          cthreads_test_mutex,
 	          &error );
 
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab mutex.",
-		 function );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
-	}
-	else
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
-	if( result == 1 )
-	{
-		if( libcthreads_thread_create(
-		     &thread1,
-		     NULL,
-		     cthreads_test_mutex_callback_function1,
-		     NULL,
-		     &error ) != 1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create thread1.",
-			 function );
+	/* Initialize test
+	 */
+	result = libcthreads_thread_create(
+	          &thread1,
+	          NULL,
+	          cthreads_test_mutex_callback_function1,
+	          NULL,
+	          &error );
 
-			goto on_error;
-		}
-		if( libcthreads_thread_create(
-		     &thread2,
-		     NULL,
-		     cthreads_test_mutex_callback_function2,
-		     NULL,
-		     &error ) != 1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create thread2.",
-			 function );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-			goto on_error;
-		}
-		cthreads_test_mutexed_value = 46;
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
-		fprintf(
-		 stdout,
-		 "Testing release\t" );
+	result = libcthreads_thread_create(
+	          &thread2,
+	          NULL,
+	          cthreads_test_mutex_callback_function2,
+	          NULL,
+	          &error );
 
-		result = libcthreads_mutex_release(
-			  cthreads_test_mutex,
-			  &error );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to release mutex.",
-			 function );
-		}
-		if( result != 1 )
-		{
-			fprintf(
-			 stdout,
-			 "(FAIL)" );
-		}
-		else
-		{
-			fprintf(
-			 stdout,
-			 "(PASS)" );
-		}
-		fprintf(
-		 stdout,
-		 "\n" );
-	}
-	if( result == -1 )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
-		libcerror_error_free(
-		 &error );
-	}
-	if( libcthreads_thread_join(
-	     &thread2,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to join thread2.",
-		 function );
+	cthreads_test_mutexed_value = 46;
 
-		goto on_error;
-	}
-	if( libcthreads_thread_join(
-	     &thread1,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to join thread1.",
-		 function );
+	/* Test release
+	 */
+	result = libcthreads_mutex_release(
+		  cthreads_test_mutex,
+		  &error );
 
-		goto on_error;
-	}
-	if( libcthreads_mutex_free(
-	     &cthreads_test_mutex,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free mutex.",
-		 function );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-		goto on_error;
-	}
-	fprintf(
-	 stdout,
-	 "Testing mutexed value\t" );
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
-	if( cthreads_test_mutexed_value != ( 46 + 19 + 38 ) )
-	{
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
+	/* Clean up
+	 */
+	result = libcthreads_thread_join(
+	          &thread2,
+	          &error );
 
-		result = 0;
-	}
-	else
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-		result = 1;
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
-	return( result );
+	result = libcthreads_thread_join(
+	          &thread1,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcthreads_mutex_free(
+	          &cthreads_test_mutex,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "cthreads_test_mutexed_value",
+	 cthreads_test_mutexed_value,
+	 46 + 19 + 38 );
+
+	return( 1 );
 
 on_error:
 	if( error != NULL )
@@ -467,65 +528,39 @@ on_error:
 		 &cthreads_test_mutex,
 		 NULL );
 	}
-	return( -1 );
+	return( 0 );
 }
 
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
+int wmain(
+     int argc CTHREADS_TEST_ATTRIBUTE_UNUSED,
+     wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #else
-int main( int argc, char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
+int main(
+     int argc CTHREADS_TEST_ATTRIBUTE_UNUSED,
+     char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
-	libcthreads_mutex_t *mutex = NULL;
-
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( argc )
 	CTHREADS_TEST_UNREFERENCED_PARAMETER( argv )
 
-	if( argc != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unsupported number of arguments.\n" );
+	CTHREADS_TEST_RUN(
+	 "libcthreads_mutex_initialize",
+	 cthreads_test_mutex_initialize );
 
-		return( EXIT_FAILURE );
-	}
-	/* Initialization tests
-	 */
-	mutex = NULL;
+	CTHREADS_TEST_RUN(
+	 "libcthreads_mutex_free",
+	 cthreads_test_mutex_free );
 
-	if( cthreads_test_mutex_initialize(
-	     &mutex,
-	     1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test initialize.\n" );
+	CTHREADS_TEST_RUN(
+	 "libcthreads_mutex_grab",
+	 cthreads_test_mutex_grab );
 
-		return( EXIT_FAILURE );
-	}
-	mutex = (libcthreads_mutex_t *) 0x12345678UL;
-
-	if( cthreads_test_mutex_initialize(
-	     &mutex,
-	     -1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test initialize.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	/* Test: locking
-	 */
-	if( cthreads_test_mutex_locking() != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test locking.\n" );
-
-		return( EXIT_FAILURE );
-	}
 	return( EXIT_SUCCESS );
+
+on_error:
+	return( EXIT_FAILURE );
 }
 

@@ -20,12 +20,11 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
-
-#include <stdio.h>
 
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
@@ -236,8 +235,6 @@ on_error:
 	}
 	return( 0 );
 }
-
-/* TODO refactor */
 
 libcthreads_lock_t *cthreads_test_lock = NULL;
 int cthreads_test_locked_value         = 0;

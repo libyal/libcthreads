@@ -20,13 +20,12 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 #include <memory.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
-
-#include <stdio.h>
 
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
