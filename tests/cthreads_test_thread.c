@@ -29,6 +29,8 @@
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
 #include "cthreads_test_libcthreads.h"
+#include "cthreads_test_macros.h"
+#include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
 /* The thread callback function
@@ -42,197 +44,227 @@ int cthreads_test_thread_callback_function(
 	return( 1 );
 }
 
-/* Tests creating a thread
- * Make sure the value thread is referencing, is set to NULL
- * Returns 1 if successful, 0 if not or -1 on error
+/* Tests the libcthreads_thread_create function
+ * Returns 1 if successful or 0 if not
  */
 int cthreads_test_thread_create(
-     libcthreads_thread_t **thread,
-     int (*callback_function)(
-            void *arguments ),
-     int expected_result )
+     void )
 {
-	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_thread_create";
-	int result               = 0;
+	libcerror_error_t *error     = NULL;
+	libcthreads_thread_t *thread = NULL;
+	int result                   = 0;
 
-	fprintf(
-	 stdout,
-	 "Testing create\t" );
-
+	/* Test libcthreads_thread_create
+	 */
 	result = libcthreads_thread_create(
-	          thread,
+	          &thread,
 	          NULL,
-	          callback_function,
+	          &cthreads_test_thread_callback_function,
 	          NULL,
 	          &error );
 
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create thread.",
-		 function );
-	}
-	if( result != expected_result )
-	{
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
-	}
-	else
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-	if( result == -1 )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "thread",
+         thread );
 
-		libcerror_error_free(
-		 &error );
-	}
-	if( result != expected_result )
-	{
-		return( 0 );
-	}
-	return( 1 );
-}
-
-/* Tests joining a thread
- * Returns 1 if successful, 0 if not or -1 on error
- */
-int cthreads_test_thread_join(
-     libcthreads_thread_t **thread )
-{
-	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_thread_join";
-	int result               = 0;
-
-	fprintf(
-	 stdout,
-	 "Testing join\t" );
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	result = libcthreads_thread_join(
-		  thread,
-		  &error );
+	          &thread,
+	          &error );
 
-	if( result == -1 )
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "thread",
+         thread );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcthreads_thread_create(
+	          NULL,
+	          NULL,
+	          &cthreads_test_thread_callback_function,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcthreads_thread_create(
+	          &thread,
+	          NULL,
+	          NULL,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	thread = (libcthreads_thread_t *) 0x12345678UL;
+
+	result = libcthreads_thread_create(
+	          &thread,
+	          NULL,
+	          &cthreads_test_thread_callback_function,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	thread = NULL;
+
+#if defined( HAVE_CTHREADS_TEST_MEMORY )
+
+	/* Test libcthreads_thread_create with malloc failing
+	 */
+	cthreads_test_malloc_attempts_before_fail = 0;
+
+	result = libcthreads_thread_create(
+	          &thread,
+	          NULL,
+	          &cthreads_test_thread_callback_function,
+	          NULL,
+	          &error );
+
+	if( cthreads_test_malloc_attempts_before_fail != -1 )
 	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to join thread.",
-		 function );
-
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
+		cthreads_test_malloc_attempts_before_fail = -1;
 	}
 	else
 	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	if( result == -1 )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "thread",
+		 thread );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
-
-		return( 0 );
 	}
+	/* Test libcthreads_thread_create with memset failing
+	 */
+	cthreads_test_memset_attempts_before_fail = 0;
+
+	result = libcthreads_thread_create(
+	          &thread,
+	          NULL,
+	          &cthreads_test_thread_callback_function,
+	          NULL,
+	          &error );
+
+	if( cthreads_test_memset_attempts_before_fail != -1 )
+	{
+		cthreads_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "thread",
+		 thread );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
+
 	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( thread != NULL )
+	{
+		libcthreads_thread_join(
+		 &thread,
+		 NULL );
+	}
+	return( 0 );
 }
 
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
+int wmain(
+     int argc CTHREADS_TEST_ATTRIBUTE_UNUSED,
+     wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #else
-int main( int argc, char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
+int main(
+     int argc CTHREADS_TEST_ATTRIBUTE_UNUSED,
+     char * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
-	libcthreads_thread_t *thread = NULL;
-
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( argc )
 	CTHREADS_TEST_UNREFERENCED_PARAMETER( argv )
 
-	if( argc != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unsupported number of arguments.\n" );
+	CTHREADS_TEST_RUN(
+	 "libcthreads_thread_create",
+	 cthreads_test_thread_create );
 
-		return( EXIT_FAILURE );
-	}
-	/* Create tests
-	 */
-	thread = NULL;
-
-	if( cthreads_test_thread_create(
-	     &thread,
-	     &cthreads_test_thread_callback_function,
-	     1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test create.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	if( cthreads_test_thread_join(
-	     &thread ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test join.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	thread = NULL;
-
-	if( cthreads_test_thread_create(
-	     &thread,
-	     NULL,
-	     -1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test create.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	thread = (libcthreads_thread_t *) 0x12345678UL;
-
-	if( cthreads_test_thread_create(
-	     &thread,
-	     &cthreads_test_thread_callback_function,
-	     -1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test create.\n" );
-
-		return( EXIT_FAILURE );
-	}
 	return( EXIT_SUCCESS );
+
+on_error:
+	return( EXIT_FAILURE );
 }
 
