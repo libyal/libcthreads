@@ -243,6 +243,44 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libcthreads_thread_join function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_thread_join(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test error cases
+	 */
+	result = libcthreads_thread_join(
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -261,6 +299,10 @@ int main(
 	CTHREADS_TEST_RUN(
 	 "libcthreads_thread_create",
 	 cthreads_test_thread_create );
+
+	CTHREADS_TEST_RUN(
+	 "libcthreads_thread_join",
+	 cthreads_test_thread_join );
 
 	return( EXIT_SUCCESS );
 

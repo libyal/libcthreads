@@ -33,6 +33,127 @@
 #include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
+libcthreads_mutex_t *cthreads_test_mutex = NULL;
+int cthreads_test_mutexed_value          = 0;
+
+/* The thread1 callback function
+ * Returns 1 if successful or -1 on error
+ */
+int cthreads_test_mutex_callback_function1(
+     void *arguments CTHREADS_TEST_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "cthreads_test_mutex_callback_function1";
+	int result               = 0;
+
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( arguments )
+
+	result = libcthreads_mutex_grab(
+	          cthreads_test_mutex,
+	          &error );
+
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab mutex.",
+		 function );
+
+		goto on_error;
+	}
+	cthreads_test_mutexed_value += 19;
+
+	result = libcthreads_mutex_release(
+		  cthreads_test_mutex,
+		  &error );
+
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release mutex.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( -1 );
+}
+
+/* The thread2 callback function
+ * Returns 1 if successful or -1 on error
+ */
+int cthreads_test_mutex_callback_function2(
+     void *arguments CTHREADS_TEST_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "cthreads_test_mutex_callback_function2";
+	int result               = 0;
+
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( arguments )
+
+	result = libcthreads_mutex_grab(
+	          cthreads_test_mutex,
+	          &error );
+
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab mutex.",
+		 function );
+
+		goto on_error;
+	}
+	cthreads_test_mutexed_value += 38;
+
+	result = libcthreads_mutex_release(
+		  cthreads_test_mutex,
+		  &error );
+
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release mutex.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( -1 );
+}
+
 /* Tests the libcthreads_mutex_initialize function
  * Returns 1 if successful or 0 if not
  */
@@ -234,127 +355,6 @@ on_error:
 		 &error );
 	}
 	return( 0 );
-}
-
-libcthreads_mutex_t *cthreads_test_mutex = NULL;
-int cthreads_test_mutexed_value          = 0;
-
-/* The thread1 callback function
- * Returns 1 if successful or -1 on error
- */
-int cthreads_test_mutex_callback_function1(
-     void *arguments CTHREADS_TEST_ATTRIBUTE_UNUSED )
-{
-	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_mutex_callback_function1";
-	int result               = 0;
-
-	CTHREADS_TEST_UNREFERENCED_PARAMETER( arguments )
-
-	result = libcthreads_mutex_grab(
-	          cthreads_test_mutex,
-	          &error );
-
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab mutex.",
-		 function );
-
-		goto on_error;
-	}
-	cthreads_test_mutexed_value += 19;
-
-	result = libcthreads_mutex_release(
-		  cthreads_test_mutex,
-		  &error );
-
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release mutex.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
-
-		libcerror_error_free(
-		 &error );
-	}
-	return( -1 );
-}
-
-/* The thread2 callback function
- * Returns 1 if successful or -1 on error
- */
-int cthreads_test_mutex_callback_function2(
-     void *arguments CTHREADS_TEST_ATTRIBUTE_UNUSED )
-{
-	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_mutex_callback_function2";
-	int result               = 0;
-
-	CTHREADS_TEST_UNREFERENCED_PARAMETER( arguments )
-
-	result = libcthreads_mutex_grab(
-	          cthreads_test_mutex,
-	          &error );
-
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab mutex.",
-		 function );
-
-		goto on_error;
-	}
-	cthreads_test_mutexed_value += 38;
-
-	result = libcthreads_mutex_release(
-		  cthreads_test_mutex,
-		  &error );
-
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release mutex.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
-
-		libcerror_error_free(
-		 &error );
-	}
-	return( -1 );
 }
 
 /* Tests the libcthreads_mutex_grab function

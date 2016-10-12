@@ -365,7 +365,10 @@ int libcthreads_thread_pool_create(
 		 "%s: unable to clear thread pool.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 internal_thread_pool );
+
+		return( -1 );
 	}
 #if defined( WINAPI ) && ( WINVER >= 0x0602 )
 /* TODO */

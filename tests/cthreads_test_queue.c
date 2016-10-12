@@ -33,6 +33,107 @@
 #include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
+libcthreads_queue_t *cthreads_test_queue = NULL;
+int cthreads_test_expected_queued_value  = 0;
+int cthreads_test_queued_value           = 0;
+int cthreads_test_number_of_iterations   = 497;
+int cthreads_test_number_of_values       = 32;
+
+/* The thread pop callback function
+ * Returns 1 if successful or -1 on error
+ */
+int cthreads_test_queue_pop_callback_function(
+     void *arguments CTHREADS_TEST_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "cthreads_test_queue_pop_callback_function";
+	int *queued_value        = NULL;
+	int iterator             = 0;
+
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( arguments )
+
+	for( iterator = 0;
+	     iterator < cthreads_test_number_of_iterations;
+	     iterator++ )
+	{
+		if( libcthreads_queue_pop(
+		     cthreads_test_queue,
+		     (intptr_t **) &queued_value,
+		     &error ) == -1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_REMOVE_FAILED,
+			 "%s: unable to pop value off queue.",
+			 function );
+
+			goto on_error;
+		}
+		cthreads_test_queued_value += *queued_value;
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( -1 );
+}
+
+/* The thread push callback function
+ * Returns 1 if successful or -1 on error
+ */
+int cthreads_test_queue_push_callback_function(
+     int *queued_values )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "cthreads_test_queue_push_callback_function";
+	int iterator             = 0;
+
+	for( iterator = 0;
+	     iterator < cthreads_test_number_of_iterations;
+	     iterator++ )
+	{
+		queued_values[ iterator ] = ( 98 * iterator ) % 45;
+
+		if( libcthreads_queue_push(
+		     cthreads_test_queue,
+		     (intptr_t *) &( queued_values[ iterator ] ),
+		     &error ) == -1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to get value from queue.",
+			 function );
+
+			goto on_error;
+		}
+		cthreads_test_expected_queued_value += queued_values[ iterator ];
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( -1 );
+}
+
 /* Tests the libcthreads_queue_initialize function
  * Returns 1 if successful or 0 if not
  */
@@ -259,105 +360,6 @@ on_error:
 		 &error );
 	}
 	return( 0 );
-}
-
-libcthreads_queue_t *cthreads_test_queue = NULL;
-int cthreads_test_expected_queued_value  = 0;
-int cthreads_test_queued_value           = 0;
-int cthreads_test_number_of_iterations   = 497;
-int cthreads_test_number_of_values       = 32;
-
-/* The thread pop callback function
- * Returns 1 if successful or -1 on error
- */
-int cthreads_test_queue_pop_callback_function(
-     void *arguments )
-{
-	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_queue_pop_callback_function";
-	int *queued_value        = NULL;
-	int iterator             = 0;
-
-	for( iterator = 0;
-	     iterator < cthreads_test_number_of_iterations;
-	     iterator++ )
-	{
-		if( libcthreads_queue_pop(
-		     cthreads_test_queue,
-		     (intptr_t **) &queued_value,
-		     &error ) == -1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_REMOVE_FAILED,
-			 "%s: unable to pop value off queue.",
-			 function );
-
-			goto on_error;
-		}
-		cthreads_test_queued_value += *queued_value;
-	}
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
-
-		libcerror_error_free(
-		 &error );
-	}
-	return( -1 );
-}
-
-/* The thread push callback function
- * Returns 1 if successful or -1 on error
- */
-int cthreads_test_queue_push_callback_function(
-     int *queued_values )
-{
-	libcerror_error_t *error = NULL;
-	static char *function    = "cthreads_test_queue_push_callback_function";
-	int iterator             = 0;
-
-	for( iterator = 0;
-	     iterator < cthreads_test_number_of_iterations;
-	     iterator++ )
-	{
-		queued_values[ iterator ] = ( 98 * iterator ) % 45;
-
-		if( libcthreads_queue_push(
-		     cthreads_test_queue,
-		     (intptr_t *) &( queued_values[ iterator ] ),
-		     &error ) == -1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to get value from queue.",
-			 function );
-
-			goto on_error;
-		}
-		cthreads_test_expected_queued_value += queued_values[ iterator ];
-	}
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_backtrace_fprint(
-		 error,
-		 stdout );
-
-		libcerror_error_free(
-		 &error );
-	}
-	return( -1 );
 }
 
 /* Tests the libcthreads_push function
