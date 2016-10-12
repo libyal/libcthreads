@@ -105,7 +105,10 @@ int libcthreads_mutex_initialize(
 		 "%s: unable to clear mutex.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 internal_mutex );
+
+		return( -1 );
 	}
 #if defined( WINAPI ) && ( WINVER >= 0x0600 )
 	InitializeCriticalSection(

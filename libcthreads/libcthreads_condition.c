@@ -106,7 +106,10 @@ int libcthreads_condition_initialize(
 		 "%s: unable to clear condition.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 internal_condition );
+
+		return( -1 );
 	}
 #if defined( WINAPI ) && ( WINVER >= 0x0600 )
 	InitializeConditionVariable(

@@ -130,6 +130,13 @@ int cthreads_test_condition_initialize(
 	if( cthreads_test_malloc_attempts_before_fail != -1 )
 	{
 		cthreads_test_malloc_attempts_before_fail = -1;
+
+		if( condition != NULL )
+		{
+			libcthreads_condition_free(
+			 &condition,
+			 NULL );
+		}
 	}
 	else
 	{
@@ -160,6 +167,13 @@ int cthreads_test_condition_initialize(
 	if( cthreads_test_memset_attempts_before_fail != -1 )
 	{
 		cthreads_test_memset_attempts_before_fail = -1;
+
+		if( condition != NULL )
+		{
+			libcthreads_condition_free(
+			 &condition,
+			 NULL );
+		}
 	}
 	else
 	{

@@ -253,6 +253,14 @@ int cthreads_test_queue_initialize(
 	if( cthreads_test_malloc_attempts_before_fail != -1 )
 	{
 		cthreads_test_malloc_attempts_before_fail = -1;
+
+		if( queue != NULL )
+		{
+			libcthreads_queue_free(
+			 &queue,
+			 NULL,
+			 NULL );
+		}
 	}
 	else
 	{
@@ -284,6 +292,14 @@ int cthreads_test_queue_initialize(
 	if( cthreads_test_memset_attempts_before_fail != -1 )
 	{
 		cthreads_test_memset_attempts_before_fail = -1;
+
+		if( queue != NULL )
+		{
+			libcthreads_queue_free(
+			 &queue,
+			 NULL,
+			 NULL );
+		}
 	}
 	else
 	{

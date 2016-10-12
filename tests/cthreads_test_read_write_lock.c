@@ -130,6 +130,13 @@ int cthreads_test_read_write_lock_initialize(
 	if( cthreads_test_malloc_attempts_before_fail != -1 )
 	{
 		cthreads_test_malloc_attempts_before_fail = -1;
+
+		if( read_write_lock != NULL )
+		{
+			libcthreads_read_write_lock_free(
+			 &read_write_lock,
+			 NULL );
+		}
 	}
 	else
 	{
@@ -160,6 +167,13 @@ int cthreads_test_read_write_lock_initialize(
 	if( cthreads_test_memset_attempts_before_fail != -1 )
 	{
 		cthreads_test_memset_attempts_before_fail = -1;
+
+		if( read_write_lock != NULL )
+		{
+			libcthreads_read_write_lock_free(
+			 &read_write_lock,
+			 NULL );
+		}
 	}
 	else
 	{

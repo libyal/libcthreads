@@ -251,6 +251,13 @@ int cthreads_test_mutex_initialize(
 	if( cthreads_test_malloc_attempts_before_fail != -1 )
 	{
 		cthreads_test_malloc_attempts_before_fail = -1;
+
+		if( mutex != NULL )
+		{
+			libcthreads_mutex_free(
+			 &mutex,
+			 NULL );
+		}
 	}
 	else
 	{
@@ -281,6 +288,13 @@ int cthreads_test_mutex_initialize(
 	if( cthreads_test_memset_attempts_before_fail != -1 )
 	{
 		cthreads_test_memset_attempts_before_fail = -1;
+
+		if( mutex != NULL )
+		{
+			libcthreads_mutex_free(
+			 &mutex,
+			 NULL );
+		}
 	}
 	else
 	{

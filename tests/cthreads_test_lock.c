@@ -251,6 +251,13 @@ int cthreads_test_lock_initialize(
 	if( cthreads_test_malloc_attempts_before_fail != -1 )
 	{
 		cthreads_test_malloc_attempts_before_fail = -1;
+
+		if( lock != NULL )
+		{
+			libcthreads_lock_free(
+			 &lock,
+			 NULL );
+		}
 	}
 	else
 	{
@@ -281,6 +288,13 @@ int cthreads_test_lock_initialize(
 	if( cthreads_test_memset_attempts_before_fail != -1 )
 	{
 		cthreads_test_memset_attempts_before_fail = -1;
+
+		if( lock != NULL )
+		{
+			libcthreads_lock_free(
+			 &lock,
+			 NULL );
+		}
 	}
 	else
 	{

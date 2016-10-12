@@ -186,7 +186,10 @@ int libcthreads_thread_create(
 		 "%s: unable to clear thread.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 internal_thread );
+
+		return( -1 );
 	}
 	internal_thread->callback_function           = callback_function;
 	internal_thread->callback_function_arguments = callback_function_arguments;

@@ -228,6 +228,13 @@ int cthreads_test_thread_pool_create(
 	if( cthreads_test_malloc_attempts_before_fail != -1 )
 	{
 		cthreads_test_malloc_attempts_before_fail = -1;
+
+		if( thread_pool != NULL )
+		{
+			libcthreads_thread_pool_join(
+			 &thread_pool,
+			 NULL );
+		}
 	}
 	else
 	{
@@ -263,6 +270,13 @@ int cthreads_test_thread_pool_create(
 	if( cthreads_test_memset_attempts_before_fail != -1 )
 	{
 		cthreads_test_memset_attempts_before_fail = -1;
+
+		if( thread_pool != NULL )
+		{
+			libcthreads_thread_pool_join(
+			 &thread_pool,
+			 NULL );
+		}
 	}
 	else
 	{

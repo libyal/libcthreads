@@ -98,7 +98,10 @@ int libcthreads_lock_initialize(
 		 "%s: unable to clear lock.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 internal_lock );
+
+		return( -1 );
 	}
 #if defined( WINAPI )
 	InitializeCriticalSection(
