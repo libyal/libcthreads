@@ -22,6 +22,7 @@
 #include <common.h>
 #include <file_stream.h>
 #include <memory.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>

@@ -21,6 +21,7 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -545,6 +546,46 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libcthreads_mutex_release function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_mutex_release(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+/* TODO: add tests */
+
+	/* Test error cases
+	 */
+	result = libcthreads_mutex_release(
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -571,6 +612,10 @@ int main(
 	CTHREADS_TEST_RUN(
 	 "libcthreads_mutex_grab",
 	 cthreads_test_mutex_grab );
+
+	CTHREADS_TEST_RUN(
+	 "libcthreads_mutex_release",
+	 cthreads_test_mutex_release );
 
 	return( EXIT_SUCCESS );
 

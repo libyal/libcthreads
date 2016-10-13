@@ -21,6 +21,7 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -250,6 +251,308 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libcthreads_condition_broadcast function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_condition_broadcast(
+     void )
+{
+	libcerror_error_t *error           = NULL;
+	libcthreads_condition_t *condition = NULL;
+	int result                         = 0;
+
+	/* Initialize test
+	 */
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test broadcast
+	 */
+	result = libcthreads_condition_broadcast(
+	          condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Clean up
+	 */
+	result = libcthreads_condition_free(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcthreads_condition_broadcast(
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libcthreads_condition_signal function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_condition_signal(
+     void )
+{
+	libcerror_error_t *error           = NULL;
+	libcthreads_condition_t *condition = NULL;
+	int result                         = 0;
+
+	/* Initialize test
+	 */
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test signal
+	 */
+	result = libcthreads_condition_signal(
+	          condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libcthreads_condition_signal(
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libcthreads_condition_free(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( condition != NULL )
+	{
+		libcthreads_condition_free(
+		 &condition,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libcthreads_condition_wait function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_condition_wait(
+     void )
+{
+	libcerror_error_t *error           = NULL;
+	libcthreads_condition_t *condition = NULL;
+	libcthreads_mutex_t *mutex         = NULL;
+	int result                         = 0;
+
+	/* Initialize test
+	 */
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcthreads_mutex_initialize(
+	          &mutex,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+/* TODO: add tests */
+
+	/* Test error cases
+	 */
+	result = libcthreads_condition_wait(
+	          NULL,
+	          mutex,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcthreads_condition_wait(
+	          condition,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libcthreads_mutex_free(
+	          &mutex,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libcthreads_condition_free(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( mutex != NULL )
+	{
+		libcthreads_mutex_free(
+		 &mutex,
+		 NULL );
+	}
+	if( condition != NULL )
+	{
+		libcthreads_condition_free(
+		 &condition,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -272,6 +575,18 @@ int main(
 	CTHREADS_TEST_RUN(
 	 "libcthreads_condition_free",
 	 cthreads_test_condition_free );
+
+	CTHREADS_TEST_RUN(
+	 "libcthreads_condition_broadcast",
+	 cthreads_test_condition_broadcast );
+
+	CTHREADS_TEST_RUN(
+	 "libcthreads_condition_signal",
+	 cthreads_test_condition_signal );
+
+	CTHREADS_TEST_RUN(
+	 "libcthreads_condition_wait",
+	 cthreads_test_condition_wait );
 
 	return( EXIT_SUCCESS );
 
