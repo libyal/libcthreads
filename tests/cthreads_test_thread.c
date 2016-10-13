@@ -198,7 +198,7 @@ int cthreads_test_thread_create(
 		libcerror_error_free(
 		 &error );
 	}
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ <= 19
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ > 19
 
 	/* This test is conditionally enabled because the glibc 2.19
 	 * implementations of pthread_create will use a non-optimized
@@ -245,7 +245,7 @@ int cthreads_test_thread_create(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* __GLIBC__ == 2 && __GLIBC_MINOR__ <= 19 */
+#endif /* __GLIBC__ == 2 && __GLIBC_MINOR__ > 19 */
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
 	return( 1 );
