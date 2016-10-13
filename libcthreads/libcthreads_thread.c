@@ -40,6 +40,7 @@
 #if !defined( HAVE_LOCAL_LIBCTHREADS ) || defined( HAVE_MULTI_THREAD_SUPPORT )
 
 #if defined( WINAPI )
+
 /* Start function helper function for WINAPI
  * Returns 0 if successful or 1 on error
  */
@@ -67,6 +68,7 @@ DWORD WINAPI libcthreads_thread_callback_function_helper(
 }
 
 #elif defined( HAVE_PTHREAD_H )
+
 /* Start function helper function for pthread
  * Returns a pointer to a newly allocated int containing 1 if successful or -1 on error
  * NULL is return if the helper function was unable to run the callback

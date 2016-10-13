@@ -198,6 +198,13 @@ int cthreads_test_thread_create(
 		libcerror_error_free(
 		 &error );
 	}
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ <= 19
+
+	/* This test is conditionally enabled because the glibc 2.19
+	 * implementations of pthread_create will use a non-optimized
+	 * memset but will still return success.
+	 */
+
 	/* Test libcthreads_thread_create with memset failing
 	 */
 	cthreads_test_memset_attempts_before_fail = 0;
@@ -222,8 +229,6 @@ int cthreads_test_thread_create(
 	}
 	else
 	{
-		CTHREADS_TEST_FPRINT_ERROR( error );
-
 		CTHREADS_TEST_ASSERT_EQUAL_INT(
 		 "result",
 		 result,
@@ -240,6 +245,7 @@ int cthreads_test_thread_create(
 		libcerror_error_free(
 		 &error );
 	}
+#endif /* __GLIBC__ == 2 && __GLIBC_MINOR__ <= 19 */
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
 	return( 1 );
