@@ -39,5 +39,5 @@
 
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_EXTERN_H ) */
 

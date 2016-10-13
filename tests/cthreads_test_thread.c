@@ -222,6 +222,8 @@ int cthreads_test_thread_create(
 	}
 	else
 	{
+		CTHREADS_TEST_FPRINT_ERROR( error );
+
 		CTHREADS_TEST_ASSERT_EQUAL_INT(
 		 "result",
 		 result,
