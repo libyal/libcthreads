@@ -27,12 +27,96 @@
 #include <stdlib.h>
 #endif
 
+#include <errno.h>
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#define __USE_GNU
+#include <dlfcn.h>
+#undef __USE_GNU
+#endif
+
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
 #include "cthreads_test_libcthreads.h"
 #include "cthreads_test_macros.h"
 #include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+static int (*cthreads_test_real_pthread_cond_init)(
+              pthread_cond_t *restrict cond,
+              const pthread_condattr_t *restrict attr ) = NULL;
+
+static int (*cthreads_test_real_pthread_cond_destroy)(
+              pthread_cond_t *cond ) = NULL;
+
+int cthreads_test_pthread_cond_init_attempts_before_fail    = -1;
+int cthreads_test_pthread_cond_destroy_attempts_before_fail = -1;
+
+/* Custom pthread_cond_init for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_cond_init(
+     pthread_cond_t *restrict cond,
+     const pthread_condattr_t *restrict attr )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_cond_init == NULL )
+	{
+		cthreads_test_real_pthread_cond_init = dlsym(
+		                                        RTLD_NEXT,
+		                                        "pthread_cond_init" );
+	}
+	if( cthreads_test_pthread_cond_init_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_cond_init_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_cond_init_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_cond_init_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_cond_init(
+	          cond,
+	          attr );
+
+	return( result );
+}
+
+/* Custom pthread_cond_destroy for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_cond_destroy(
+     pthread_cond_t *cond )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_cond_destroy == NULL )
+	{
+		cthreads_test_real_pthread_cond_destroy = dlsym(
+		                                           RTLD_NEXT,
+		                                           "pthread_cond_destroy" );
+	}
+	if( cthreads_test_pthread_cond_destroy_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_cond_destroy_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_cond_destroy_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_cond_destroy_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_cond_destroy(
+	          cond );
+
+	return( result );
+}
+
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
 
 /* Tests the libcthreads_condition_initialize function
  * Returns 1 if successful or 0 if not
@@ -196,6 +280,47 @@ int cthreads_test_condition_initialize(
 	}
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_condition_initialize with pthread_cond_init failing
+	 */
+	cthreads_test_pthread_cond_init_attempts_before_fail = 0;
+
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	if( cthreads_test_pthread_cond_init_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_init_attempts_before_fail = -1;
+
+		if( condition != NULL )
+		{
+			libcthreads_condition_free(
+			 &condition,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "condition",
+		 condition );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
 	return( 1 );
 
 on_error:
@@ -219,8 +344,12 @@ on_error:
 int cthreads_test_condition_free(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error           = NULL;
+	int result                         = 0;
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+	libcthreads_condition_t *condition = NULL;
+#endif
 
 	/* Test error cases
 	 */
@@ -240,6 +369,62 @@ int cthreads_test_condition_free(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Initialize test
+	 */
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test libcthreads_condition_free with pthread_cond_destroy failing
+	 */
+	cthreads_test_pthread_cond_destroy_attempts_before_fail = 0;
+
+	result = libcthreads_condition_free(
+	          &condition,
+	          &error );
+
+	if( cthreads_test_pthread_cond_destroy_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_destroy_attempts_before_fail = -1;
+
+		if( condition != NULL )
+		{
+			libcthreads_condition_free(
+			 &condition,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "condition",
+		 condition );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
 	return( 1 );
 
 on_error:
@@ -248,6 +433,14 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+	if( condition != NULL )
+	{
+		libcthreads_condition_free(
+		 &condition,
+		 NULL );
+	}
+#endif
 	return( 0 );
 }
 
@@ -324,6 +517,9 @@ int cthreads_test_condition_broadcast(
 	libcerror_error_free(
 	 &error );
 
+	/* TODO: Test libcthreads_condition_broadcast with pthread_cond_broadcast failing
+	 */
+
 	return( 1 );
 
 on_error:
@@ -331,6 +527,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( condition != NULL )
+	{
+		libcthreads_condition_free(
+		 &condition,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -407,6 +609,9 @@ int cthreads_test_condition_signal(
         CTHREADS_TEST_ASSERT_IS_NULL(
          "error",
          error );
+
+	/* TODO: Test libcthreads_condition_signal with pthread_cond_signal failing
+	 */
 
 	return( 1 );
 
@@ -501,6 +706,9 @@ int cthreads_test_condition_wait(
 
 	libcerror_error_free(
 	 &error );
+
+	/* TODO: Test libcthreads_condition_wait with pthread_cond_wait failing
+	 */
 
 	/* Clean up
 	 */
