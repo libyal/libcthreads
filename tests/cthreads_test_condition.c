@@ -44,22 +44,24 @@
 
 #if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
 
-static int (*cthreads_test_real_pthread_cond_init)(
-              pthread_cond_t *restrict cond,
-              const pthread_condattr_t *restrict attr ) = NULL;
+static int (*cthreads_test_real_pthread_cond_init)(pthread_cond_t *, const pthread_condattr_t *) = NULL;
+static int (*cthreads_test_real_pthread_cond_destroy)(pthread_cond_t *)                          = NULL;
+static int (*cthreads_test_real_pthread_cond_broadcast)(pthread_cond_t *)                        = NULL;
+static int (*cthreads_test_real_pthread_cond_signal)(pthread_cond_t *)                           = NULL;
+static int (*cthreads_test_real_pthread_cond_wait)(pthread_cond_t *, pthread_mutex_t *)          = NULL;
 
-static int (*cthreads_test_real_pthread_cond_destroy)(
-              pthread_cond_t *cond ) = NULL;
-
-int cthreads_test_pthread_cond_init_attempts_before_fail    = -1;
-int cthreads_test_pthread_cond_destroy_attempts_before_fail = -1;
+int cthreads_test_pthread_cond_init_attempts_before_fail                                         = -1;
+int cthreads_test_pthread_cond_destroy_attempts_before_fail                                      = -1;
+int cthreads_test_pthread_cond_broadcast_attempts_before_fail                                    = -1;
+int cthreads_test_pthread_cond_signal_attempts_before_fail                                       = -1;
+int cthreads_test_pthread_cond_wait_attempts_before_fail                                         = -1;
 
 /* Custom pthread_cond_init for testing error cases
  * Returns 0 if successful or an error value otherwise
  */
 int pthread_cond_init(
-     pthread_cond_t *restrict cond,
-     const pthread_condattr_t *restrict attr )
+     pthread_cond_t *cond,
+     const pthread_condattr_t *attr )
 {
 	int result = 0;
 
@@ -112,6 +114,98 @@ int pthread_cond_destroy(
 	}
 	result = cthreads_test_real_pthread_cond_destroy(
 	          cond );
+
+	return( result );
+}
+
+/* Custom pthread_cond_broadcast for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_cond_broadcast(
+     pthread_cond_t *cond )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_cond_broadcast == NULL )
+	{
+		cthreads_test_real_pthread_cond_broadcast = dlsym(
+		                                             RTLD_NEXT,
+		                                             "pthread_cond_broadcast" );
+	}
+	if( cthreads_test_pthread_cond_broadcast_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_cond_broadcast_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_cond_broadcast_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_cond_broadcast_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_cond_broadcast(
+	          cond );
+
+	return( result );
+}
+
+/* Custom pthread_cond_signal for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_cond_signal(
+     pthread_cond_t *cond )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_cond_signal == NULL )
+	{
+		cthreads_test_real_pthread_cond_signal = dlsym(
+		                                          RTLD_NEXT,
+		                                          "pthread_cond_signal" );
+	}
+	if( cthreads_test_pthread_cond_signal_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_cond_signal_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_cond_signal_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_cond_signal_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_cond_signal(
+	          cond );
+
+	return( result );
+}
+
+/* Custom pthread_cond_wait for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_cond_wait(
+     pthread_cond_t *cond,
+     pthread_mutex_t *mutex )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_cond_wait == NULL )
+	{
+		cthreads_test_real_pthread_cond_wait = dlsym(
+		                                        RTLD_NEXT,
+		                                        "pthread_cond_wait" );
+	}
+	if( cthreads_test_pthread_cond_wait_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_cond_wait_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_cond_wait_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_cond_wait_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_cond_wait(
+	          cond,
+	          mutex );
 
 	return( result );
 }
@@ -484,21 +578,6 @@ int cthreads_test_condition_broadcast(
          "error",
          error );
 
-	/* Clean up
-	 */
-	result = libcthreads_condition_free(
-	          &condition,
-	          &error );
-
-	CTHREADS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
-
 	/* Test error cases
 	 */
 	result = libcthreads_condition_broadcast(
@@ -517,8 +596,50 @@ int cthreads_test_condition_broadcast(
 	libcerror_error_free(
 	 &error );
 
-	/* TODO: Test libcthreads_condition_broadcast with pthread_cond_broadcast failing
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_condition_broadcast with pthread_cond_broadcast failing
 	 */
+	cthreads_test_pthread_cond_broadcast_attempts_before_fail = 0;
+
+	result = libcthreads_condition_broadcast(
+	          condition,
+	          &error );
+
+	if( cthreads_test_pthread_cond_broadcast_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_broadcast_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+	/* Clean up
+	 */
+	result = libcthreads_condition_free(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	return( 1 );
 
@@ -595,6 +716,36 @@ int cthreads_test_condition_signal(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_condition_signal with pthread_cond_signal failing
+	 */
+	cthreads_test_pthread_cond_signal_attempts_before_fail = 0;
+
+	result = libcthreads_condition_signal(
+	          condition,
+	          &error );
+
+	if( cthreads_test_pthread_cond_signal_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_signal_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
 	/* Clean up
 	 */
 	result = libcthreads_condition_free(
@@ -609,9 +760,6 @@ int cthreads_test_condition_signal(
         CTHREADS_TEST_ASSERT_IS_NULL(
          "error",
          error );
-
-	/* TODO: Test libcthreads_condition_signal with pthread_cond_signal failing
-	 */
 
 	return( 1 );
 
@@ -707,8 +855,36 @@ int cthreads_test_condition_wait(
 	libcerror_error_free(
 	 &error );
 
-	/* TODO: Test libcthreads_condition_wait with pthread_cond_wait failing
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_condition_wait with pthread_cond_wait failing
 	 */
+	cthreads_test_pthread_cond_wait_attempts_before_fail = 0;
+
+	result = libcthreads_condition_wait(
+	          condition,
+	          mutex,
+	          &error );
+
+	if( cthreads_test_pthread_cond_wait_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_wait_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
 
 	/* Clean up
 	 */
