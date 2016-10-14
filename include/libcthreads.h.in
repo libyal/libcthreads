@@ -29,6 +29,8 @@
 #include <libcthreads/features.h>
 #include <libcthreads/types.h>
 
+#include <stdio.h>
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -469,5 +471,5 @@ int libcthreads_thread_pool_join(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_H ) */
 

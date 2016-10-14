@@ -56,6 +56,10 @@ int cthreads_test_pthread_cond_broadcast_attempts_before_fail                   
 int cthreads_test_pthread_cond_signal_attempts_before_fail                                       = -1;
 int cthreads_test_pthread_cond_wait_attempts_before_fail                                         = -1;
 
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
 /* Custom pthread_cond_init for testing error cases
  * Returns 0 if successful or an error value otherwise
  */
@@ -816,8 +820,6 @@ int cthreads_test_condition_wait(
         CTHREADS_TEST_ASSERT_IS_NULL(
          "error",
          error );
-
-/* TODO: add tests */
 
 	/* Test error cases
 	 */
