@@ -212,6 +212,12 @@ int cthreads_test_thread_pool_create(
 	thread_pool = NULL;
 
 #if defined( HAVE_CTHREADS_TEST_MEMORY )
+#if defined( OPTIMIZATION_DISABLED )
+
+	/* This test is conditionally enabled because implementations of
+	 * pthread_create will use a non-optimized malloc and memset and
+	 * will still return success.
+	 */
 
 	/* Test libcthreads_thread_pool_create with malloc failing
 	 */
@@ -297,6 +303,7 @@ int cthreads_test_thread_pool_create(
 		libcerror_error_free(
 		 &error );
 	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
 	return( 1 );

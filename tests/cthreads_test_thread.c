@@ -251,11 +251,11 @@ int cthreads_test_thread_create(
 		libcerror_error_free(
 		 &error );
 	}
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ > 19
+#if defined( OPTIMIZATION_DISABLED )
 
-	/* This test is conditionally enabled because the glibc 2.19
-	 * implementations of pthread_create will use a non-optimized
-	 * memset but will still return success.
+	/* This test is conditionally enabled because implementations of
+	 * pthread_create will use a non-optimized memset and will return
+	 * success.
 	 */
 
 	/* Test libcthreads_thread_create with memset failing
@@ -298,7 +298,7 @@ int cthreads_test_thread_create(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* __GLIBC__ == 2 && __GLIBC_MINOR__ > 19 */
+#endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
 	return( 1 );

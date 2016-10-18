@@ -860,7 +860,23 @@ int cthreads_test_lock_release(
      void )
 {
 	libcerror_error_t *error = NULL;
+	libcthreads_lock_t *lock = NULL;
 	int result               = 0;
+
+	/* Initialize test
+	 */
+	result = libcthreads_lock_initialize(
+	          &lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	/* Test error cases
 	 */
@@ -880,7 +896,50 @@ int cthreads_test_lock_release(
 	libcerror_error_free(
 	 &error );
 
-	/* TODO: add test for failing pthread_mutex_unlock */
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_lock_release with pthread_mutex_unlock failing
+	 */
+	cthreads_test_pthread_mutex_unlock_attempts_before_fail = 0;
+
+	result = libcthreads_lock_release(
+	          lock,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_unlock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+	/* Clean up
+	 */
+	result = libcthreads_lock_free(
+	          &lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	return( 1 );
 
@@ -889,6 +948,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( lock != NULL )
+	{
+		libcthreads_lock_free(
+		 &lock,
+		 NULL );
 	}
 	return( 0 );
 }

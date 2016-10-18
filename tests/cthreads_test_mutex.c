@@ -950,18 +950,6 @@ int cthreads_test_mutex_try_grab(
 		 "error",
 		 error );
 	}
-	result = libcthreads_mutex_release(
-		  mutex,
-		  &error );
-
-	CTHREADS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
 
 #endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
 
@@ -994,6 +982,18 @@ int cthreads_test_mutex_try_grab(
 
 	/* Clean up
 	 */
+	result = libcthreads_mutex_release(
+		  mutex,
+		  &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 	result = libcthreads_mutex_free(
 	          &mutex,
 	          &error );
@@ -1034,8 +1034,24 @@ on_error:
 int cthreads_test_mutex_release(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error   = NULL;
+	libcthreads_mutex_t *mutex = NULL;
+	int result                 = 0;
+
+	/* Initialize test
+	 */
+	result = libcthreads_mutex_initialize(
+	          &mutex,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	/* Test error cases
 	 */
@@ -1055,7 +1071,50 @@ int cthreads_test_mutex_release(
 	libcerror_error_free(
 	 &error );
 
-	/* TODO: add test for failing pthread_mutex_unlock */
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_mutex_release with pthread_mutex_unlock failing
+	 */
+	cthreads_test_pthread_mutex_unlock_attempts_before_fail = 0;
+
+	result = libcthreads_mutex_release(
+	          mutex,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_unlock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+	/* Clean up
+	 */
+	result = libcthreads_mutex_free(
+	          &mutex,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	return( 1 );
 
@@ -1064,6 +1123,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( mutex != NULL )
+	{
+		libcthreads_mutex_free(
+		 &mutex,
+		 NULL );
 	}
 	return( 0 );
 }

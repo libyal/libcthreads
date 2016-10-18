@@ -882,10 +882,24 @@ on_error:
 int cthreads_test_read_write_lock_release_for_read(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error                       = NULL;
+	libcthreads_read_write_lock_t *read_write_lock = NULL;
+	int result                                     = 0;
 
-/* TODO: add tests */
+	/* Initialize test
+	 */
+	result = libcthreads_read_write_lock_initialize(
+	          &read_write_lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	/* Test error cases
 	 */
@@ -905,6 +919,51 @@ int cthreads_test_read_write_lock_release_for_read(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_read_write_lock_release_for_read with pthread_rwlock_unlock failing
+	 */
+	cthreads_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libcthreads_read_write_lock_release_for_read(
+	          read_write_lock,
+	          &error );
+
+	if( cthreads_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+	/* Clean up
+	 */
+	result = libcthreads_read_write_lock_free(
+	          &read_write_lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
 	return( 1 );
 
 on_error:
@@ -912,6 +971,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( read_write_lock != NULL )
+	{
+		libcthreads_read_write_lock_free(
+		 &read_write_lock,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -922,10 +987,24 @@ on_error:
 int cthreads_test_read_write_lock_release_for_write(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error                       = NULL;
+	libcthreads_read_write_lock_t *read_write_lock = NULL;
+	int result                                     = 0;
 
-/* TODO: add tests */
+	/* Initialize test
+	 */
+	result = libcthreads_read_write_lock_initialize(
+	          &read_write_lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	/* Test error cases
 	 */
@@ -945,6 +1024,51 @@ int cthreads_test_read_write_lock_release_for_write(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_read_write_lock_release_for_write with pthread_rwlock_unlock failing
+	 */
+	cthreads_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libcthreads_read_write_lock_release_for_write(
+	          read_write_lock,
+	          &error );
+
+	if( cthreads_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+	/* Clean up
+	 */
+	result = libcthreads_read_write_lock_free(
+	          &read_write_lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
 	return( 1 );
 
 on_error:
@@ -952,6 +1076,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( read_write_lock != NULL )
+	{
+		libcthreads_read_write_lock_free(
+		 &read_write_lock,
+		 NULL );
 	}
 	return( 0 );
 }
