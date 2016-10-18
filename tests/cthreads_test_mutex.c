@@ -891,13 +891,14 @@ on_error:
 int cthreads_test_mutex_try_grab(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error   = NULL;
+	libcthreads_mutex_t *mutex = NULL;
+	int result                 = 0;
 
 	/* Initialize test
 	 */
 	result = libcthreads_mutex_initialize(
-	          &cthreads_test_mutex,
+	          &mutex,
 	          &error );
 
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
@@ -912,7 +913,7 @@ int cthreads_test_mutex_try_grab(
 	/* Test try grab
 	 */
 	result = libcthreads_mutex_try_grab(
-	          cthreads_test_mutex,
+	          mutex,
 	          &error );
 
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
@@ -923,6 +924,46 @@ int cthreads_test_mutex_try_grab(
         CTHREADS_TEST_ASSERT_IS_NULL(
          "error",
          error );
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_mutex_grab with pthread_mutex_trylock returing EBUSY
+	 */
+	cthreads_test_pthread_mutex_trylock_attempts_before_fail = 0;
+
+	result = libcthreads_mutex_try_grab(
+	          mutex,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_trylock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_trylock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 0 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
+	result = libcthreads_mutex_release(
+		  mutex,
+		  &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
 
 	/* Test error cases
 	 */
@@ -946,36 +987,15 @@ int cthreads_test_mutex_try_grab(
 
 	/* Test libcthreads_mutex_grab with pthread_mutex_trylock failing
 	 */
-	cthreads_test_pthread_mutex_trylock_attempts_before_fail = 0;
 
-	result = libcthreads_mutex_grab(
-	          cthreads_test_mutex,
-	          &error );
+	/* TODO add tests */
 
-	if( cthreads_test_pthread_mutex_trylock_attempts_before_fail != -1 )
-	{
-		cthreads_test_pthread_mutex_trylock_attempts_before_fail = -1;
-	}
-	else
-	{
-		CTHREADS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
 #endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
 
 	/* Clean up
 	 */
 	result = libcthreads_mutex_free(
-	          &cthreads_test_mutex,
+	          &mutex,
 	          &error );
 
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
@@ -999,25 +1019,10 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( thread2 != NULL )
+	if( mutex != NULL )
 	{
-		libcthreads_thread_join(
-		 &thread2,
-		 NULL );
-	}
-	if( thread1 != NULL )
-	{
-		libcthreads_thread_join(
-		 &thread1,
-		 NULL );
-	}
-	if( cthreads_test_mutex != NULL )
-	{
-		libcthreads_mutex_release(
-		 cthreads_test_mutex,
-		 NULL );
 		libcthreads_mutex_free(
-		 &cthreads_test_mutex,
+		 &mutex,
 		 NULL );
 	}
 	return( 0 );
