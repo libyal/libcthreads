@@ -27,12 +27,64 @@
 #include <stdlib.h>
 #endif
 
+#include <errno.h>
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#define __USE_GNU
+#include <dlfcn.h>
+#undef __USE_GNU
+#endif
+
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
 #include "cthreads_test_libcthreads.h"
 #include "cthreads_test_macros.h"
 #include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+static int (*cthreads_test_real_pthread_thread_join)(pthread_t thread, void **retval) = NULL;
+
+int cthreads_test_pthread_thread_join_attempts_before_fail                            = -1;
+
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+/* Custom pthread_thread_join for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_thread_join(
+     pthread_t thread,
+     void **retval )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_thread_join == NULL )
+	{
+		cthreads_test_real_pthread_thread_join = dlsym(
+		                                          RTLD_NEXT,
+		                                          "pthread_thread_join" );
+	}
+	if( cthreads_test_pthread_thread_join_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_thread_join_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_thread_join_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_thread_join_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_thread_join(
+	          thread,
+	          retval );
+
+	return( result );
+}
+
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
 
 /* The thread callback function
  * Returns 1 if successful or -1 on error
@@ -272,8 +324,9 @@ on_error:
 int cthreads_test_thread_join(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error     = NULL;
+	libcthreads_thread_t *thread = NULL;
+	int result                   = 0;
 
 	/* Test error cases
 	 */
@@ -292,6 +345,83 @@ int cthreads_test_thread_join(
 
 	libcerror_error_free(
 	 &error );
+
+	thread = NULL;
+
+	result = libcthreads_thread_join(
+	          &thread,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Initialize test
+	 */
+	result = libcthreads_thread_create(
+	          &thread,
+	          NULL,
+	          &cthreads_test_thread_callback_function,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test libcthreads_thread_join with pthread_thread_join failing
+	 */
+	cthreads_test_pthread_thread_join_attempts_before_fail = 0;
+
+	result = libcthreads_thread_join(
+	          &thread,
+	          &error );
+
+	if( cthreads_test_pthread_thread_join_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_thread_join_attempts_before_fail = -1;
+
+		if( thread != NULL )
+		{
+			libcthreads_thread_join(
+			 &thread,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "thread",
+		 thread );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
 
 	return( 1 );
 

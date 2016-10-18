@@ -46,9 +46,13 @@
 
 static int (*cthreads_test_real_pthread_mutex_init)(pthread_mutex_t *, const pthread_mutexattr_t *) = NULL;
 static int (*cthreads_test_real_pthread_mutex_destroy)(pthread_mutex_t *)                           = NULL;
+static int (*cthreads_test_real_pthread_mutex_lock)(pthread_mutex_t *)                              = NULL;
+static int (*cthreads_test_real_pthread_mutex_unlock)(pthread_mutex_t *)                            = NULL;
 
 int cthreads_test_pthread_mutex_init_attempts_before_fail                                           = -1;
 int cthreads_test_pthread_mutex_destroy_attempts_before_fail                                        = -1;
+int cthreads_test_pthread_mutex_lock_attempts_before_fail                                           = -1;
+int cthreads_test_pthread_mutex_unlock_attempts_before_fail                                         = -1;
 
 #endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
 
@@ -114,6 +118,66 @@ int pthread_mutex_destroy(
 		cthreads_test_pthread_mutex_destroy_attempts_before_fail--;
 	}
 	result = cthreads_test_real_pthread_mutex_destroy(
+	          mutex );
+
+	return( result );
+}
+
+/* Custom pthread_mutex_lock for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_mutex_lock(
+     pthread_mutex_t *mutex )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_mutex_lock == NULL )
+	{
+		cthreads_test_real_pthread_mutex_lock = dlsym(
+		                                         RTLD_NEXT,
+		                                         "pthread_mutex_lock" );
+	}
+	if( cthreads_test_pthread_mutex_lock_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_mutex_lock_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_mutex_lock_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_mutex_lock_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_mutex_lock(
+	          mutex );
+
+	return( result );
+}
+
+/* Custom pthread_mutex_unlock for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_mutex_unlock(
+     pthread_mutex_t *mutex )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_mutex_unlock == NULL )
+	{
+		cthreads_test_real_pthread_mutex_unlock = dlsym(
+		                                           RTLD_NEXT,
+		                                           "pthread_mutex_unlock" );
+	}
+	if( cthreads_test_pthread_mutex_unlock_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_mutex_unlock_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_mutex_unlock_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_mutex_unlock_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_mutex_unlock(
 	          mutex );
 
 	return( result );
@@ -685,19 +749,6 @@ int cthreads_test_lock_grab(
          "error",
          error );
 
-	result = libcthreads_lock_free(
-	          &cthreads_test_lock,
-	          &error );
-
-	CTHREADS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
-
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "cthreads_test_locked_value",
 	 cthreads_test_locked_value,
@@ -721,7 +772,50 @@ int cthreads_test_lock_grab(
 	libcerror_error_free(
 	 &error );
 
-	/* TODO: add test for failing pthread_mutex_lock */
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_lock_grab with pthread_mutex_lock failing
+	 */
+	cthreads_test_pthread_mutex_lock_attempts_before_fail = 0;
+
+	result = libcthreads_lock_grab(
+	          cthreads_test_lock,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_lock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_lock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+	/* Clean up
+	 */
+	result = libcthreads_lock_free(
+	          &cthreads_test_lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
 
 	return( 1 );
 

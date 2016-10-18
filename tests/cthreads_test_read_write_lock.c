@@ -27,6 +27,14 @@
 #include <stdlib.h>
 #endif
 
+#include <errno.h>
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#define __USE_GNU
+#include <dlfcn.h>
+#undef __USE_GNU
+#endif
+
 #include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcstring.h"
 #include "cthreads_test_libcthreads.h"
@@ -34,8 +42,148 @@
 #include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+static int (*cthreads_test_real_pthread_rwlock_init)(pthread_rwlock_t *, const pthread_rwlockattr_t *) = NULL;
+static int (*cthreads_test_real_pthread_rwlock_destroy)(pthread_rwlock_t *)                            = NULL;
+static int (*cthreads_test_real_pthread_rwlock_lock)(pthread_rwlock_t *)                               = NULL;
+static int (*cthreads_test_real_pthread_rwlock_unlock)(pthread_rwlock_t *)                             = NULL;
+
+int cthreads_test_pthread_rwlock_init_attempts_before_fail                                             = -1;
+int cthreads_test_pthread_rwlock_destroy_attempts_before_fail                                          = -1;
+int cthreads_test_pthread_rwlock_lock_attempts_before_fail                                             = -1;
+int cthreads_test_pthread_rwlock_unlock_attempts_before_fail                                           = -1;
+
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
 libcthreads_read_write_lock_t *cthreads_test_read_write_lock = NULL;
 int cthreads_test_locked_value                               = 0;
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+/* Custom pthread_rwlock_init for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_rwlock_init(
+     pthread_rwlock_t *rwlock,
+     const pthread_rwlockattr_t *attr )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_rwlock_init == NULL )
+	{
+		cthreads_test_real_pthread_rwlock_init = dlsym(
+		                                          RTLD_NEXT,
+		                                          "pthread_rwlock_init" );
+	}
+	if( cthreads_test_pthread_rwlock_init_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_rwlock_init_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_rwlock_init_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_rwlock_init_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_rwlock_init(
+	          rwlock,
+	          attr );
+
+	return( result );
+}
+
+/* Custom pthread_rwlock_destroy for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_rwlock_destroy(
+     pthread_rwlock_t *rwlock )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_rwlock_destroy == NULL )
+	{
+		cthreads_test_real_pthread_rwlock_destroy = dlsym(
+		                                             RTLD_NEXT,
+		                                             "pthread_rwlock_destroy" );
+	}
+	if( cthreads_test_pthread_rwlock_destroy_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_rwlock_destroy_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_rwlock_destroy_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_rwlock_destroy_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_rwlock_destroy(
+	          rwlock );
+
+	return( result );
+}
+
+/* Custom pthread_rwlock_lock for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_rwlock_lock(
+     pthread_rwlock_t *rwlock )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_rwlock_lock == NULL )
+	{
+		cthreads_test_real_pthread_rwlock_lock = dlsym(
+		                                          RTLD_NEXT,
+		                                          "pthread_rwlock_lock" );
+	}
+	if( cthreads_test_pthread_rwlock_lock_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_rwlock_lock_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_rwlock_lock_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_rwlock_lock_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_rwlock_lock(
+	          rwlock );
+
+	return( result );
+}
+
+/* Custom pthread_rwlock_unlock for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_rwlock_unlock(
+     pthread_rwlock_t *rwlock )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_rwlock_unlock == NULL )
+	{
+		cthreads_test_real_pthread_rwlock_unlock = dlsym(
+		                                            RTLD_NEXT,
+		                                            "pthread_rwlock_unlock" );
+	}
+	if( cthreads_test_pthread_rwlock_unlock_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_rwlock_unlock_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_rwlock_unlock_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_rwlock_unlock(
+	          rwlock );
+
+	return( result );
+}
+
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
 
 /* The thread1 callback function
  * Returns 1 if successful or -1 on error
@@ -317,6 +465,47 @@ int cthreads_test_read_write_lock_initialize(
 	}
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_read_write_lock_initialize with pthread_rwlock_init failing
+	 */
+	cthreads_test_pthread_rwlock_init_attempts_before_fail = 0;
+
+	result = libcthreads_read_write_lock_initialize(
+	          &read_write_lock,
+	          &error );
+
+	if( cthreads_test_pthread_rwlock_init_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_rwlock_init_attempts_before_fail = -1;
+
+		if( read_write_lock != NULL )
+		{
+			libcthreads_read_write_lock_free(
+			 &read_write_lock,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "read_write_lock",
+		 read_write_lock );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
 	return( 1 );
 
 on_error:
@@ -340,12 +529,120 @@ on_error:
 int cthreads_test_read_write_lock_free(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error                       = NULL;
+	int result                                     = 0;
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+	libcthreads_read_write_lock_t *read_write_lock = NULL;
+#endif
 
 	/* Test error cases
 	 */
 	result = libcthreads_read_write_lock_free(
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Initialize test
+	 */
+	result = libcthreads_read_write_lock_initialize(
+	          &read_write_lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        CTHREADS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test libcthreads_read_write_lock_free with pthread_rwlock_destroy failing
+	 */
+	cthreads_test_pthread_rwlock_destroy_attempts_before_fail = 0;
+
+	result = libcthreads_read_write_lock_free(
+	          &read_write_lock,
+	          &error );
+
+	if( cthreads_test_pthread_rwlock_destroy_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_rwlock_destroy_attempts_before_fail = -1;
+
+		if( read_write_lock != NULL )
+		{
+			libcthreads_read_write_lock_free(
+			 &read_write_lock,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "read_write_lock",
+		 read_write_lock );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+	if( read_write_lock != NULL )
+	{
+		libcthreads_read_write_lock_free(
+		 &read_write_lock,
+		 NULL );
+	}
+#endif
+	return( 0 );
+}
+
+/* Tests the libcthreads_read_write_lock_grab_for_read function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_read_write_lock_grab_for_read(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+/* TODO: add tests */
+
+	/* Test error cases
+	 */
+	result = libcthreads_read_write_lock_grab_for_read(
 	          NULL,
 	          &error );
 
@@ -372,10 +669,10 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libcthreads_read_write_lock_grab function
+/* Tests the libcthreads_read_write_lock_grab_for_write function
  * Returns 1 if successful or 0 if not
  */
-int cthreads_test_read_write_lock_grab(
+int cthreads_test_read_write_lock_grab_for_write(
      void )
 {
 	libcerror_error_t *error      = NULL;
@@ -492,6 +789,43 @@ int cthreads_test_read_write_lock_grab(
          "error",
          error );
 
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "cthreads_test_locked_value",
+	 cthreads_test_locked_value,
+	 46 + 19 + 38 );
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+
+	/* Test libcthreads_read_write_lock_grab with pthread_rwlock_lock failing
+	 */
+	cthreads_test_pthread_rwlock_lock_attempts_before_fail = 0;
+
+	result = libcthreads_read_write_lock_grab_for_write(
+	          cthreads_test_read_write_lock,
+	          &error );
+
+	if( cthreads_test_pthread_rwlock_lock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_rwlock_lock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+	/* Clean up
+	 */
 	result = libcthreads_read_write_lock_free(
 	          &cthreads_test_read_write_lock,
 	          &error );
@@ -505,10 +839,6 @@ int cthreads_test_read_write_lock_grab(
          "error",
          error );
 
-	CTHREADS_TEST_ASSERT_EQUAL_INT(
-	 "cthreads_test_locked_value",
-	 cthreads_test_locked_value,
-	 46 + 19 + 38 );
 
 	return( 1 );
 
@@ -546,10 +876,50 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libcthreads_read_write_lock_release function
+/* Tests the libcthreads_read_write_lock_release_for_read function
  * Returns 1 if successful or 0 if not
  */
-int cthreads_test_read_write_lock_release(
+int cthreads_test_read_write_lock_release_for_read(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+/* TODO: add tests */
+
+	/* Test error cases
+	 */
+	result = libcthreads_read_write_lock_release_for_read(
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libcthreads_read_write_lock_release_for_write function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_read_write_lock_release_for_write(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -610,12 +980,20 @@ int main(
 	 cthreads_test_read_write_lock_free );
 
 	CTHREADS_TEST_RUN(
-	 "libcthreads_read_write_lock_grab",
-	 cthreads_test_read_write_lock_grab );
+	 "libcthreads_read_write_lock_grab_for_read",
+	 cthreads_test_read_write_lock_grab_for_read );
 
 	CTHREADS_TEST_RUN(
-	 "libcthreads_read_write_lock_release",
-	 cthreads_test_read_write_lock_release );
+	 "libcthreads_read_write_lock_grab_for_write",
+	 cthreads_test_read_write_lock_grab_for_write );
+
+	CTHREADS_TEST_RUN(
+	 "libcthreads_read_write_lock_release_for_read",
+	 cthreads_test_read_write_lock_release_for_read );
+
+	CTHREADS_TEST_RUN(
+	 "libcthreads_read_write_lock_release_for_write",
+	 cthreads_test_read_write_lock_release_for_write );
 
 	return( EXIT_SUCCESS );
 
