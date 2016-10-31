@@ -2,7 +2,6 @@ include_HEADERS = \
 	libcthreads.h
 
 pkginclude_HEADERS = \
-	libcthreads/codepage.h \
 	libcthreads/definitions.h \
 	libcthreads/error.h \
 	libcthreads/extern.h \

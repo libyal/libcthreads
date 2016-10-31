@@ -215,5 +215,5 @@ typedef intptr_t libcthreads_thread_pool_t;
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_TYPES_H ) */
 

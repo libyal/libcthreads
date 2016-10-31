@@ -22,7 +22,6 @@
 #if !defined( _LIBCTHREADS_H )
 #define _LIBCTHREADS_H
 
-#include <libcthreads/codepage.h>
 #include <libcthreads/definitions.h>
 #include <libcthreads/error.h>
 #include <libcthreads/extern.h>
