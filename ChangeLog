@@ -1,12 +1,11 @@
 TODO
+* thread pool
+  - remove sorted push? not compatible with TP_POOL or fallback on unsorted push?
 * queue
   - revisit libcthreads_queue_empty - currently waits until queue is empty
     so rename to wait_until_empty or change logic
   - crash of test changes due to concurrency and orig function not being set
     correctly?
-* thread pool
-  - fix winapi version
-  - add winapi TP_POOL implemenation
 * have local library be dependent on HAVE_MULTI_THREAD_SUPPORT
 * add macros for locking ? or have fallback dummy locks ?
 * add try grab function
@@ -14,6 +13,12 @@ TODO
   - read/write
 * reimplement repeating thread as a queued thread?
 * add glib support
+
+20161102
+* worked on TP_POOL support
+
+20161101
+* worked on tests
 
 20161019
 * worked on tests

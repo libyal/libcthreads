@@ -48,6 +48,14 @@ struct libcthreads_internal_thread_pool
 	 */
 	TP_POOL *thread_pool;
 
+	/* The cleanup group.
+	 */
+	TP_CLEANUP_GROUP *cleanup_group;
+
+	/* The callback environment
+	 */
+	TP_CALLBACK_ENVIRON callback_environment;
+
 #else
 	/* The number of threads in the pool
 	 */
@@ -117,7 +125,7 @@ struct libcthreads_internal_thread_pool
 	 */
 	uint8_t status;
 
-#endif /* !( defined( WINAPI ) && ( WINVER >= 0x0602 ) ) */
+#endif /* defined( WINAPI ) && ( WINVER >= 0x0602 ) */
 };
 
 LIBCTHREADS_EXTERN \
@@ -147,6 +155,8 @@ int libcthreads_thread_pool_push(
      intptr_t *value,
      libcerror_error_t **error );
 
+#if !( defined( WINAPI ) && ( WINVER >= 0x0602 ) )
+
 LIBCTHREADS_EXTERN \
 int libcthreads_thread_pool_push_sorted(
      libcthreads_thread_pool_t *thread_pool,
@@ -157,6 +167,8 @@ int libcthreads_thread_pool_push_sorted(
             libcerror_error_t **error ),
      uint8_t sort_flags,
      libcerror_error_t **error );
+
+#endif /* !( defined( WINAPI ) && ( WINVER >= 0x0602 ) ) */
 
 LIBCTHREADS_EXTERN \
 int libcthreads_thread_pool_join(
