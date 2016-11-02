@@ -52,65 +52,55 @@ void CALLBACK libcthreads_thread_pool_callback_function_helper(
 	intptr_t *value                                          = NULL;
 	int callback_function_result                             = 0;
 	int pop_result                                           = 0;
-	int result                                               = 1;
 
 	LIBCTHREADS_UNREFERENCED_PARAMETER( callback_instance )
 	LIBCTHREADS_UNREFERENCED_PARAMETER( thread_pool_work )
 
-	if( arguments != NULL )
+	if( arguments == NULL )
 	{
-		internal_thread_pool = (libcthreads_internal_thread_pool_t *) arguments;
+		return;
+	}
+	internal_thread_pool = (libcthreads_internal_thread_pool_t *) arguments;
 
-		if( ( internal_thread_pool != NULL )
-		 && ( internal_thread_pool->callback_function != NULL ) )
-		{
-			result = 0;
+	if( ( internal_thread_pool == NULL )
+	 || ( internal_thread_pool->callback_function == NULL ) )
+	{
+		return;
+	}
+	pop_result = libcthreads_internal_thread_pool_pop(
+		      internal_thread_pool,
+		      &value,
+		      &error );
 
-			do
-			{
-				pop_result = libcthreads_internal_thread_pool_pop(
-					      internal_thread_pool,
-					      &value,
-					      &error );
-
-				if( pop_result == -1 )
-				{
-					break;
-				}
-				else if( pop_result != 0 )
-				{
-					callback_function_result = internal_thread_pool->callback_function(
-								    value,
-								    internal_thread_pool->callback_function_arguments );
-
-					if( ( callback_function_result != 1 )
-					 && ( result == 1 ) )
-					{
-						result = callback_function_result;
-					}
-				}
-				else if( internal_thread_pool->status == LIBCTHREADS_STATUS_EXIT )
-				{
-					break;
-				}
-			}
-			while( pop_result != -1 );
-
-			if( pop_result == -1 )
-			{
-				result = 1;
-			}
-			if( error != NULL )
-			{
+	if( pop_result == -1 )
+	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				libcerror_error_backtrace_fprint(
-				 error,
-				 stdout );
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
 #endif
-				libcerror_error_free(
-				 &error );
-			}
-		}
+		libcerror_error_free(
+		 &error );
+
+		return;
+	}
+	if( pop_result == 0 )
+	{
+		return;
+	}
+	callback_function_result = internal_thread_pool->callback_function(
+	                            value,
+	                            internal_thread_pool->callback_function_arguments );
+
+	if( callback_function_result != 1 )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+#endif
+		libcerror_error_free(
+		 &error );
 	}
 }
 
