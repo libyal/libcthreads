@@ -1,6 +1,4 @@
 TODO
-* thread pool
-  - remove sorted push? not compatible with TP_POOL or fallback on unsorted push?
 * queue
   - revisit libcthreads_queue_empty - currently waits until queue is empty
     so rename to wait_until_empty or change logic

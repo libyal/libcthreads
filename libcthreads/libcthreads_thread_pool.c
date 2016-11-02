@@ -49,6 +49,7 @@ void CALLBACK libcthreads_thread_pool_callback_function_helper(
 {
 	libcerror_error_t *error                                 = NULL;
 	libcthreads_internal_thread_pool_t *internal_thread_pool = NULL;
+	intptr_t *value                                          = NULL;
 	int callback_function_result                             = 0;
 	int pop_result                                           = 0;
 	int result                                               = 1;
@@ -290,7 +291,10 @@ int libcthreads_thread_pool_create(
 	libcthreads_internal_thread_pool_t *internal_thread_pool = NULL;
 	static char *function                                    = "libcthreads_thread_pool_create";
 	size_t array_size                                        = 0;
+
+#if !defined( WINAPI ) || ( WINVER < 0x0602 )
 	int thread_index                                         = 0;
+#endif
 
 #if defined( WINAPI )
 	DWORD error_code                                         = 0;
@@ -307,6 +311,10 @@ int libcthreads_thread_pool_create(
 	pthread_attr_t *attributes                               = NULL;
 	int *thread_return_value                                 = NULL;
 	int pthread_result                                       = 0;
+#endif
+
+#if defined( WINAPI ) && ( WINVER >= 0x0602 )
+	LIBCTHREADS_UNREFERENCED_PARAMETER( thread_attributes )
 #endif
 
 	if( thread_pool == NULL )
@@ -1670,7 +1678,7 @@ int libcthreads_thread_pool_join(
 
 		result = -1;
 	}
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER < 0x0602 )
 	memory_free(
 	 internal_thread_pool->thread_identifiers_array );
 
