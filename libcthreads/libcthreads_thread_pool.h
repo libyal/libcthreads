@@ -79,6 +79,8 @@ struct libcthreads_internal_thread_pool
 #error Missing thread type
 #endif
 
+#endif /* defined( WINAPI ) && ( WINVER >= 0x0602 ) */
+
 	/* The callback function
 	 */
 	int (*callback_function)(
@@ -124,8 +126,6 @@ struct libcthreads_internal_thread_pool
 	/* The status
 	 */
 	uint8_t status;
-
-#endif /* defined( WINAPI ) && ( WINVER >= 0x0602 ) */
 };
 
 LIBCTHREADS_EXTERN \
@@ -140,22 +140,16 @@ int libcthreads_thread_pool_create(
      void *callback_function_arguments,
      libcerror_error_t **error );
 
-#if !( defined( WINAPI ) && ( WINVER >= 0x0602 ) )
-
 int libcthreads_internal_thread_pool_pop(
      libcthreads_internal_thread_pool_t *internal_thread_pool,
      intptr_t **value,
      libcerror_error_t **error );
-
-#endif /* !( defined( WINAPI ) && ( WINVER >= 0x0602 ) ) */
 
 LIBCTHREADS_EXTERN \
 int libcthreads_thread_pool_push(
      libcthreads_thread_pool_t *thread_pool,
      intptr_t *value,
      libcerror_error_t **error );
-
-#if !( defined( WINAPI ) && ( WINVER >= 0x0602 ) )
 
 LIBCTHREADS_EXTERN \
 int libcthreads_thread_pool_push_sorted(
@@ -167,8 +161,6 @@ int libcthreads_thread_pool_push_sorted(
             libcerror_error_t **error ),
      uint8_t sort_flags,
      libcerror_error_t **error );
-
-#endif /* !( defined( WINAPI ) && ( WINVER >= 0x0602 ) ) */
 
 LIBCTHREADS_EXTERN \
 int libcthreads_thread_pool_join(
