@@ -1,6 +1,6 @@
 # Library API type testing script
 #
-# Version: 20160912
+# Version: 20161106
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -12,26 +12,57 @@ $TestPrefix = ${TestPrefix}.Substring(3)
 
 $TestTypes = "condition lock mutex queue read_write_lock thread thread_pool" -split " "
 
-$TestToolDirectory = "..\vs2010\Release"
+$TestToolDirectory = "..\msvscpp\Release"
 
 Function TestAPIType
 {
 	param( [string]$TestType )
 
+	$TestDescription = "Testing API type: ${TestType}"
 	$TestExecutable = "${TestToolDirectory}\${TestPrefix}_test_${TestType}.exe"
 
-	Invoke-Expression ${TestExecutable}
+	$Output = Invoke-Expression ${TestExecutable}
+	$Result = ${LastExitCode}
+
+	If (${Result} -ne ${ExitSuccess})
+	{
+		Write-Host ${Output} -foreground Red
+	}
+	Write-Host "${TestDescription} " -nonewline
+
+	If (${Result} -ne ${ExitSuccess})
+	{
+		Write-Host " (FAIL)"
+	}
+	Else
+	{
+		Write-Host " (PASS)"
+	}
+	Return ${Result}
 }
+
+If (-Not (Test-Path ${TestToolDirectory}))
+{
+	$TestToolDirectory = "..\vs2010\Release"
+}
+If (-Not (Test-Path ${TestToolDirectory}))
+{
+	Write-Host "Missing test tool directory." -foreground Red
+
+	Exit ${ExitFailure}
+}
+
+$Result = ${ExitIgnore}
 
 Foreach (${TestType} in ${TestTypes})
 {
-	TestAPIType ${TestType}
+	$Result = TestAPIType ${TestType}
 
-	if (${LastExitCode} -ne ${ExitSuccess})
+	If (${Result} -ne ${ExitSuccess})
 	{
 		Break
 	}
 }
 
-Exit ${LastExitCode}
+Exit ${Result}
 
