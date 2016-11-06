@@ -36,7 +36,6 @@
 #endif
 
 #include "cthreads_test_libcerror.h"
-#include "cthreads_test_libcstring.h"
 #include "cthreads_test_libcthreads.h"
 #include "cthreads_test_macros.h"
 #include "cthreads_test_memory.h"
@@ -1135,7 +1134,7 @@ on_error:
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain(
      int argc CTHREADS_TEST_ATTRIBUTE_UNUSED,
      wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )

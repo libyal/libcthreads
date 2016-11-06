@@ -7,8 +7,8 @@ License: LGPL
 Source: %{name}-%{version}.tar.gz
 URL: https://github.com/libyal/libcthreads/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-@libcthreads_spec_requires@ @ax_libcerror_spec_requires@ @ax_libcstring_spec_requires@
-@libcthreads_spec_build_requires@ @ax_libcerror_spec_build_requires@ @ax_libcstring_spec_build_requires@
+@libcthreads_spec_requires@ @ax_libcerror_spec_requires@
+@libcthreads_spec_build_requires@ @ax_libcerror_spec_build_requires@
 
 %description
 libcthreads is a library to support cross-platform C threads functions

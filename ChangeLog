@@ -12,6 +12,10 @@ TODO
 * reimplement repeating thread as a queued thread?
 * add glib support
 
+20161106
+* moved libcstring macros to common
+* worked on tests
+
 20161102
 * worked on TP_POOL support
 

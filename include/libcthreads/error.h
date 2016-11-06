@@ -39,7 +39,7 @@ enum LIBCTHREADS_ERROR_DOMAINS
 	LIBCTHREADS_ERROR_DOMAIN_INPUT				= (int) 'i',
 	LIBCTHREADS_ERROR_DOMAIN_MEMORY				= (int) 'm',
 	LIBCTHREADS_ERROR_DOMAIN_OUTPUT				= (int) 'o',
-	LIBCTHREADS_ERROR_DOMAIN_RUNTIME			= (int) 'r',
+	LIBCTHREADS_ERROR_DOMAIN_RUNTIME			= (int) 'r'
 };
 
 /* The argument error codes
@@ -208,6 +208,17 @@ enum LIBCTHREADS_MEMORY_ERROR
 	LIBCTHREADS_MEMORY_ERROR_SET_FAILED			= 3
 };
 
+/* The output error codes
+ */
+enum LIBCTHREADS_OUTPUT_ERROR
+{
+	LIBCTHREADS_OUTPUT_ERROR_GENERIC			= 0,
+
+	/* There is insuficient space to write the output
+	 */
+	LIBCTHREADS_OUTPUT_ERROR_INSUFFICIENT_SPACE		= 1
+};
+
 /* The runtime error codes
  * to signify errors regarding runtime processing
  */
@@ -274,17 +285,6 @@ enum LIBCTHREADS_RUNTIME_ERROR
 	/* An abort was requested
 	 */
 	LIBCTHREADS_RUNTIME_ERROR_ABORT_REQUESTED		= 15
-};
-
-/* The output error codes
- */
-enum LIBCTHREADS_OUTPUT_ERROR
-{
-	LIBCTHREADS_OUTPUT_ERROR_GENERIC			= 0,
-
-	/* There is insuficient space to write the output
-	 */
-	LIBCTHREADS_OUTPUT_ERROR_INSUFFICIENT_SPACE		= 1
 };
 
 #endif /* !defined( _LIBCTHREADS_ERROR_H ) */

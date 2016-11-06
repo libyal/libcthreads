@@ -23,8 +23,6 @@
 #include <types.h>
 
 #include "libcthreads_definitions.h"
-#include "libcthreads_libcerror.h"
-#include "libcthreads_libcstring.h"
 #include "libcthreads_support.h"
 
 #if !defined( HAVE_LOCAL_LIBCTHREADS )

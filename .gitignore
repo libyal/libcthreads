@@ -133,4 +133,3 @@ stamp-h[1-9]
 
 # Local library dependencies specific files
 /libcerror
-/libcstring

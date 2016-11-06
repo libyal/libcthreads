@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -108,7 +109,7 @@ int cthreads_test_error_backtrace_sprint(
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain(
      int argc CTHREADS_TEST_ATTRIBUTE_UNUSED,
      wchar_t * const argv[] CTHREADS_TEST_ATTRIBUTE_UNUSED )

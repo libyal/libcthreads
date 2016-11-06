@@ -26,7 +26,6 @@
 #include <types.h>
 
 #include "libcthreads_extern.h"
-#include "libcthreads_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -44,5 +43,5 @@ const char *libcthreads_get_version(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_SUPPORT_H ) */
 
