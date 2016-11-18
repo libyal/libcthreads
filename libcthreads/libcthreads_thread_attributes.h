@@ -74,5 +74,5 @@ int libcthreads_thread_attributes_free(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_THREAD_ATTRIBUTES_H ) */
 

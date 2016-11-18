@@ -84,5 +84,5 @@ int libcthreads_lock_release(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_INTERNAL_LOCK_H ) */
 

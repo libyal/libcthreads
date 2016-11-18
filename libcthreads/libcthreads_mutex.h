@@ -94,5 +94,5 @@ int libcthreads_mutex_release(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_INTERNAL_MUTEX_H ) */
 

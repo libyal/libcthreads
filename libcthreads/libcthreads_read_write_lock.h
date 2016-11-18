@@ -120,5 +120,5 @@ int libcthreads_read_write_lock_release_for_write(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_INTERNAL_READ_WRITE_LOCK_H ) */
 

@@ -116,5 +116,5 @@ int libcthreads_condition_wait(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_INTERNAL_CONDITION_H ) */
 

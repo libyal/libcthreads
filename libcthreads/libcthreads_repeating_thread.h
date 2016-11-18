@@ -111,5 +111,5 @@ int libcthreads_repeating_thread_join(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_INTERNAL_REPEATING_THREAD_H ) */
 

@@ -91,5 +91,5 @@ int libcthreads_thread_join(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBCTHREADS_INTERNAL_THREAD_H ) */
 

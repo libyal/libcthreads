@@ -24,11 +24,11 @@
 
 #include <libcthreads/types.h>
 
-#define LIBCTHREADS_VERSION				@VERSION@
+#define LIBCTHREADS_VERSION			@VERSION@
 
 /* The libcthreads version string
  */
-#define LIBCTHREADS_VERSION_STRING			"@VERSION@"
+#define LIBCTHREADS_VERSION_STRING		"@VERSION@"
 
 /* The comparison function definitions
  */
@@ -53,11 +53,11 @@ enum LIBCTHREADS_SORT_FLAGS
 {
 	/* Allow duplicate values
 	 */
-	LIBCTHREADS_SORT_FLAG_NON_UNIQUE_VALUES		= 0x00,
+	LIBCTHREADS_SORT_FLAG_NON_UNIQUE_VALUES	= 0x00,
 
 	/* Only allow unique values, no duplicates
 	 */
-	LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES		= 0x01
+	LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES	= 0x01
 };
 
 #endif /* !defined( _LIBCTHREADS_DEFINITIONS_H ) */
