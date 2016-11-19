@@ -38,9 +38,9 @@
 #include <libcthreads/extern.h>
 
 #else
-#define LIBCTHREADS_EXTERN	extern
+#define LIBCTHREADS_EXTERN	/* extern */
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) */
 
 #endif /* !defined( _LIBCTHREADS_INTERNAL_EXTERN_H ) */
 

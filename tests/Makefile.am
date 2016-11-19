@@ -2,6 +2,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
 	@LIBCERROR_CPPFLAGS@ \
+	@PTHREAD_CPPFLAGS@ \
 	@LIBCTHREADS_DLL_IMPORT@
 
 TESTS = \
@@ -23,8 +24,10 @@ check_PROGRAMS = \
 	cthreads_test_mutex \
 	cthreads_test_queue \
 	cthreads_test_read_write_lock \
+	cthreads_test_repeating_thread \
 	cthreads_test_support \
 	cthreads_test_thread \
+	cthreads_test_thread_attributes \
 	cthreads_test_thread_pool
 
 cthreads_test_condition_SOURCES = \
@@ -96,6 +99,18 @@ cthreads_test_read_write_lock_LDADD = \
 	../libcthreads/libcthreads.la \
 	@LIBCERROR_LIBADD@
 
+cthreads_test_repeating_thread_SOURCES = \
+	cthreads_test_libcerror.h \
+	cthreads_test_libcthreads.h \
+	cthreads_test_macros.h \
+	cthreads_test_memory.c cthreads_test_memory.h \
+	cthreads_test_repeating_thread.c \
+	cthreads_test_unused.h
+
+cthreads_test_repeating_thread_LDADD = \
+	../libcthreads/libcthreads.la \
+	@LIBCERROR_LIBADD@
+
 cthreads_test_support_SOURCES = \
 	cthreads_test_libcthreads.h \
 	cthreads_test_macros.h \
@@ -114,6 +129,18 @@ cthreads_test_thread_SOURCES = \
 	cthreads_test_unused.h
 
 cthreads_test_thread_LDADD = \
+	../libcthreads/libcthreads.la \
+	@LIBCERROR_LIBADD@
+
+cthreads_test_thread_attributes_SOURCES = \
+	cthreads_test_libcerror.h \
+	cthreads_test_libcthreads.h \
+	cthreads_test_macros.h \
+	cthreads_test_memory.c cthreads_test_memory.h \
+	cthreads_test_thread_attributes.c \
+	cthreads_test_unused.h
+
+cthreads_test_thread_attributes_LDADD = \
 	../libcthreads/libcthreads.la \
 	@LIBCERROR_LIBADD@
 
