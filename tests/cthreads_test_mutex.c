@@ -340,11 +340,17 @@ on_error:
 int cthreads_test_mutex_initialize(
      void )
 {
-	libcerror_error_t *error   = NULL;
-	libcthreads_mutex_t *mutex = NULL;
-	int result                 = 0;
+	libcerror_error_t *error        = NULL;
+	libcthreads_mutex_t *mutex      = NULL;
+	int result                      = 0;
 
-	/* Test libcthreads_mutex_initialize
+#if defined( HAVE_CTHREADS_TEST_MEMORY )
+	int number_of_malloc_fail_tests = 1;
+	int number_of_memset_fail_tests = 1;
+	int test_number                 = 0;
+#endif
+
+	/* Test regular cases
 	 */
 	result = libcthreads_mutex_initialize(
 	          &mutex,
@@ -420,79 +426,89 @@ int cthreads_test_mutex_initialize(
 
 #if defined( HAVE_CTHREADS_TEST_MEMORY )
 
-	/* Test libcthreads_mutex_initialize with malloc failing
-	 */
-	cthreads_test_malloc_attempts_before_fail = 0;
-
-	result = libcthreads_mutex_initialize(
-	          &mutex,
-	          &error );
-
-	if( cthreads_test_malloc_attempts_before_fail != -1 )
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
 	{
-		cthreads_test_malloc_attempts_before_fail = -1;
+		/* Test libcthreads_mutex_initialize with malloc failing
+		 */
+		cthreads_test_malloc_attempts_before_fail = test_number;
 
-		if( mutex != NULL )
+		result = libcthreads_mutex_initialize(
+		          &mutex,
+		          &error );
+
+		if( cthreads_test_malloc_attempts_before_fail != -1 )
 		{
-			libcthreads_mutex_free(
-			 &mutex,
-			 NULL );
+			cthreads_test_malloc_attempts_before_fail = -1;
+
+			if( mutex != NULL )
+			{
+				libcthreads_mutex_free(
+				 &mutex,
+				 NULL );
+			}
+		}
+		else
+		{
+			CTHREADS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			CTHREADS_TEST_ASSERT_IS_NULL(
+			 "mutex",
+			 mutex );
+
+			CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
 	}
-	else
+	for( test_number = 0;
+	     test_number < number_of_memset_fail_tests;
+	     test_number++ )
 	{
-		CTHREADS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		/* Test libcthreads_mutex_initialize with memset failing
+		 */
+		cthreads_test_memset_attempts_before_fail = test_number;
 
-		CTHREADS_TEST_ASSERT_IS_NULL(
-		 "mutex",
-		 mutex );
+		result = libcthreads_mutex_initialize(
+		          &mutex,
+		          &error );
 
-		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libcthreads_mutex_initialize with memset failing
-	 */
-	cthreads_test_memset_attempts_before_fail = 0;
-
-	result = libcthreads_mutex_initialize(
-	          &mutex,
-	          &error );
-
-	if( cthreads_test_memset_attempts_before_fail != -1 )
-	{
-		cthreads_test_memset_attempts_before_fail = -1;
-
-		if( mutex != NULL )
+		if( cthreads_test_memset_attempts_before_fail != -1 )
 		{
-			libcthreads_mutex_free(
-			 &mutex,
-			 NULL );
+			cthreads_test_memset_attempts_before_fail = -1;
+
+			if( mutex != NULL )
+			{
+				libcthreads_mutex_free(
+				 &mutex,
+				 NULL );
+			}
 		}
-	}
-	else
-	{
-		CTHREADS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		else
+		{
+			CTHREADS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
 
-		CTHREADS_TEST_ASSERT_IS_NULL(
-		 "mutex",
-		 mutex );
+			CTHREADS_TEST_ASSERT_IS_NULL(
+			 "mutex",
+			 mutex );
 
-		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+			CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
 
-		libcerror_error_free(
-		 &error );
+			libcerror_error_free(
+			 &error );
+		}
 	}
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 

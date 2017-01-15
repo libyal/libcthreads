@@ -225,7 +225,13 @@ int cthreads_test_condition_initialize(
 	libcthreads_condition_t *condition = NULL;
 	int result                         = 0;
 
-	/* Test libcthreads_condition_initialize
+#if defined( HAVE_CTHREADS_TEST_MEMORY )
+	int number_of_malloc_fail_tests    = 1;
+	int number_of_memset_fail_tests    = 1;
+	int test_number                    = 0;
+#endif
+
+	/* Test regular cases
 	 */
 	result = libcthreads_condition_initialize(
 	          &condition,
@@ -301,79 +307,89 @@ int cthreads_test_condition_initialize(
 
 #if defined( HAVE_CTHREADS_TEST_MEMORY )
 
-	/* Test libcthreads_condition_initialize with malloc failing
-	 */
-	cthreads_test_malloc_attempts_before_fail = 0;
-
-	result = libcthreads_condition_initialize(
-	          &condition,
-	          &error );
-
-	if( cthreads_test_malloc_attempts_before_fail != -1 )
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
 	{
-		cthreads_test_malloc_attempts_before_fail = -1;
+		/* Test libcthreads_condition_initialize with malloc failing
+		 */
+		cthreads_test_malloc_attempts_before_fail = test_number;
 
-		if( condition != NULL )
+		result = libcthreads_condition_initialize(
+		          &condition,
+		          &error );
+
+		if( cthreads_test_malloc_attempts_before_fail != -1 )
 		{
-			libcthreads_condition_free(
-			 &condition,
-			 NULL );
+			cthreads_test_malloc_attempts_before_fail = -1;
+
+			if( condition != NULL )
+			{
+				libcthreads_condition_free(
+				 &condition,
+				 NULL );
+			}
+		}
+		else
+		{
+			CTHREADS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			CTHREADS_TEST_ASSERT_IS_NULL(
+			 "condition",
+			 condition );
+
+			CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
 	}
-	else
+	for( test_number = 0;
+	     test_number < number_of_memset_fail_tests;
+	     test_number++ )
 	{
-		CTHREADS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		/* Test libcthreads_condition_initialize with memset failing
+		 */
+		cthreads_test_memset_attempts_before_fail = test_number;
 
-		CTHREADS_TEST_ASSERT_IS_NULL(
-		 "condition",
-		 condition );
+		result = libcthreads_condition_initialize(
+		          &condition,
+		          &error );
 
-		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libcthreads_condition_initialize with memset failing
-	 */
-	cthreads_test_memset_attempts_before_fail = 0;
-
-	result = libcthreads_condition_initialize(
-	          &condition,
-	          &error );
-
-	if( cthreads_test_memset_attempts_before_fail != -1 )
-	{
-		cthreads_test_memset_attempts_before_fail = -1;
-
-		if( condition != NULL )
+		if( cthreads_test_memset_attempts_before_fail != -1 )
 		{
-			libcthreads_condition_free(
-			 &condition,
-			 NULL );
+			cthreads_test_memset_attempts_before_fail = -1;
+
+			if( condition != NULL )
+			{
+				libcthreads_condition_free(
+				 &condition,
+				 NULL );
+			}
 		}
-	}
-	else
-	{
-		CTHREADS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		else
+		{
+			CTHREADS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
 
-		CTHREADS_TEST_ASSERT_IS_NULL(
-		 "condition",
-		 condition );
+			CTHREADS_TEST_ASSERT_IS_NULL(
+			 "condition",
+			 condition );
 
-		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+			CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
 
-		libcerror_error_free(
-		 &error );
+			libcerror_error_free(
+			 &error );
+		}
 	}
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
