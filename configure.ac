@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libcthreads],
- [20170115],
+ [20170304],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
