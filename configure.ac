@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libcthreads],
- [20170330],
+ [20170411],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -134,7 +134,6 @@ AC_CONFIG_FILES([libcthreads/libcthreads_definitions.h])
 dnl Have configure make distribution specific files
 AC_CONFIG_FILES([common/types.h])
 AC_CONFIG_FILES([dpkg/changelog])
-AC_CONFIG_FILES([dpkg/copyright])
 AC_CONFIG_FILES([libcthreads/libcthreads.rc])
 AC_CONFIG_FILES([libcthreads.pc])
 AC_CONFIG_FILES([libcthreads.spec])

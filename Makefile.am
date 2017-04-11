@@ -16,10 +16,9 @@ DPKG_FILES = \
 	dpkg/compat \
 	dpkg/control \
 	dpkg/copyright \
-	dpkg/copyright.in \
 	dpkg/rules \
-	dpkg/libcthreads-dev.docs \
-	dpkg/libcthreads.docs \
+	dpkg/libcthreads-dev.install \
+	dpkg/libcthreads.install \
 	dpkg/source/format
 
 GETTEXT_FILES = \
