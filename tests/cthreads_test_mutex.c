@@ -29,7 +29,7 @@
 
 #include <errno.h>
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 #define __USE_GNU
 #include <dlfcn.h>
 #undef __USE_GNU
@@ -41,7 +41,7 @@
 #include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 static int (*cthreads_test_real_pthread_mutex_init)(pthread_mutex_t *, const pthread_mutexattr_t *) = NULL;
 static int (*cthreads_test_real_pthread_mutex_destroy)(pthread_mutex_t *)                           = NULL;
@@ -55,12 +55,12 @@ int cthreads_test_pthread_mutex_lock_attempts_before_fail                       
 int cthreads_test_pthread_mutex_trylock_attempts_before_fail                                        = -1;
 int cthreads_test_pthread_mutex_unlock_attempts_before_fail                                         = -1;
 
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 libcthreads_mutex_t *cthreads_test_mutex = NULL;
 int cthreads_test_mutexed_value          = 0;
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 /* Custom pthread_mutex_init for testing error cases
  * Returns 0 if successful or an error value otherwise
@@ -214,7 +214,7 @@ int pthread_mutex_unlock(
 	return( result );
 }
 
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 /* The thread1 callback function
  * Returns 1 if successful or -1 on error
@@ -512,7 +512,7 @@ int cthreads_test_mutex_initialize(
 	}
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Test libcthreads_mutex_initialize with pthread_mutex_init failing
 	 */
@@ -551,7 +551,7 @@ int cthreads_test_mutex_initialize(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	return( 1 );
 
@@ -579,7 +579,7 @@ int cthreads_test_mutex_free(
 	libcerror_error_t *error   = NULL;
 	int result                 = 0;
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 	libcthreads_mutex_t *mutex = NULL;
 #endif
 
@@ -601,7 +601,7 @@ int cthreads_test_mutex_free(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Initialize test
 	 */
@@ -655,7 +655,7 @@ int cthreads_test_mutex_free(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	return( 1 );
 
@@ -665,7 +665,7 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 	if( mutex != NULL )
 	{
 		libcthreads_mutex_free(
@@ -819,7 +819,7 @@ int cthreads_test_mutex_grab(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Test libcthreads_mutex_grab with pthread_mutex_lock failing
 	 */
@@ -847,7 +847,7 @@ int cthreads_test_mutex_grab(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	/* Clean up
 	 */
@@ -940,7 +940,7 @@ int cthreads_test_mutex_try_grab(
          "error",
          error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Test libcthreads_mutex_grab with pthread_mutex_trylock returing EBUSY
 	 */
@@ -966,7 +966,7 @@ int cthreads_test_mutex_try_grab(
 		 error );
 	}
 
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	/* Test error cases
 	 */
@@ -986,14 +986,14 @@ int cthreads_test_mutex_try_grab(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Test libcthreads_mutex_grab with pthread_mutex_trylock failing
 	 */
 
 	/* TODO add tests */
 
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	/* Clean up
 	 */
@@ -1086,7 +1086,7 @@ int cthreads_test_mutex_release(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Test libcthreads_mutex_release with pthread_mutex_unlock failing
 	 */
@@ -1114,7 +1114,7 @@ int cthreads_test_mutex_release(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	/* Clean up
 	 */

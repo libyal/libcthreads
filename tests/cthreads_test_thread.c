@@ -29,7 +29,7 @@
 
 #include <errno.h>
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 #define __USE_GNU
 #include <dlfcn.h>
 #undef __USE_GNU
@@ -41,15 +41,15 @@
 #include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 static int (*cthreads_test_real_pthread_thread_join)(pthread_t thread, void **retval) = NULL;
 
 int cthreads_test_pthread_thread_join_attempts_before_fail                            = -1;
 
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 /* Custom pthread_thread_join for testing error cases
  * Returns 0 if successful or an error value otherwise
@@ -83,7 +83,7 @@ int pthread_thread_join(
 	return( result );
 }
 
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 /* The thread callback function
  * Returns 1 if successful or -1 on error
@@ -363,7 +363,7 @@ int cthreads_test_thread_join(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Initialize test
 	 */
@@ -420,7 +420,7 @@ int cthreads_test_thread_join(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	return( 1 );
 

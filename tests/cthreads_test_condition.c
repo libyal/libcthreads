@@ -29,7 +29,7 @@
 
 #include <errno.h>
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 #define __USE_GNU
 #include <dlfcn.h>
 #undef __USE_GNU
@@ -41,7 +41,7 @@
 #include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 static int (*cthreads_test_real_pthread_cond_init)(pthread_cond_t *, const pthread_condattr_t *) = NULL;
 static int (*cthreads_test_real_pthread_cond_destroy)(pthread_cond_t *)                          = NULL;
@@ -55,9 +55,9 @@ int cthreads_test_pthread_cond_broadcast_attempts_before_fail                   
 int cthreads_test_pthread_cond_signal_attempts_before_fail                                       = -1;
 int cthreads_test_pthread_cond_wait_attempts_before_fail                                         = -1;
 
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 /* Custom pthread_cond_init for testing error cases
  * Returns 0 if successful or an error value otherwise
@@ -213,7 +213,7 @@ int pthread_cond_wait(
 	return( result );
 }
 
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 /* Tests the libcthreads_condition_initialize function
  * Returns 1 if successful or 0 if not
@@ -393,7 +393,7 @@ int cthreads_test_condition_initialize(
 	}
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Test libcthreads_condition_initialize with pthread_cond_init failing
 	 */
@@ -432,7 +432,7 @@ int cthreads_test_condition_initialize(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	return( 1 );
 
@@ -460,7 +460,7 @@ int cthreads_test_condition_free(
 	libcerror_error_t *error           = NULL;
 	int result                         = 0;
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 	libcthreads_condition_t *condition = NULL;
 #endif
 
@@ -482,7 +482,7 @@ int cthreads_test_condition_free(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Initialize test
 	 */
@@ -536,7 +536,7 @@ int cthreads_test_condition_free(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	return( 1 );
 
@@ -546,7 +546,7 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 	if( condition != NULL )
 	{
 		libcthreads_condition_free(
@@ -615,7 +615,7 @@ int cthreads_test_condition_broadcast(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Test libcthreads_condition_broadcast with pthread_cond_broadcast failing
 	 */
@@ -643,7 +643,7 @@ int cthreads_test_condition_broadcast(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	/* Clean up
 	 */
@@ -735,7 +735,7 @@ int cthreads_test_condition_signal(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Test libcthreads_condition_signal with pthread_cond_signal failing
 	 */
@@ -763,7 +763,7 @@ int cthreads_test_condition_signal(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	/* Clean up
 	 */
@@ -872,7 +872,7 @@ int cthreads_test_condition_wait(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
 	/* Test libcthreads_condition_wait with pthread_cond_wait failing
 	 */
@@ -901,7 +901,7 @@ int cthreads_test_condition_wait(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 	/* Clean up
 	 */
