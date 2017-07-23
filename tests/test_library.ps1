@@ -1,14 +1,10 @@
 # Tests C library functions and types.
 #
-# Version: 20170115
+# Version: 20170722
 
 $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
-
-$TestPrefix = Split-Path -path ${Pwd}.Path -parent
-$TestPrefix = Split-Path -path ${TestPrefix} -leaf
-$TestPrefix = ${TestPrefix}.Substring(3)
 
 $LibraryTests = "condition error lock mutex queue read_write_lock repeating_thread support thread thread_attributes thread_pool"
 $LibraryTestsWithInput = ""
@@ -20,7 +16,7 @@ Function RunTest
 	param( [string]$TestType )
 
 	$TestDescription = "Testing: ${TestName}"
-	$TestExecutable = "${TestToolDirectory}\${TestPrefix}_test_${TestName}.exe"
+	$TestExecutable = "${TestToolDirectory}\cthreads_test_${TestName}.exe"
 
 	$Output = Invoke-Expression ${TestExecutable}
 	$Result = ${LastExitCode}

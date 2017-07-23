@@ -119,6 +119,7 @@ stamp-h[1-9]
 /include/libcthreads/types.h
 /libcthreads/libcthreads.rc
 /libcthreads/libcthreads_definitions.h
+/tests/*.exe
 /tests/cthreads_test_condition
 /tests/cthreads_test_error
 /tests/cthreads_test_lock
