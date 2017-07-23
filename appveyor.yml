@@ -61,6 +61,7 @@ build_script:
 - cmd: if [%TARGET%]==[mingw] (
     xcopy /q /s C:\projects\libcthreads C:\MinGW\msys\1.0\home\appveyor\ &&
     C:\MinGW\msys\1.0\bin\bash -e -l -c "cd libcthreads" &&
+    C:\MinGW\msys\1.0\bin\bash -e -l -c "wget -o m4/pgk.m4 https://cgit.freedesktop.org/pkg-config/plain/pkg.m4.in && sed 's/@VERSION@/0.29/' -i m4/pgk.m4" &&
     C:\MinGW\msys\1.0\bin\bash -e -l -c "./synclibs.sh && ./autogen.sh" &&
     C:\MinGW\msys\1.0\bin\bash -e -l -c "./runtests.sh" )
 - cmd: if [%TARGET%]==[mingw-w64] (
