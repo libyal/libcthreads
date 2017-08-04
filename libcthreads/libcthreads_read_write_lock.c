@@ -50,7 +50,7 @@ int libcthreads_read_write_lock_initialize(
 	libcthreads_internal_read_write_lock_t *internal_read_write_lock = NULL;
 	static char *function                                            = "libcthreads_read_write_lock_initialize";
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0400 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
 
 #elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
@@ -114,7 +114,7 @@ int libcthreads_read_write_lock_initialize(
 	InitializeSRWLock(
 	 &( internal_read_write_lock->slim_read_write_lock ) );
 
-#elif defined( WINAPI ) && ( WINVER > 0x0500 )
+#elif defined( WINAPI ) && ( WINVER >= 0x0400 )
 	InitializeCriticalSection(
 	 &( internal_read_write_lock->write_critical_section ) );
 
@@ -141,6 +141,10 @@ int libcthreads_read_write_lock_initialize(
 
 		goto on_error;
 	}
+#elif defined( WINAPI )
+
+#error libcthreads_read_write_lock_initialize for Windows earlier than NT4 not implemented
+
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_rwlock_init(
 		          &( internal_read_write_lock->read_write_lock ),
@@ -166,7 +170,7 @@ int libcthreads_read_write_lock_initialize(
 on_error:
 	if( internal_read_write_lock != NULL )
 	{
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0400 ) && ( WINVER < 0x0600 )
 		DeleteCriticalSection(
 		 &( internal_read_write_lock->read_critical_section ) );
 
@@ -190,7 +194,7 @@ int libcthreads_read_write_lock_free(
 	static char *function                                            = "libcthreads_read_write_lock_free";
 	int result                                                       = 1;
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0400 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
 
 #elif defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
@@ -213,7 +217,7 @@ int libcthreads_read_write_lock_free(
 		internal_read_write_lock = (libcthreads_internal_read_write_lock_t *) *read_write_lock;
 		*read_write_lock         = NULL;
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0400 ) && ( WINVER < 0x0600 )
 		if( CloseHandle(
 		     internal_read_write_lock->no_read_event_handle ) == 0 )
 		{
@@ -234,6 +238,10 @@ int libcthreads_read_write_lock_free(
 
 		DeleteCriticalSection(
 		 &( internal_read_write_lock->write_critical_section ) );
+
+#elif defined( WINAPI ) && ( WINVER < 0x0400 )
+
+#error libcthreads_read_write_lock_free for Windows earlier than NT4 not implemented
 
 #elif defined( HAVE_PTHREAD_H )
 		pthread_result = pthread_rwlock_destroy(
@@ -283,7 +291,7 @@ int libcthreads_read_write_lock_grab_for_read(
 	libcthreads_internal_read_write_lock_t *internal_read_write_lock = NULL;
 	static char *function                                            = "libcthreads_read_write_lock_grab_for_read";
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0400 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
 	BOOL result                                                      = 0;
 
@@ -308,7 +316,7 @@ int libcthreads_read_write_lock_grab_for_read(
 	AcquireSRWLockShared(
 	 &( internal_read_write_lock->slim_read_write_lock ) );
 
-#elif defined( WINAPI ) && ( WINVER > 0x0500 )
+#elif defined( WINAPI ) && ( WINVER >= 0x0400 )
 	EnterCriticalSection(
 	 &( internal_read_write_lock->write_critical_section ) );
 
@@ -351,6 +359,9 @@ int libcthreads_read_write_lock_grab_for_read(
 
 		return( -1 );
 	}
+#elif defined( WINAPI )
+
+#error libcthreads_read_write_lock_grab_for_read for Windows earlier than NT4 not implemented
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_rwlock_rdlock(
@@ -382,7 +393,7 @@ int libcthreads_read_write_lock_grab_for_write(
 	libcthreads_internal_read_write_lock_t *internal_read_write_lock = NULL;
 	static char *function                                            = "libcthreads_read_write_lock_grab_for_write";
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0400 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
 	DWORD wait_status                                                = 0;
 
@@ -407,7 +418,7 @@ int libcthreads_read_write_lock_grab_for_write(
 	AcquireSRWLockExclusive(
 	 &( internal_read_write_lock->slim_read_write_lock ) );
 
-#elif defined( WINAPI ) && ( WINVER > 0x0500 )
+#elif defined( WINAPI ) && ( WINVER >= 0x0400 )
 	EnterCriticalSection(
 	 &( internal_read_write_lock->write_critical_section ) );
 
@@ -432,6 +443,9 @@ int libcthreads_read_write_lock_grab_for_write(
 
 		return( -1 );
 	}
+#elif defined( WINAPI )
+
+#error libcthreads_read_write_lock_grab_for_write for Windows earlier than NT4 not implemented
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_rwlock_wrlock(
@@ -463,7 +477,7 @@ int libcthreads_read_write_lock_release_for_read(
 	libcthreads_internal_read_write_lock_t *internal_read_write_lock = NULL;
 	static char *function                                            = "libcthreads_read_write_lock_release_for_read";
 
-#if defined( WINAPI ) && ( WINVER > 0x0500 ) && ( WINVER < 0x0600 )
+#if defined( WINAPI ) && ( WINVER >= 0x0400 ) && ( WINVER < 0x0600 )
 	DWORD error_code                                                 = 0;
 	BOOL result                                                      = 0;
 
@@ -488,7 +502,7 @@ int libcthreads_read_write_lock_release_for_read(
 	ReleaseSRWLockShared(
 	 &( internal_read_write_lock->slim_read_write_lock ) );
 
-#elif defined( WINAPI ) && ( WINVER > 0x0500 )
+#elif defined( WINAPI ) && ( WINVER >= 0x0400 )
 	EnterCriticalSection(
 	 &( internal_read_write_lock->read_critical_section ) );
 
@@ -525,6 +539,9 @@ int libcthreads_read_write_lock_release_for_read(
 
 		return( -1 );
 	}
+#elif defined( WINAPI )
+
+#error libcthreads_read_write_lock_release_for_read for Windows earlier than NT4 not implemented
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_rwlock_unlock(
@@ -577,9 +594,13 @@ int libcthreads_read_write_lock_release_for_write(
 	ReleaseSRWLockExclusive(
 	 &( internal_read_write_lock->slim_read_write_lock ) );
 
-#elif defined( WINAPI ) && ( WINVER > 0x0500 )
+#elif defined( WINAPI ) && ( WINVER >= 0x0400 )
 	LeaveCriticalSection(
 	 &( internal_read_write_lock->write_critical_section ) );
+
+#elif defined( WINAPI )
+
+#error libcthreads_read_write_lock_release_for_write for Windows earlier than NT4 not implemented
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_rwlock_unlock(

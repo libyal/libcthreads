@@ -52,7 +52,7 @@ struct libcthreads_internal_read_write_lock
 	 */
 	SRWLOCK slim_read_write_lock;
 
-#elif defined( WINAPI ) && ( WINVER > 0x0500 )
+#elif defined( WINAPI )
 	/* The read critical section
 	 */
 	CRITICAL_SECTION read_critical_section;
@@ -68,11 +68,6 @@ struct libcthreads_internal_read_write_lock
 	/* The no read event handle
 	 */
 	HANDLE no_read_event_handle;
-
-#elif defined( WINAPI )
-
-/* TODO */
-#error WINAPI read/write lock for Windows 2000 or earlier NOT implemented yet
 
 #elif defined( HAVE_PTHREAD_H )
 	/* The read/write lock
