@@ -1,7 +1,7 @@
 #!/bin/sh
 # Script to generate ./configure using the autotools
 #
-# Version: 20170723
+# Version: 20170724
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
