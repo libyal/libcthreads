@@ -242,13 +242,13 @@ int cthreads_test_condition_initialize(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "condition",
-         condition );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "condition",
+	 condition );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libcthreads_condition_free(
 	          &condition,
@@ -259,13 +259,13 @@ int cthreads_test_condition_initialize(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "condition",
-         condition );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "condition",
+	 condition );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -278,9 +278,9 @@ int cthreads_test_condition_initialize(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -296,9 +296,9 @@ int cthreads_test_condition_initialize(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -475,9 +475,9 @@ int cthreads_test_condition_free(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -495,9 +495,9 @@ int cthreads_test_condition_free(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test libcthreads_condition_free with pthread_cond_destroy failing
 	 */
@@ -578,9 +578,9 @@ int cthreads_test_condition_broadcast(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test broadcast
 	 */
@@ -593,9 +593,9 @@ int cthreads_test_condition_broadcast(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -608,9 +608,9 @@ int cthreads_test_condition_broadcast(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -656,9 +656,9 @@ int cthreads_test_condition_broadcast(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
@@ -698,9 +698,9 @@ int cthreads_test_condition_signal(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test signal
 	 */
@@ -713,9 +713,9 @@ int cthreads_test_condition_signal(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -728,9 +728,9 @@ int cthreads_test_condition_signal(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -776,9 +776,9 @@ int cthreads_test_condition_signal(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
@@ -819,9 +819,9 @@ int cthreads_test_condition_wait(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libcthreads_mutex_initialize(
 	          &mutex,
@@ -832,9 +832,9 @@ int cthreads_test_condition_wait(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -848,9 +848,9 @@ int cthreads_test_condition_wait(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -865,9 +865,9 @@ int cthreads_test_condition_wait(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -914,9 +914,9 @@ int cthreads_test_condition_wait(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libcthreads_condition_free(
 	          &condition,
@@ -927,9 +927,9 @@ int cthreads_test_condition_wait(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 

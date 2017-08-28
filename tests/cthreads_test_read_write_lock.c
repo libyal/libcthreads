@@ -329,13 +329,13 @@ int cthreads_test_read_write_lock_initialize(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "read_write_lock",
-         read_write_lock );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "read_write_lock",
+	 read_write_lock );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libcthreads_read_write_lock_free(
 	          &read_write_lock,
@@ -346,13 +346,13 @@ int cthreads_test_read_write_lock_initialize(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "read_write_lock",
-         read_write_lock );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "read_write_lock",
+	 read_write_lock );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -365,9 +365,9 @@ int cthreads_test_read_write_lock_initialize(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -383,9 +383,9 @@ int cthreads_test_read_write_lock_initialize(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -562,9 +562,9 @@ int cthreads_test_read_write_lock_free(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -582,9 +582,9 @@ int cthreads_test_read_write_lock_free(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test libcthreads_read_write_lock_free with pthread_rwlock_destroy failing
 	 */
@@ -666,9 +666,9 @@ int cthreads_test_read_write_lock_grab_for_read(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -706,9 +706,9 @@ int cthreads_test_read_write_lock_grab_for_write(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test grab
 	 */
@@ -721,9 +721,9 @@ int cthreads_test_read_write_lock_grab_for_write(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Initialize test
 	 */
@@ -739,9 +739,9 @@ int cthreads_test_read_write_lock_grab_for_write(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libcthreads_thread_create(
 	          &thread2,
@@ -755,9 +755,9 @@ int cthreads_test_read_write_lock_grab_for_write(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	cthreads_test_locked_value = 46;
 
@@ -772,9 +772,9 @@ int cthreads_test_read_write_lock_grab_for_write(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Clean up
 	 */
@@ -787,9 +787,9 @@ int cthreads_test_read_write_lock_grab_for_write(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libcthreads_thread_join(
 	          &thread1,
@@ -800,9 +800,9 @@ int cthreads_test_read_write_lock_grab_for_write(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "cthreads_test_locked_value",
@@ -850,9 +850,9 @@ int cthreads_test_read_write_lock_grab_for_write(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 
 	return( 1 );
@@ -912,9 +912,9 @@ int cthreads_test_read_write_lock_release_for_read(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -927,9 +927,9 @@ int cthreads_test_read_write_lock_release_for_read(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -975,9 +975,9 @@ int cthreads_test_read_write_lock_release_for_read(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
@@ -1017,9 +1017,9 @@ int cthreads_test_read_write_lock_release_for_write(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -1032,9 +1032,9 @@ int cthreads_test_read_write_lock_release_for_write(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -1080,9 +1080,9 @@ int cthreads_test_read_write_lock_release_for_write(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 

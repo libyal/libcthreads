@@ -120,13 +120,13 @@ int cthreads_test_thread_create(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "thread",
-         thread );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "thread",
+	 thread );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libcthreads_thread_join(
 	          &thread,
@@ -137,13 +137,13 @@ int cthreads_test_thread_create(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "thread",
-         thread );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "thread",
+	 thread );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -159,9 +159,9 @@ int cthreads_test_thread_create(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -178,9 +178,9 @@ int cthreads_test_thread_create(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -199,9 +199,9 @@ int cthreads_test_thread_create(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -338,9 +338,9 @@ int cthreads_test_thread_join(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -356,9 +356,9 @@ int cthreads_test_thread_join(
 	 result,
 	 -1 );
 
-        CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -379,9 +379,9 @@ int cthreads_test_thread_join(
 	 result,
 	 1 );
 
-        CTHREADS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test libcthreads_thread_join with pthread_thread_join failing
 	 */
