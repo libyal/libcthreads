@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libcthreads],
- [20170828],
+ [20170903],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -14,9 +14,6 @@ AC_CONFIG_MACRO_DIR([m4])
 
 dnl Check for host type
 AC_CANONICAL_HOST
-
-dnl Check for large file support
-AC_SYS_LARGEFILE
 
 dnl Check for libtool DLL support
 AC_LIBTOOL_WIN32_DLL
@@ -43,6 +40,9 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_VOLATILE
 
+dnl Check for large file support
+AC_SYS_LARGEFILE
+
 dnl Check if WINAPI support should be enabled
 AX_COMMON_CHECK_ENABLE_WINAPI
 
@@ -52,10 +52,10 @@ AX_COMMON_CHECK_ENABLE_WIDE_CHARACTER_TYPE
 dnl Check for type definitions
 AX_TYPES_CHECK_LOCAL
 
-dnl Checks for libraries and library functions
+dnl Check if common headers and functions are available
 AX_COMMON_CHECK_LOCAL
 
-dnl Check for enabling libcerror for cross-platform C error functions
+dnl Check if libcerror or required headers and functions are available
 AX_LIBCERROR_CHECK_ENABLE
 
 dnl Check for library function support
@@ -109,12 +109,7 @@ AC_SUBST(
  [SPEC_DATE],
  [`date +"%a %b %e %Y" 2> /dev/null`])
 
-dnl Set the current working directory for PackageMaker files
-AC_SUBST(
- [PWD],
- [`pwd`])
-
-dnl Have configure make the Makefiles
+dnl Generate Makefiles
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([common/Makefile])
@@ -125,19 +120,19 @@ AC_CONFIG_FILES([po/Makevars])
 AC_CONFIG_FILES([manuals/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([msvscpp/Makefile])
-dnl Have configure make the include files
+dnl Generate header files
 AC_CONFIG_FILES([include/libcthreads.h])
 AC_CONFIG_FILES([include/libcthreads/definitions.h])
 AC_CONFIG_FILES([include/libcthreads/features.h])
 AC_CONFIG_FILES([include/libcthreads/types.h])
 AC_CONFIG_FILES([libcthreads/libcthreads_definitions.h])
-dnl Have configure make distribution specific files
+dnl Generate distribution specific files
 AC_CONFIG_FILES([common/types.h])
 AC_CONFIG_FILES([dpkg/changelog])
 AC_CONFIG_FILES([libcthreads/libcthreads.rc])
 AC_CONFIG_FILES([libcthreads.pc])
 AC_CONFIG_FILES([libcthreads.spec])
-dnl Have configure write its configuration
+dnl Generate a source configuration file
 AC_CONFIG_HEADERS([common/config.h])
 
 AC_OUTPUT
