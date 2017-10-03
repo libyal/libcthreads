@@ -5,13 +5,13 @@ Summary: Library to support cross-platform C threads functions
 Group: System Environment/Libraries
 License: LGPL
 Source: %{name}-%{version}.tar.gz
-URL: https://github.com/libyal/libcthreads/
+URL: https://github.com/libyal/libcthreads
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 @libcthreads_spec_requires@ @ax_libcerror_spec_requires@
 @libcthreads_spec_build_requires@ @ax_libcerror_spec_build_requires@
 
 %description
-libcthreads is a library to support cross-platform C threads functions
+Library to support cross-platform C threads functions
 
 %package devel
 Summary: Header files and libraries for developing applications for libcthreads
