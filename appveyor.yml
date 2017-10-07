@@ -35,7 +35,7 @@ environment:
   - TARGET: mingw-w64
 
 install:
-- cmd: git clone https://github.com/codecov/codecov-bash ..\codecov-bash
+- cmd: git clone https://github.com/codecov/codecov-bash.git ..\codecov-bash
 - cmd: git clone https://github.com/libyal/vstools.git ..\vstools
 
 build_script:
@@ -102,6 +102,6 @@ test_script:
 
 after_test:
 - cmd: if [%TARGET%]==[mingw] (
-    xcopy /i /q /s C:\projects\codecov-bash\codecov C:\MinGW\msys\1.0\home\appveyor\libcthreads\codecov.sh &&
-    C:\MinGW\msys\1.0\bin\bash -e -l -c "cd libthreads && chmod a+x ./codecov.sh && ./codecov.sh" )
+    copy C:\projects\codecov-bash\codecov C:\MinGW\msys\1.0\home\appveyor\libcthreads\codecov.sh &&
+    C:\MinGW\msys\1.0\bin\bash -e -l -c "cd libcthreads && chmod a+x ./codecov.sh && ./codecov.sh" )
 
