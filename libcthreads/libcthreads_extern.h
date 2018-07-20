@@ -37,8 +37,11 @@
 
 #include <libcthreads/extern.h>
 
+#define LIBCTHREADS_EXTERN_VARIABLE	LIBCTHREADS_EXTERN
+
 #else
-#define LIBCTHREADS_EXTERN	/* extern */
+#define LIBCTHREADS_EXTERN		/* extern */
+#define LIBCTHREADS_EXTERN_VARIABLE	extern
 
 #endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) */
 
