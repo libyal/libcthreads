@@ -378,6 +378,8 @@ int cthreads_test_lock_initialize(
 	          &lock,
 	          &error );
 
+	lock = NULL;
+
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -389,8 +391,6 @@ int cthreads_test_lock_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	lock = NULL;
 
 #if defined( HAVE_CTHREADS_TEST_MEMORY )
 
@@ -670,7 +670,7 @@ int cthreads_test_lock_grab(
 	 "error",
 	 error );
 
-	/* Test grab
+	/* Test regular cases
 	 */
 	result = libcthreads_lock_grab(
 	          cthreads_test_lock,

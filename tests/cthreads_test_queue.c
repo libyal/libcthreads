@@ -34,6 +34,8 @@
 #include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
+#include "../libcthreads/libcthreads_queue.h"
+
 libcthreads_queue_t *cthreads_test_queue = NULL;
 int cthreads_test_expected_queued_value  = 0;
 int cthreads_test_queued_value           = 0;
@@ -141,11 +143,17 @@ on_error:
 int cthreads_test_queue_initialize(
      void )
 {
-	libcerror_error_t *error   = NULL;
-	libcthreads_queue_t *queue = NULL;
-	int result                 = 0;
+	libcerror_error_t *error        = NULL;
+	libcthreads_queue_t *queue      = NULL;
+	int result                      = 0;
 
-	/* Test libcthreads_queue_initialize
+#if defined( HAVE_CTHREADS_TEST_MEMORY )
+	int number_of_malloc_fail_tests = 5;
+	int number_of_memset_fail_tests = 2;
+	int test_number                 = 0;
+#endif
+
+	/* Test regular cases
 	 */
 	result = libcthreads_queue_initialize(
 	          &queue,
@@ -243,6 +251,8 @@ int cthreads_test_queue_initialize(
 	          0,
 	          &error );
 
+	queue = NULL;
+
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -255,161 +265,95 @@ int cthreads_test_queue_initialize(
 	libcerror_error_free(
 	 &error );
 
-	queue = NULL;
-
 #if defined( HAVE_CTHREADS_TEST_MEMORY )
 
-	/* Test libcthreads_queue_initialize with malloc failing
-	 */
-	cthreads_test_malloc_attempts_before_fail = 0;
-
-	result = libcthreads_queue_initialize(
-	          &queue,
-	          0,
-	          &error );
-
-	if( cthreads_test_malloc_attempts_before_fail != -1 )
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
 	{
-		cthreads_test_malloc_attempts_before_fail = -1;
+		/* Test libcthreads_queue_initialize with malloc failing
+		 */
+		cthreads_test_malloc_attempts_before_fail = test_number;
 
-		if( queue != NULL )
+		result = libcthreads_queue_initialize(
+		          &queue,
+		          0,
+		          &error );
+
+		if( cthreads_test_malloc_attempts_before_fail != -1 )
 		{
-			libcthreads_queue_free(
-			 &queue,
-			 NULL,
-			 NULL );
+			cthreads_test_malloc_attempts_before_fail = -1;
+
+			if( queue != NULL )
+			{
+				libcthreads_queue_free(
+				 &queue,
+				 NULL,
+				 NULL );
+			}
+		}
+		else
+		{
+			CTHREADS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			CTHREADS_TEST_ASSERT_IS_NULL(
+			 "queue",
+			 queue );
+
+			CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
 	}
-	else
+	for( test_number = 0;
+	     test_number < number_of_memset_fail_tests;
+	     test_number++ )
 	{
-		CTHREADS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		/* Test libcthreads_queue_initialize with memset failing
+		 */
+		cthreads_test_memset_attempts_before_fail = test_number;
 
-		CTHREADS_TEST_ASSERT_IS_NULL(
-		 "queue",
-		 queue );
+		result = libcthreads_queue_initialize(
+		          &queue,
+		          0,
+		          &error );
 
-		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	cthreads_test_malloc_attempts_before_fail = 1;
-
-	result = libcthreads_queue_initialize(
-	          &queue,
-	          0,
-	          &error );
-
-	if( cthreads_test_malloc_attempts_before_fail != -1 )
-	{
-		cthreads_test_malloc_attempts_before_fail = -1;
-
-		if( queue != NULL )
+		if( cthreads_test_memset_attempts_before_fail != -1 )
 		{
-			libcthreads_queue_free(
-			 &queue,
-			 NULL,
-			 NULL );
+			cthreads_test_memset_attempts_before_fail = -1;
+
+			if( queue != NULL )
+			{
+				libcthreads_queue_free(
+				 &queue,
+				 NULL,
+				 NULL );
+			}
 		}
-	}
-	else
-	{
-		CTHREADS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		CTHREADS_TEST_ASSERT_IS_NULL(
-		 "queue",
-		 queue );
-
-		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libcthreads_queue_initialize with memset failing
-	 */
-	cthreads_test_memset_attempts_before_fail = 0;
-
-	result = libcthreads_queue_initialize(
-	          &queue,
-	          0,
-	          &error );
-
-	if( cthreads_test_memset_attempts_before_fail != -1 )
-	{
-		cthreads_test_memset_attempts_before_fail = -1;
-
-		if( queue != NULL )
+		else
 		{
-			libcthreads_queue_free(
-			 &queue,
-			 NULL,
-			 NULL );
+			CTHREADS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			CTHREADS_TEST_ASSERT_IS_NULL(
+			 "queue",
+			 queue );
+
+			CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
-	}
-	else
-	{
-		CTHREADS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		CTHREADS_TEST_ASSERT_IS_NULL(
-		 "queue",
-		 queue );
-
-		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	cthreads_test_memset_attempts_before_fail = 1;
-
-	result = libcthreads_queue_initialize(
-	          &queue,
-	          0,
-	          &error );
-
-	if( cthreads_test_memset_attempts_before_fail != -1 )
-	{
-		cthreads_test_memset_attempts_before_fail = -1;
-
-		if( queue != NULL )
-		{
-			libcthreads_queue_free(
-			 &queue,
-			 NULL,
-			 NULL );
-		}
-	}
-	else
-	{
-		CTHREADS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		CTHREADS_TEST_ASSERT_IS_NULL(
-		 "queue",
-		 queue );
-
-		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
 	}
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
@@ -476,8 +420,45 @@ on_error:
 int cthreads_test_queue_empty(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error   = NULL;
+	libcthreads_queue_t *queue = NULL;
+	intptr_t **values_array    = NULL;
+	int result                 = 0;
+
+	/* Initialize test
+	 */
+	result = libcthreads_queue_initialize(
+	          &queue,
+	          10,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "queue",
+	 queue );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libcthreads_queue_empty(
+	          queue,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -497,6 +478,44 @@ int cthreads_test_queue_empty(
 	libcerror_error_free(
 	 &error );
 
+	values_array = ( (libcthreads_internal_queue_t *) queue )->values_array;
+
+	( (libcthreads_internal_queue_t *) queue )->values_array = NULL;
+
+	result = libcthreads_queue_empty(
+	          queue,
+	          &error );
+
+	( (libcthreads_internal_queue_t *) queue )->values_array = values_array;
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libcthreads_queue_free(
+	          &queue,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:
@@ -504,6 +523,13 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( queue != NULL )
+	{
+		libcthreads_queue_free(
+		 &queue,
+		 NULL,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -514,13 +540,111 @@ on_error:
 int cthreads_test_queue_try_pop(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error   = NULL;
+	libcthreads_queue_t *queue = NULL;
+	intptr_t *value            = NULL;
+	intptr_t **values_array    = NULL;
+	int queued_value           = 1;
+	int result                 = 0;
+
+	/* Initialize test
+	 */
+	result = libcthreads_queue_initialize(
+	          &queue,
+	          10,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "queue",
+	 queue );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libcthreads_queue_try_pop(
+	          queue,
+	          &value,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "value",
+	 value );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
 	result = libcthreads_queue_try_pop(
 	          NULL,
+	          &value,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	values_array = ( (libcthreads_internal_queue_t *) queue )->values_array;
+
+	( (libcthreads_internal_queue_t *) queue )->values_array = NULL;
+
+	result = libcthreads_queue_try_pop(
+	          queue,
+	          &value,
+	          &error );
+
+	( (libcthreads_internal_queue_t *) queue )->values_array = values_array;
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcthreads_queue_try_pop(
+	          queue,
 	          NULL,
 	          &error );
 
@@ -536,6 +660,22 @@ int cthreads_test_queue_try_pop(
 	libcerror_error_free(
 	 &error );
 
+	/* Clean up
+	 */
+	result = libcthreads_queue_free(
+	          &queue,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:
@@ -543,6 +683,13 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( queue != NULL )
+	{
+		libcthreads_queue_free(
+		 &queue,
+		 NULL,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -553,13 +700,111 @@ on_error:
 int cthreads_test_queue_pop(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error   = NULL;
+	libcthreads_queue_t *queue = NULL;
+	intptr_t *value            = NULL;
+	intptr_t **values_array    = NULL;
+	int queued_value           = 1;
+	int result                 = 0;
+
+	/* Initialize test
+	 */
+	result = libcthreads_queue_initialize(
+	          &queue,
+	          10,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "queue",
+	 queue );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libcthreads_queue_pop(
+	          queue,
+	          &value,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "value",
+	 value );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
 	result = libcthreads_queue_pop(
 	          NULL,
+	          &value,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	values_array = ( (libcthreads_internal_queue_t *) queue )->values_array;
+
+	( (libcthreads_internal_queue_t *) queue )->values_array = NULL;
+
+	result = libcthreads_queue_pop(
+	          queue,
+	          &value,
+	          &error );
+
+	( (libcthreads_internal_queue_t *) queue )->values_array = values_array;
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcthreads_queue_pop(
+	          queue,
 	          NULL,
 	          &error );
 
@@ -575,6 +820,22 @@ int cthreads_test_queue_pop(
 	libcerror_error_free(
 	 &error );
 
+	/* Clean up
+	 */
+	result = libcthreads_queue_free(
+	          &queue,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:
@@ -583,13 +844,302 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+	if( queue != NULL )
+	{
+		libcthreads_queue_free(
+		 &queue,
+		 NULL,
+		 NULL );
+	}
 	return( 0 );
 }
 
-/* Tests the libcthreads_push function
+/* Tests the libcthreads_queue_try_push function
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_queue_try_push(
+     void )
+{
+	libcerror_error_t *error   = NULL;
+	libcthreads_queue_t *queue = NULL;
+	intptr_t **values_array    = NULL;
+	int queued_value           = 1;
+	int result                 = 0;
+
+	/* Initialize test
+	 */
+	result = libcthreads_queue_initialize(
+	          &queue,
+	          10,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "queue",
+	 queue );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libcthreads_queue_try_push(
+	          queue,
+	          (intptr_t *) &queued_value,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libcthreads_queue_try_push(
+	          NULL,
+	          (intptr_t *) &queued_value,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	values_array = ( (libcthreads_internal_queue_t *) queue )->values_array;
+
+	( (libcthreads_internal_queue_t *) queue )->values_array = NULL;
+
+	result = libcthreads_queue_try_push(
+	          queue,
+	          (intptr_t *) &queued_value,
+	          &error );
+
+	( (libcthreads_internal_queue_t *) queue )->values_array = values_array;
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcthreads_queue_try_push(
+	          queue,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libcthreads_queue_free(
+	          &queue,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( queue != NULL )
+	{
+		libcthreads_queue_free(
+		 &queue,
+		 NULL,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libcthreads_queue_push function
  * Returns 1 if successful or 0 if not
  */
 int cthreads_test_queue_push(
+     void )
+{
+	libcerror_error_t *error   = NULL;
+	libcthreads_queue_t *queue = NULL;
+	intptr_t **values_array    = NULL;
+	int queued_value           = 1;
+	int result                 = 0;
+
+	/* Initialize test
+	 */
+	result = libcthreads_queue_initialize(
+	          &queue,
+	          10,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "queue",
+	 queue );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libcthreads_queue_push(
+	          NULL,
+	          (intptr_t *) &queued_value,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	values_array = ( (libcthreads_internal_queue_t *) queue )->values_array;
+
+	( (libcthreads_internal_queue_t *) queue )->values_array = NULL;
+
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value,
+	          &error );
+
+	( (libcthreads_internal_queue_t *) queue )->values_array = values_array;
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libcthreads_queue_push(
+	          queue,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libcthreads_queue_free(
+	          &queue,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( queue != NULL )
+	{
+		libcthreads_queue_free(
+		 &queue,
+		 NULL,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libcthreads_queue_push and libcthreads_queue_pop functions in separate threads
+ * Returns 1 if successful or 0 if not
+ */
+int cthreads_test_queue_push_pop_threaded(
      void )
 {
 	libcerror_error_t *error          = NULL;
@@ -835,8 +1385,16 @@ int main(
 	 cthreads_test_queue_pop );
 
 	CTHREADS_TEST_RUN(
+	 "libcthreads_queue_try_push",
+	 cthreads_test_queue_try_push );
+
+	CTHREADS_TEST_RUN(
 	 "libcthreads_queue_push",
 	 cthreads_test_queue_push );
+
+	CTHREADS_TEST_RUN(
+	 "cthreads_test_queue_push_pop_threaded",
+	 cthreads_test_queue_push_pop_threaded );
 
 	return( EXIT_SUCCESS );
 

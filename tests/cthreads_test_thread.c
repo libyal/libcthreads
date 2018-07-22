@@ -194,6 +194,8 @@ int cthreads_test_thread_create(
 	          NULL,
 	          &error );
 
+	thread = NULL;
+
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -205,8 +207,6 @@ int cthreads_test_thread_create(
 
 	libcerror_error_free(
 	 &error );
-
-	thread = NULL;
 
 #if defined( HAVE_CTHREADS_TEST_MEMORY )
 

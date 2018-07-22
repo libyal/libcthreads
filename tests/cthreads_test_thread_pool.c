@@ -196,6 +196,8 @@ int cthreads_test_thread_pool_create(
 	          NULL,
 	          &error );
 
+	thread_pool = NULL;
+
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -207,8 +209,6 @@ int cthreads_test_thread_pool_create(
 
 	libcerror_error_free(
 	 &error );
-
-	thread_pool = NULL;
 
 #if defined( HAVE_CTHREADS_TEST_MEMORY )
 #if defined( OPTIMIZATION_DISABLED )

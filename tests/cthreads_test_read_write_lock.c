@@ -378,6 +378,8 @@ int cthreads_test_read_write_lock_initialize(
 	          &read_write_lock,
 	          &error );
 
+	read_write_lock = NULL;
+
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -389,8 +391,6 @@ int cthreads_test_read_write_lock_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	read_write_lock = NULL;
 
 #if defined( HAVE_CTHREADS_TEST_MEMORY )
 

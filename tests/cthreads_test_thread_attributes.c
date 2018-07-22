@@ -109,6 +109,8 @@ int cthreads_test_thread_attributes_initialize(
 	          &thread_attributes,
 	          &error );
 
+	thread_attributes = NULL;
+
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -120,8 +122,6 @@ int cthreads_test_thread_attributes_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	thread_attributes = NULL;
 
 #if defined( HAVE_CTHREADS_TEST_MEMORY )
 

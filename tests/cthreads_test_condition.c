@@ -291,6 +291,8 @@ int cthreads_test_condition_initialize(
 	          &condition,
 	          &error );
 
+	condition = NULL;
+
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -302,8 +304,6 @@ int cthreads_test_condition_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	condition = NULL;
 
 #if defined( HAVE_CTHREADS_TEST_MEMORY )
 
@@ -582,7 +582,7 @@ int cthreads_test_condition_broadcast(
 	 "error",
 	 error );
 
-	/* Test broadcast
+	/* Test regular cases
 	 */
 	result = libcthreads_condition_broadcast(
 	          condition,
@@ -702,7 +702,7 @@ int cthreads_test_condition_signal(
 	 "error",
 	 error );
 
-	/* Test signal
+	/* Test regular cases
 	 */
 	result = libcthreads_condition_signal(
 	          condition,
