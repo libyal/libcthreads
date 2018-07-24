@@ -774,18 +774,33 @@ int libcthreads_thread_pool_create(
 				  &libcthreads_thread_pool_callback_function_helper,
 				  (void *) internal_thread_pool );
 
-		if( pthread_result != 0 )
+		switch( pthread_result )
 		{
-			libcerror_system_set_error(
-			 error,
-			 pthread_result,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create thread: %d.",
-			 function,
-			 thread_index );
+			case 0:
+				break;
 
-			goto on_error;
+			case EAGAIN:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to create thread: %d with error: Insufficient resources.",
+				 function,
+				 thread_index );
+
+				goto on_error;
+
+			default:
+				libcerror_system_set_error(
+				 error,
+				 pthread_result,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to create thread: %d.",
+				 function,
+				 thread_index );
+
+				goto on_error;
 		}
 	}
 #endif /* defined( WINAPI ) && ( WINVER >= 0x0602 ) */
@@ -1599,8 +1614,9 @@ int libcthreads_thread_pool_join(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to join thread with error: Deadlock condition detected.",
-			 function );
+			 "%s: unable to join thread: %d with error: Deadlock condition detected.",
+			 function,
+			 thread_index );
 
 			result = -1;
 		}

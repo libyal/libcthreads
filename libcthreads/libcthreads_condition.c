@@ -165,17 +165,31 @@ int libcthreads_condition_initialize(
 		          &( internal_condition->condition ),
 	                  NULL );
 
-	if( pthread_result != 0 )
+	switch( pthread_result )
 	{
-		libcerror_system_set_error(
-		 error,
-		 pthread_result,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize condition.",
-		 function );
+		case 0:
+			break;
 
-		goto on_error;
+		case EAGAIN:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to initialize condition with error: Insufficient resources.",
+			 function );
+
+			goto on_error;
+
+		default:
+			libcerror_system_set_error(
+			 error,
+			 pthread_result,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to initialize condition.",
+			 function );
+
+			goto on_error;
 	}
 #endif
 	*condition = (libcthreads_condition_t *) internal_condition;
@@ -277,6 +291,17 @@ int libcthreads_condition_free(
 		switch( pthread_result )
 		{
 			case 0:
+				break;
+
+			case EAGAIN:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to destroy condition with error: Insufficient resources.",
+				 function );
+
+				result = -1;
 				break;
 
 			case EBUSY:

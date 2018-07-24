@@ -150,17 +150,31 @@ int libcthreads_read_write_lock_initialize(
 		          &( internal_read_write_lock->read_write_lock ),
 	                  NULL );
 
-	if( pthread_result != 0 )
+	switch( pthread_result )
 	{
-		libcerror_system_set_error(
-		 error,
-		 pthread_result,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize read/write lock.",
-		 function );
+		case 0:
+			break;
 
-		goto on_error;
+		case EAGAIN:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to initialize read/write lock with error: Insufficient resources.",
+			 function );
+
+			goto on_error;
+
+		default:
+			libcerror_system_set_error(
+			 error,
+			 pthread_result,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to initialize read/write lock.",
+			 function );
+
+			goto on_error;
 	}
 #endif
 	*read_write_lock = (libcthreads_read_write_lock_t *) internal_read_write_lock;
@@ -250,6 +264,17 @@ int libcthreads_read_write_lock_free(
 		switch( pthread_result )
 		{
 			case 0:
+				break;
+
+			case EAGAIN:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to destroy read/write lock with error: Insufficient resources.",
+				 function );
+
+				result = -1;
 				break;
 
 			case EBUSY:
@@ -372,6 +397,16 @@ int libcthreads_read_write_lock_grab_for_read(
 	{
 		case 0:
 			break;
+
+		case EAGAIN:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to lock read/write lock for read with error: Maximum number of locks exceeded.",
+			 function );
+
+			return( -1 );
 
 		case EDEADLK:
 			libcerror_error_set(
