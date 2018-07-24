@@ -23,6 +23,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <errno.h>
+
 #if defined( WINAPI ) && ( WINVER >= 0x0602 )
 #include <Processthreadsapi.h>
 #include <Synchapi.h>
@@ -544,7 +546,18 @@ int libcthreads_repeating_thread_join(
 	                  internal_repeating_thread->thread,
 	                  (void **) &thread_return_value );
 
-	if( pthread_result != 0 )
+	if( pthread_result == EDEADLK )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to join thread with error: Deadlock condition detected.",
+		 function );
+
+		result = -1;
+	}
+	else if( pthread_result != 0 )
 	{
 		libcerror_system_set_error(
 		 error,

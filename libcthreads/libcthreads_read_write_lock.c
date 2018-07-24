@@ -247,32 +247,33 @@ int libcthreads_read_write_lock_free(
 		pthread_result = pthread_rwlock_destroy(
 		                  &( internal_read_write_lock->read_write_lock ) );
 
-		if( pthread_result != 0 )
+		switch( pthread_result )
 		{
-			switch( pthread_result )
-			{
-				case EBUSY:
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to destroy read/write lock with error: Resource busy.",
-					 function );
+			case 0:
+				break;
 
-					break;
+			case EBUSY:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to destroy read/write lock with error: Resource busy.",
+				 function );
 
-				default:
-					libcerror_system_set_error(
-					 error,
-					 pthread_result,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to destroy read/write lock.",
-					 function );
+				result = -1;
+				break;
 
-					break;
-			}
-			result = -1;
+			default:
+				libcerror_system_set_error(
+				 error,
+				 pthread_result,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to destroy read/write lock.",
+				 function );
+
+				result = -1;
+				break;
 		}
 #endif
 		memory_free(
@@ -367,17 +368,31 @@ int libcthreads_read_write_lock_grab_for_read(
 	pthread_result = pthread_rwlock_rdlock(
 	                  &( internal_read_write_lock->read_write_lock ) );
 
-	if( pthread_result != 0 )
+	switch( pthread_result )
 	{
-		libcerror_system_set_error(
-		 error,
-		 pthread_result,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to lock read/write lock for read.",
-		 function );
+		case 0:
+			break;
 
-		return( -1 );
+		case EDEADLK:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to lock read/write lock for read with error: Deadlock condition detected.",
+			 function );
+
+			return( -1 );
+
+		default:
+			libcerror_system_set_error(
+			 error,
+			 pthread_result,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to lock read/write lock for read.",
+			 function );
+
+			return( -1 );
 	}
 #endif
 	return( 1 );
@@ -451,17 +466,31 @@ int libcthreads_read_write_lock_grab_for_write(
 	pthread_result = pthread_rwlock_wrlock(
 	                  &( internal_read_write_lock->read_write_lock ) );
 
-	if( pthread_result != 0 )
+	switch( pthread_result )
 	{
-		libcerror_system_set_error(
-		 error,
-		 pthread_result,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to lock read/write lock for write.",
-		 function );
+		case 0:
+			break;
 
-		return( -1 );
+		case EDEADLK:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to lock read/write lock for write with error: Deadlock condition detected.",
+			 function );
+
+			return( -1 );
+
+		default:
+			libcerror_system_set_error(
+			 error,
+			 pthread_result,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to lock read/write lock for write.",
+			 function );
+
+			return( -1 );
 	}
 #endif
 	return( 1 );

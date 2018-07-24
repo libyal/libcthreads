@@ -274,32 +274,33 @@ int libcthreads_condition_free(
 		pthread_result = pthread_cond_destroy(
 		                  &( internal_condition->condition ) );
 
-		if( pthread_result != 0 )
+		switch( pthread_result )
 		{
-			switch( pthread_result )
-			{
-				case EBUSY:
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to destroy condition with error: Resource busy.",
-					 function );
+			case 0:
+				break;
 
-					break;
+			case EBUSY:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to destroy condition with error: Resource busy.",
+				 function );
 
-				default:
-					libcerror_system_set_error(
-					 error,
-					 pthread_result,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to destroy condition.",
-					 function );
+				result = -1;
+				break;
 
-					break;
-			}
-			result = -1;
+			default:
+				libcerror_system_set_error(
+				 error,
+				 pthread_result,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to destroy condition.",
+				 function );
+
+				result = -1;
+				break;
 		}
 #endif
 		memory_free(
