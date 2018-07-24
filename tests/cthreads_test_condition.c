@@ -55,6 +55,9 @@ int cthreads_test_pthread_cond_broadcast_attempts_before_fail                   
 int cthreads_test_pthread_cond_signal_attempts_before_fail                                       = -1;
 int cthreads_test_pthread_cond_wait_attempts_before_fail                                         = -1;
 
+int cthreads_test_real_pthread_cond_init_function_return_value                                   = EBUSY;
+int cthreads_test_real_pthread_cond_destroy_function_return_value                                = EBUSY;
+
 #endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 #if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
@@ -78,7 +81,7 @@ int pthread_cond_init(
 	{
 		cthreads_test_pthread_cond_init_attempts_before_fail = -1;
 
-		return( EBUSY );
+		return( cthreads_test_real_pthread_cond_init_function_return_value );
 	}
 	else if( cthreads_test_pthread_cond_init_attempts_before_fail > 0 )
 	{
@@ -109,7 +112,7 @@ int pthread_cond_destroy(
 	{
 		cthreads_test_pthread_cond_destroy_attempts_before_fail = -1;
 
-		return( EBUSY );
+		return( cthreads_test_real_pthread_cond_destroy_function_return_value );
 	}
 	else if( cthreads_test_pthread_cond_destroy_attempts_before_fail > 0 )
 	{
@@ -395,9 +398,86 @@ int cthreads_test_condition_initialize(
 
 #if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
-	/* Test libcthreads_condition_initialize with pthread_cond_init failing
+	/* Test libcthreads_condition_initialize with pthread_cond_init returning EAGAIN
 	 */
-	cthreads_test_pthread_cond_init_attempts_before_fail = 0;
+	cthreads_test_pthread_cond_init_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_cond_init_function_return_value = EAGAIN;
+
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	if( cthreads_test_pthread_cond_init_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_init_attempts_before_fail = -1;
+
+		if( condition != NULL )
+		{
+			libcthreads_condition_free(
+			 &condition,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "condition",
+		 condition );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libcthreads_condition_initialize with pthread_cond_init returning EBUSY
+	 */
+	cthreads_test_pthread_cond_init_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_cond_init_function_return_value = EBUSY;
+
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	if( cthreads_test_pthread_cond_init_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_init_attempts_before_fail = -1;
+
+		if( condition != NULL )
+		{
+			libcthreads_condition_free(
+			 &condition,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "condition",
+		 condition );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libcthreads_condition_initialize with pthread_cond_init returning ENOMEM
+	 */
+	cthreads_test_pthread_cond_init_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_cond_init_function_return_value = ENOMEM;
 
 	result = libcthreads_condition_initialize(
 	          &condition,
@@ -499,9 +579,116 @@ int cthreads_test_condition_free(
 	 "error",
 	 error );
 
-	/* Test libcthreads_condition_free with pthread_cond_destroy failing
+	/* Test libcthreads_condition_free with pthread_cond_destroy returning EAGAIN
 	 */
-	cthreads_test_pthread_cond_destroy_attempts_before_fail = 0;
+	cthreads_test_pthread_cond_destroy_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_cond_destroy_function_return_value = EAGAIN;
+
+	result = libcthreads_condition_free(
+	          &condition,
+	          &error );
+
+	if( cthreads_test_pthread_cond_destroy_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_destroy_attempts_before_fail = -1;
+
+		if( condition != NULL )
+		{
+			libcthreads_condition_free(
+			 &condition,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "condition",
+		 condition );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Initialize test
+	 */
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libcthreads_condition_free with pthread_cond_destroy returning EBUSY
+	 */
+	cthreads_test_pthread_cond_destroy_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_cond_destroy_function_return_value = EBUSY;
+
+	result = libcthreads_condition_free(
+	          &condition,
+	          &error );
+
+	if( cthreads_test_pthread_cond_destroy_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_destroy_attempts_before_fail = -1;
+
+		if( condition != NULL )
+		{
+			libcthreads_condition_free(
+			 &condition,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "condition",
+		 condition );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Initialize test
+	 */
+	result = libcthreads_condition_initialize(
+	          &condition,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libcthreads_condition_free with pthread_cond_destroy returning ENOMEM
+	 */
+	cthreads_test_pthread_cond_destroy_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_cond_destroy_function_return_value = ENOMEM;
 
 	result = libcthreads_condition_free(
 	          &condition,

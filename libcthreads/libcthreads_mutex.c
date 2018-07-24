@@ -140,17 +140,31 @@ int libcthreads_mutex_initialize(
 	                  &( internal_mutex->mutex ),
 	                  NULL );
 
-	if( pthread_result != 0 )
+	switch( pthread_result )
 	{
-		libcerror_system_set_error(
-		 error,
-		 pthread_result,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize mutex.",
-		 function );
+		case 0:
+			break;
 
-		goto on_error;
+		case EAGAIN:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to initialize mutex with error: Insufficient resources.",
+			 function );
+
+			goto on_error;
+
+		default:
+			libcerror_system_set_error(
+			 error,
+			 pthread_result,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to initialize mutex.",
+			 function );
+
+			goto on_error;
 	}
 #endif
 	*mutex = (libcthreads_mutex_t *) internal_mutex;
@@ -225,32 +239,44 @@ int libcthreads_mutex_free(
 		pthread_result = pthread_mutex_destroy(
 		                  &( internal_mutex->mutex ) );
 
-		if( pthread_result != 0 )
+		switch( pthread_result )
 		{
-			switch( pthread_result )
-			{
-				case EBUSY:
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to destroy mutex with error: Resource busy.",
-					 function );
+			case 0:
+				break;
 
-					break;
+			case EAGAIN:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to destroy mutex with error: Insufficient resources.",
+				 function );
 
-				default:
-					libcerror_system_set_error(
-					 error,
-					 pthread_result,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to destroy mutex.",
-					 function );
+				result = -1;
+				break;
 
-					break;
-			}
-			result = -1;
+			case EBUSY:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to destroy mutex with error: Resource busy.",
+				 function );
+
+				result = -1;
+				break;
+
+			default:
+				libcerror_system_set_error(
+				 error,
+				 pthread_result,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to destroy mutex.",
+				 function );
+
+				result = -1;
+				break;
 		}
 #endif
 		memory_free(
@@ -318,17 +344,41 @@ int libcthreads_mutex_grab(
 	pthread_result = pthread_mutex_lock(
 	                  &( internal_mutex->mutex ) );
 
-	if( pthread_result != 0 )
+	switch( pthread_result )
 	{
-		libcerror_system_set_error(
-		 error,
-		 pthread_result,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to lock mutex.",
-		 function );
+		case 0:
+			break;
 
-		return( -1 );
+		case EAGAIN:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to lock mutex with error: Maximum number of locks exceeded.",
+			 function );
+
+			return( -1 );
+
+		case EDEADLK:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to lock mutex with error: Deadlock condition detected.",
+			 function );
+
+			return( -1 );
+
+		default:
+			libcerror_system_set_error(
+			 error,
+			 pthread_result,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to lock mutex.",
+			 function );
+
+			return( -1 );
 	}
 #endif
 	return( 1 );
@@ -405,21 +455,45 @@ int libcthreads_mutex_try_grab(
 	pthread_result = pthread_mutex_trylock(
 	                  &( internal_mutex->mutex ) );
 
-	if( pthread_result == EBUSY )
+	switch( pthread_result )
 	{
-		result = 0;
-	}
-	else if( pthread_result != 0 )
-	{
-		libcerror_system_set_error(
-		 error,
-		 pthread_result,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to lock mutex.",
-		 function );
+		case 0:
+			break;
 
-		return( -1 );
+		case EBUSY:
+			result = 0;
+			break;
+
+		case EAGAIN:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to try lock mutex with error: Maximum number of locks exceeded.",
+			 function );
+
+			return( -1 );
+
+		case EDEADLK:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to try lock mutex with error: Deadlock condition detected.",
+			 function );
+
+			return( -1 );
+
+		default:
+			libcerror_system_set_error(
+			 error,
+			 pthread_result,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to try lock mutex.",
+			 function );
+
+			return( -1 );
 	}
 #endif
 	return( result );
@@ -483,17 +557,41 @@ int libcthreads_mutex_release(
 	pthread_result = pthread_mutex_unlock(
 	                  &( internal_mutex->mutex ) );
 
-	if( pthread_result != 0 )
+	switch( pthread_result )
 	{
-		libcerror_system_set_error(
-		 error,
-		 pthread_result,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to unlock mutex.",
-		 function );
+		case 0:
+			break;
 
-		return( -1 );
+		case EAGAIN:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to unlock mutex with error: Maximum number of locks exceeded.",
+			 function );
+
+			return( -1 );
+
+		case EDEADLK:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to unlock mutex with error: Deadlock condition detected.",
+			 function );
+
+			return( -1 );
+
+		default:
+			libcerror_system_set_error(
+			 error,
+			 pthread_result,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to unlock mutex.",
+			 function );
+
+			return( -1 );
 	}
 #endif
 	return( 1 );

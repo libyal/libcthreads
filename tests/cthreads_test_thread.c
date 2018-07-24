@@ -43,13 +43,54 @@
 
 #if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
-static int (*cthreads_test_real_pthread_thread_join)(pthread_t thread, void **retval) = NULL;
+static int (*cthreads_test_real_pthread_thread_create)(pthread_t *, const pthread_attr_t *, void *(*)(void *), void *) = NULL;
+static int (*cthreads_test_real_pthread_thread_join)(pthread_t, void **)                                               = NULL;
 
-int cthreads_test_pthread_thread_join_attempts_before_fail                            = -1;
+int cthreads_test_pthread_thread_create_attempts_before_fail                                                           = -1;
+int cthreads_test_pthread_thread_join_attempts_before_fail                                                             = -1;
+
+int cthreads_test_real_pthread_thread_create_function_return_value                                                     = EBUSY;
+int cthreads_test_real_pthread_thread_join_function_return_value                                                       = EBUSY;
 
 #endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 #if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+
+/* Custom pthread_thread_create for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_thread_create(
+     pthread_t *thread,
+     const pthread_attr_t *attr,
+     void *(*start_routine)(void *),
+     void **arg )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_thread_create == NULL )
+	{
+		cthreads_test_real_pthread_thread_create = dlsym(
+		                                            RTLD_NEXT,
+		                                            "pthread_thread_create" );
+	}
+	if( cthreads_test_pthread_thread_create_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_thread_create_attempts_before_fail = -1;
+
+		return( cthreads_test_real_pthread_thread_create_function_return_value );
+	}
+	else if( cthreads_test_pthread_thread_create_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_thread_create_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_thread_create(
+	          thread,
+	          attr,
+	          start_routine,
+	          arg );
+
+	return( result );
+}
 
 /* Custom pthread_thread_join for testing error cases
  * Returns 0 if successful or an error value otherwise
@@ -68,9 +109,15 @@ int pthread_thread_join(
 	}
 	if( cthreads_test_pthread_thread_join_attempts_before_fail == 0 )
 	{
+		/* Join the thread otherwise it can enter a nondeterministic state
+		 */
+		cthreads_test_real_pthread_thread_join(
+		 thread,
+		 retval );
+
 		cthreads_test_pthread_thread_join_attempts_before_fail = -1;
 
-		return( EBUSY );
+		return( cthreads_test_real_pthread_thread_join_function_return_value );
 	}
 	else if( cthreads_test_pthread_thread_join_attempts_before_fail > 0 )
 	{
@@ -300,6 +347,92 @@ int cthreads_test_thread_create(
 #endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_CTHREADS_TEST_MEMORY ) */
 
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+
+	/* Test libcthreads_thread_create with pthread_thread_create returning EAGAIN
+	 */
+	cthreads_test_pthread_thread_create_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_thread_create_function_return_value = EAGAIN;
+
+	result = libcthreads_thread_create(
+	          &thread,
+	          NULL,
+	          &cthreads_test_thread_callback_function,
+	          NULL,
+	          &error );
+
+	if( cthreads_test_pthread_thread_create_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_thread_create_attempts_before_fail = -1;
+
+		if( thread != NULL )
+		{
+			libcthreads_thread_join(
+			 &thread,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "thread",
+		 thread );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libcthreads_thread_create with pthread_thread_create returning EBUSY
+	 */
+	cthreads_test_pthread_thread_create_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_thread_create_function_return_value = EBUSY;
+
+	result = libcthreads_thread_create(
+	          &thread,
+	          NULL,
+	          &cthreads_test_thread_callback_function,
+	          NULL,
+	          &error );
+
+	if( cthreads_test_pthread_thread_create_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_thread_create_attempts_before_fail = -1;
+
+		if( thread != NULL )
+		{
+			libcthreads_thread_join(
+			 &thread,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "thread",
+		 thread );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
+
 	return( 1 );
 
 on_error:
@@ -383,9 +516,66 @@ int cthreads_test_thread_join(
 	 "error",
 	 error );
 
-	/* Test libcthreads_thread_join with pthread_thread_join failing
+	/* Test libcthreads_thread_join with pthread_thread_join returning EDEADLK
 	 */
-	cthreads_test_pthread_thread_join_attempts_before_fail = 0;
+	cthreads_test_pthread_thread_join_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_thread_join_function_return_value = EDEADLK;
+
+	result = libcthreads_thread_join(
+	          &thread,
+	          &error );
+
+	if( cthreads_test_pthread_thread_join_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_thread_join_attempts_before_fail = -1;
+
+		if( thread != NULL )
+		{
+			libcthreads_thread_join(
+			 &thread,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "thread",
+		 thread );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Initialize test
+	 */
+	result = libcthreads_thread_create(
+	          &thread,
+	          NULL,
+	          &cthreads_test_thread_callback_function,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libcthreads_thread_join with pthread_thread_join returning EBUSY
+	 */
+	cthreads_test_pthread_thread_join_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_thread_join_function_return_value = EBUSY;
 
 	result = libcthreads_thread_join(
 	          &thread,

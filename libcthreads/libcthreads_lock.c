@@ -357,7 +357,7 @@ int libcthreads_lock_release(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to lock mutex with error: Maximum number of locks exceeded.",
+			 "%s: unable to unlock mutex with error: Maximum number of locks exceeded.",
 			 function );
 
 			return( -1 );

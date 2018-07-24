@@ -53,6 +53,11 @@ int cthreads_test_pthread_mutex_destroy_attempts_before_fail                    
 int cthreads_test_pthread_mutex_lock_attempts_before_fail                                           = -1;
 int cthreads_test_pthread_mutex_unlock_attempts_before_fail                                         = -1;
 
+int cthreads_test_real_pthread_mutex_init_function_return_value                                     = EBUSY;
+int cthreads_test_real_pthread_mutex_destroy_function_return_value                                  = EBUSY;
+int cthreads_test_real_pthread_mutex_lock_function_return_value                                     = EBUSY;
+int cthreads_test_real_pthread_mutex_unlock_function_return_value                                   = EBUSY;
+
 #endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
 
 libcthreads_lock_t *cthreads_test_lock = NULL;
@@ -79,7 +84,7 @@ int pthread_mutex_init(
 	{
 		cthreads_test_pthread_mutex_init_attempts_before_fail = -1;
 
-		return( EBUSY );
+		return( cthreads_test_real_pthread_mutex_init_function_return_value );
 	}
 	else if( cthreads_test_pthread_mutex_init_attempts_before_fail > 0 )
 	{
@@ -110,7 +115,7 @@ int pthread_mutex_destroy(
 	{
 		cthreads_test_pthread_mutex_destroy_attempts_before_fail = -1;
 
-		return( EBUSY );
+		return( cthreads_test_real_pthread_mutex_destroy_function_return_value );
 	}
 	else if( cthreads_test_pthread_mutex_destroy_attempts_before_fail > 0 )
 	{
@@ -140,7 +145,7 @@ int pthread_mutex_lock(
 	{
 		cthreads_test_pthread_mutex_lock_attempts_before_fail = -1;
 
-		return( EBUSY );
+		return( cthreads_test_real_pthread_mutex_lock_function_return_value );
 	}
 	else if( cthreads_test_pthread_mutex_lock_attempts_before_fail > 0 )
 	{
@@ -170,7 +175,7 @@ int pthread_mutex_unlock(
 	{
 		cthreads_test_pthread_mutex_unlock_attempts_before_fail = -1;
 
-		return( EBUSY );
+		return( cthreads_test_real_pthread_mutex_unlock_function_return_value );
 	}
 	else if( cthreads_test_pthread_mutex_unlock_attempts_before_fail > 0 )
 	{
@@ -482,9 +487,48 @@ int cthreads_test_lock_initialize(
 
 #if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
-	/* Test libcthreads_lock_initialize with pthread_mutex_init failing
+	/* Test libcthreads_lock_initialize with pthread_mutex_init returning EAGAIN
 	 */
-	cthreads_test_pthread_mutex_init_attempts_before_fail = 0;
+	cthreads_test_pthread_mutex_init_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_init_function_return_value = EAGAIN;
+
+	result = libcthreads_lock_initialize(
+	          &lock,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_init_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_init_attempts_before_fail = -1;
+
+		if( lock != NULL )
+		{
+			libcthreads_lock_free(
+			 &lock,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "lock",
+		 lock );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libcthreads_lock_initialize with pthread_mutex_init returning EBUSY
+	 */
+	cthreads_test_pthread_mutex_init_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_init_function_return_value = EBUSY;
 
 	result = libcthreads_lock_initialize(
 	          &lock,
@@ -586,9 +630,116 @@ int cthreads_test_lock_free(
 	 "error",
 	 error );
 
-	/* Test libcthreads_lock_free with pthread_mutex_destroy failing
+	/* Test libcthreads_lock_free with pthread_mutex_destroy returning EAGAIN
 	 */
-	cthreads_test_pthread_mutex_destroy_attempts_before_fail = 0;
+	cthreads_test_pthread_mutex_destroy_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_destroy_function_return_value = EAGAIN;
+
+	result = libcthreads_lock_free(
+	          &lock,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_destroy_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_destroy_attempts_before_fail = -1;
+
+		if( lock != NULL )
+		{
+			libcthreads_lock_free(
+			 &lock,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "lock",
+		 lock );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Initialize test
+	 */
+	result = libcthreads_lock_initialize(
+	          &lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libcthreads_lock_free with pthread_mutex_destroy returning EBUSY
+	 */
+	cthreads_test_pthread_mutex_destroy_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_destroy_function_return_value = EBUSY;
+
+	result = libcthreads_lock_free(
+	          &lock,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_destroy_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_destroy_attempts_before_fail = -1;
+
+		if( lock != NULL )
+		{
+			libcthreads_lock_free(
+			 &lock,
+			 NULL );
+		}
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "lock",
+		 lock );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Initialize test
+	 */
+	result = libcthreads_lock_initialize(
+	          &lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libcthreads_lock_free with pthread_mutex_destroy returning ENOMEM
+	 */
+	cthreads_test_pthread_mutex_destroy_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_destroy_function_return_value = ENOMEM;
 
 	result = libcthreads_lock_free(
 	          &lock,
@@ -789,9 +940,64 @@ int cthreads_test_lock_grab(
 
 #if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
-	/* Test libcthreads_lock_grab with pthread_mutex_lock failing
+	/* Test libcthreads_lock_grab with pthread_mutex_lock returning EAGAIN
 	 */
-	cthreads_test_pthread_mutex_lock_attempts_before_fail = 0;
+	cthreads_test_pthread_mutex_lock_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_lock_function_return_value = EAGAIN;
+
+	result = libcthreads_lock_grab(
+	          cthreads_test_lock,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_lock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_lock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libcthreads_lock_grab with pthread_mutex_lock returning EDEADLK
+	 */
+	cthreads_test_pthread_mutex_lock_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_lock_function_return_value = EDEADLK;
+
+	result = libcthreads_lock_grab(
+	          cthreads_test_lock,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_lock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_lock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libcthreads_lock_grab with pthread_mutex_lock returning EBUSY
+	 */
+	cthreads_test_pthread_mutex_lock_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_lock_function_return_value = EBUSY;
 
 	result = libcthreads_lock_grab(
 	          cthreads_test_lock,
@@ -913,9 +1119,64 @@ int cthreads_test_lock_release(
 
 #if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
 
-	/* Test libcthreads_lock_release with pthread_mutex_unlock failing
+	/* Test libcthreads_lock_release with pthread_mutex_unlock returning EAGAIN
 	 */
-	cthreads_test_pthread_mutex_unlock_attempts_before_fail = 0;
+	cthreads_test_pthread_mutex_unlock_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_unlock_function_return_value = EAGAIN;
+
+	result = libcthreads_lock_release(
+	          lock,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_unlock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libcthreads_lock_release with pthread_mutex_unlock returning EDEADLK
+	 */
+	cthreads_test_pthread_mutex_unlock_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_unlock_function_return_value = EDEADLK;
+
+	result = libcthreads_lock_release(
+	          lock,
+	          &error );
+
+	if( cthreads_test_pthread_mutex_unlock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libcthreads_lock_release with pthread_mutex_unlock returning EBUSY
+	 */
+	cthreads_test_pthread_mutex_unlock_attempts_before_fail       = 0;
+	cthreads_test_real_pthread_mutex_unlock_function_return_value = EBUSY;
 
 	result = libcthreads_lock_release(
 	          lock,
