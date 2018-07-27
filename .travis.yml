@@ -48,8 +48,8 @@ matrix:
   - name: "Linux with gcc without optimization"
     env:
     - CONFIGURE_OPTIONS="--enable-shared=no"
-    - CPPFLAGS="-DOPTIMIZATION_DISABLED"
     - CFLAGS="--coverage -O0"
+    - CPPFLAGS="-DOPTIMIZATION_DISABLED"
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc-no-optimization"
     compiler: gcc
@@ -84,16 +84,36 @@ matrix:
     os: osx
     osx_image: xcode8.3
 before_install:
-  - if test ${TRAVIS_OS_NAME} = "linux"; then sudo apt-get update && sudo apt-mark hold oracle-java8-installer oracle-java9-installer postgresql-9.2 postgresql-9.3 postgresql-9.4 postgresql-9.5 postgresql-9.6 postgresql-client postgresql-client-common postgresql-common postgresql-contrib-9.2 postgresql-contrib-9.3 postgresql-contrib-9.4 postgresql-contrib-9.5 postgresql-contrib-9.6 postgresql-doc && sudo apt-get --fix-missing -o Dpkg::Options::="--force-confold" upgrade -y --allow-unauthenticated && sudo apt-get install -y autopoint; fi
-  - if test ${TRAVIS_OS_NAME} = "osx"; then brew update && brew install gettext gnu-sed && brew link --force gettext; fi
-  - if test ${TARGET} = "coverity"; then echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-; fi
+  - if test ${TRAVIS_OS_NAME} = "linux"; then
+      sudo apt-get update && sudo apt-mark hold oracle-java8-installer oracle-java9-installer postgresql-9.2 postgresql-9.3 postgresql-9.4 postgresql-9.5 postgresql-9.6 postgresql-client postgresql-client-common postgresql-common postgresql-contrib-9.2 postgresql-contrib-9.3 postgresql-contrib-9.4 postgresql-contrib-9.5 postgresql-contrib-9.6 postgresql-doc && sudo apt-get --fix-missing -o Dpkg::Options::="--force-confold" upgrade -y --allow-unauthenticated && sudo apt-get install -y autopoint;
+    elif test ${TRAVIS_OS_NAME} = "osx"; then
+      brew update && brew install gettext gnu-sed && brew link --force gettext;
+    fi
+  - if test ${TARGET} = "coverity"; then
+      echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-;
+    fi
 install:
-  - if test ${TRAVIS_OS_NAME} = "osx"; then export SED="/usr/local/bin/gsed"; fi
+  - if test ${TRAVIS_OS_NAME} = "osx"; then
+      export SED="/usr/local/bin/gsed";
+    fi
   - ./synclibs.sh --use-head && ./autogen.sh
-  - if test ${TARGET} = "shared"; then ./configure > /dev/null && make > /dev/null && ./syncsharedlibs.sh --use-head; fi
-  - if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
+  - if test ${TARGET} = "shared"; then
+      ./configure > /dev/null && make > /dev/null && ./syncsharedlibs.sh --use-head;
+    fi
+  - if test -x "synctestdata.sh"; then
+      ./synctestdata.sh;
+    fi
 script:
-  - if test ${TRAVIS_OS_NAME} = "linux"; then export PATH=$(echo $PATH | tr ":" "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s/::/:/g"); fi
-  - if test ${TARGET} != "coverity"; then ./configure ${CONFIGURE_OPTIONS} && make > /dev/null && make check CHECK_WITH_STDERR=1; fi
+  - if test ${TRAVIS_OS_NAME} = "linux"; then
+      export PATH=$(echo $PATH | tr ":" "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s/::/:/g");
+    fi
+  - if test ${TARGET} != "coverity"; then
+      ./configure ${CONFIGURE_OPTIONS} && make > /dev/null && make check CHECK_WITH_STDERR=1;
+      if test $? -ne 0 && test -f tests/test-suite.log; then
+        cat tests/test-suite.log;
+      fi;
+    fi
 after_success:
-  - if test ${TRAVIS_OS_NAME} = "linux"; then curl -o codecov.sh -s https://codecov.io/bash && /bin/bash ./codecov.sh -n ${TARGET} -y .codecov.yml; fi
+  - if test ${TARGET} = "linux-gcc-no-optimization"; then
+      curl -o codecov.sh -s https://codecov.io/bash && /bin/bash ./codecov.sh -n ${TARGET} -y .codecov.yml;
+    fi
