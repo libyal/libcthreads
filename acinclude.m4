@@ -1,6 +1,6 @@
 dnl Checks for required headers and functions
 dnl
-dnl Version: 20170903
+dnl Version: 20170904
 
 dnl Function to detect if libcthreads dependencies are available
 AC_DEFUN([AX_LIBCTHREADS_CHECK_LOCAL],

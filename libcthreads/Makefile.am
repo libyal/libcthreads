@@ -2,7 +2,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
 	@LIBCERROR_CPPFLAGS@ \
-	@PTHREAD_CPPFLAGS@
+	@PTHREAD_CPPFLAGS@ \
+	@LIBCTHREADS_DLL_EXPORT@
 
 lib_LTLIBRARIES = libcthreads.la
 

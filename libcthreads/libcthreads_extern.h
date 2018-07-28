@@ -28,13 +28,6 @@
  */
 #if !defined( HAVE_LOCAL_LIBCTHREADS )
 
-/* If libtool DLL support is enabled set LIBCTHREADS_DLL_EXPORT
- * before including libcthreads/extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBCTHREADS_DLL_EXPORT
-#endif
-
 #include <libcthreads/extern.h>
 
 #define LIBCTHREADS_EXTERN_VARIABLE	LIBCTHREADS_EXTERN
