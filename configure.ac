@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libcthreads],
- [20180728],
+ [20180919],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -93,9 +93,6 @@ AS_IF(
  [AC_SUBST(
   [libcthreads_spec_requires],
   [Requires:])
- AC_SUBST(
-  [libcthreads_spec_build_requires],
-  [BuildRequires:])
  ])
 
 dnl Set the date for the dpkg files

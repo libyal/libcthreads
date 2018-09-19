@@ -83,6 +83,14 @@ matrix:
     compiler: gcc
     os: osx
     osx_image: xcode8.3
+  - name: "MacOS gcc and pkgbuild"
+    env:
+    - CONFIGURE_OPTIONS="--disable-dependency-tracking --prefix=/usr/local"
+    - TARGET="macos-gcc-pkgbuild"
+    compiler: clang
+    compiler: gcc
+    os: osx
+    osx_image: xcode8.3
 before_install:
   - if test ${TRAVIS_OS_NAME} = "linux"; then
       sudo apt-get update && sudo apt-mark hold oracle-java8-installer oracle-java9-installer postgresql-9.2 postgresql-9.3 postgresql-9.4 postgresql-9.5 postgresql-9.6 postgresql-client postgresql-client-common postgresql-common postgresql-contrib-9.2 postgresql-contrib-9.3 postgresql-contrib-9.4 postgresql-contrib-9.5 postgresql-contrib-9.6 postgresql-doc && sudo apt-get --fix-missing -o Dpkg::Options::="--force-confold" upgrade -y --allow-unauthenticated && sudo apt-get install -y autopoint;
@@ -112,6 +120,13 @@ script:
       if test $? -ne 0 && test -f tests/test-suite.log; then
         cat tests/test-suite.log;
       fi;
+      if test ${TARGET} = "macos-gcc-pkgbuild"; then
+        VERSION=`sed '5!d; s/^ \[//;s/\],$//' configure.ac` &&
+        make install DESTDIR=${PWD}/osx-pkg &&
+        mkdir -p ${PWD}/osx-pkg/usr/share/doc/libcthreads &&
+        cp AUTHORS COPYING NEWS README ${PWD}/osx-pkg/usr/share/doc/libcthreads &&
+        pkgbuild --root osx-pkg --identifier com.github.libyal.libcthreads --version ${VERSION} --ownership recommended ../libcthreads-${VERSION}.pkg;
+      fi
     fi
 after_success:
   - if test ${TARGET} = "linux-gcc-no-optimization"; then

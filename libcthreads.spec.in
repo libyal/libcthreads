@@ -8,7 +8,7 @@ Source: %{name}-%{version}.tar.gz
 URL: https://github.com/libyal/libcthreads
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 @libcthreads_spec_requires@ @ax_libcerror_spec_requires@
-@libcthreads_spec_build_requires@ @ax_libcerror_spec_build_requires@
+BuildRequires: gcc @ax_libcerror_spec_build_requires@
 
 %description
 Library to support cross-platform C threads functions
