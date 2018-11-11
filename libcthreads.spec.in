@@ -10,15 +10,15 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 @libcthreads_spec_requires@ @ax_libcerror_spec_requires@
 BuildRequires: gcc @ax_libcerror_spec_build_requires@
 
-%description
+%description -n libcthreads
 Library to support cross-platform C threads functions
 
-%package devel
+%package -n libcthreads-devel
 Summary: Header files and libraries for developing applications for libcthreads
 Group: Development/Libraries
 Requires: libcthreads = %{version}-%{release}
 
-%description devel
+%description -n libcthreads-devel
 Header files and libraries for developing applications for libcthreads.
 
 %prep
@@ -39,13 +39,13 @@ rm -rf %{buildroot}
 
 %postun -p /sbin/ldconfig
 
-%files
+%files -n libcthreads
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
 %attr(755,root,root) %{_libdir}/*.so.*
 
-%files devel
+%files -n libcthreads-devel
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README ChangeLog
