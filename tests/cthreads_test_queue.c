@@ -128,8 +128,8 @@ int pthread_mutex_unlock(
  * Returns LIBCTHREADS_COMPARE_LESS, LIBCTHREADS_COMPARE_EQUAL, LIBCTHREADS_COMPARE_GREATER if successful or -1 on error
  */
 int cthreads_test_queue_value_compare_function(
-     intptr_t *first_value,
-     intptr_t *second_value,
+     int *first_value,
+     int *second_value,
      libcthreads_error_t **error )
 {
 	static char *function = "cthreads_test_queue_value_compare_function";
@@ -1803,7 +1803,7 @@ int cthreads_test_queue_push_sorted(
 	result = libcthreads_queue_push_sorted(
 	          queue,
 	          (intptr_t *) &queued_value2,
-	          &cthreads_test_queue_value_compare_function,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
 	          0,
 	          &error );
 
@@ -1821,7 +1821,7 @@ int cthreads_test_queue_push_sorted(
 	result = libcthreads_queue_push_sorted(
 	          NULL,
 	          (intptr_t *) &queued_value2,
-	          &cthreads_test_queue_value_compare_function,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
 	          0,
 	          &error );
 
@@ -1844,7 +1844,7 @@ int cthreads_test_queue_push_sorted(
 	result = libcthreads_queue_push_sorted(
 	          queue,
 	          (intptr_t *) &queued_value2,
-	          &cthreads_test_queue_value_compare_function,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
 	          0,
 	          &error );
 
@@ -1865,7 +1865,7 @@ int cthreads_test_queue_push_sorted(
 	result = libcthreads_queue_push_sorted(
 	          queue,
 	          NULL,
-	          &cthreads_test_queue_value_compare_function,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
 	          0,
 	          &error );
 
@@ -1903,7 +1903,7 @@ int cthreads_test_queue_push_sorted(
 	result = libcthreads_queue_push_sorted(
 	          queue,
 	          (intptr_t *) &queued_value2,
-	          &cthreads_test_queue_value_compare_function,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
 	          0xff,
 	          &error );
 
@@ -1928,7 +1928,7 @@ int cthreads_test_queue_push_sorted(
 	result = libcthreads_queue_push_sorted(
 	          queue,
 	          (intptr_t *) &queued_value2,
-	          &cthreads_test_queue_value_compare_function,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
 	          0,
 	          &error );
 
@@ -1960,7 +1960,7 @@ int cthreads_test_queue_push_sorted(
 	result = libcthreads_queue_push_sorted(
 	          queue,
 	          (intptr_t *) &queued_value2,
-	          &cthreads_test_queue_value_compare_function,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
 	          0,
 	          &error );
 
