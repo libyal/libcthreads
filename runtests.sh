@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script that runs the tests
 #
-# Version: 20181228
+# Version: 20190103
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;

@@ -13,6 +13,14 @@ BuildRequires: gcc @ax_libcerror_spec_build_requires@
 %description -n libcthreads
 Library to support cross-platform C threads functions
 
+%package -n libcthreads-static
+Summary: Library to support cross-platform C threads functions
+Group: Development/Libraries
+Requires: libcthreads = %{version}-%{release}
+
+%description -n libcthreads-static
+Static library version of libcthreads.
+
 %package -n libcthreads-devel
 Summary: Header files and libraries for developing applications for libcthreads
 Group: Development/Libraries
@@ -45,11 +53,16 @@ rm -rf %{buildroot}
 %doc AUTHORS README
 %attr(755,root,root) %{_libdir}/*.so.*
 
+%files -n libcthreads-static
+%defattr(644,root,root,755)
+%license COPYING
+%doc AUTHORS README
+%attr(755,root,root) %{_libdir}/*.a
+
 %files -n libcthreads-devel
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
-%{_libdir}/*.a
 %{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/libcthreads.pc
