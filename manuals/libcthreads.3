@@ -1,11 +1,9 @@
-.Dd January  1, 2017
+.Dd March 11, 2019
 .Dt libcthreads 3
 .Os libcthreads
 .Sh NAME
 .Nm libcthreads.h
 .Nd Library to support cross-platform C threads functions
-.Sh LIBRARY
-.Lb libcthreads
 .Sh SYNOPSIS
 .In libcthreads.h
 .Pp
@@ -17,101 +15,101 @@ Error functions
 .Ft void
 .Fn libcthreads_error_free "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_error_fprint "libcthreads_error_t *error, FILE *stream"
+.Fn libcthreads_error_fprint "libcthreads_error_t *error" "FILE *stream"
 .Ft int
-.Fn libcthreads_error_sprint "libcthreads_error_t *error, char *string, size_t size"
+.Fn libcthreads_error_sprint "libcthreads_error_t *error" "char *string" "size_t size"
 .Ft int
-.Fn libcthreads_error_backtrace_fprint "libcthreads_error_t *error, FILE *stream"
+.Fn libcthreads_error_backtrace_fprint "libcthreads_error_t *error" "FILE *stream"
 .Ft int
-.Fn libcthreads_error_backtrace_sprint "libcthreads_error_t *error, char *string, size_t size"
+.Fn libcthreads_error_backtrace_sprint "libcthreads_error_t *error" "char *string" "size_t size"
 .Pp
 Thread functions
 .Ft int
-.Fn libcthreads_thread_create "libcthreads_thread_t **thread, const libcthreads_thread_attributes_t *thread_attributes, int (*callback_function)( void *arguments ), void *callback_function_arguments, libcthreads_error_t **error"
+.Fn libcthreads_thread_create "libcthreads_thread_t **thread" "const libcthreads_thread_attributes_t *thread_attributes" "int (*callback_function)( void *arguments )" "void *callback_function_arguments" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_thread_join "libcthreads_thread_t **thread, libcthreads_error_t **error"
+.Fn libcthreads_thread_join "libcthreads_thread_t **thread" "libcthreads_error_t **error"
 .Pp
 Thread attributes functions
 .Ft int
-.Fn libcthreads_thread_attributes_initialize "libcthreads_thread_attributes_t **thread_attributes, libcthreads_error_t **error"
+.Fn libcthreads_thread_attributes_initialize "libcthreads_thread_attributes_t **thread_attributes" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_thread_attributes_free "libcthreads_thread_attributes_t **thread_attributes, libcthreads_error_t **error"
+.Fn libcthreads_thread_attributes_free "libcthreads_thread_attributes_t **thread_attributes" "libcthreads_error_t **error"
 .Pp
 Condition functions
 .Ft int
-.Fn libcthreads_condition_initialize "libcthreads_condition_t **condition, libcthreads_error_t **error"
+.Fn libcthreads_condition_initialize "libcthreads_condition_t **condition" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_condition_free "libcthreads_condition_t **condition, libcthreads_error_t **error"
+.Fn libcthreads_condition_free "libcthreads_condition_t **condition" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_condition_broadcast "libcthreads_condition_t *condition, libcthreads_error_t **error"
+.Fn libcthreads_condition_broadcast "libcthreads_condition_t *condition" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_condition_signal "libcthreads_condition_t *condition, libcthreads_error_t **error"
+.Fn libcthreads_condition_signal "libcthreads_condition_t *condition" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_condition_wait "libcthreads_condition_t *condition, libcthreads_mutex_t *mutex, libcthreads_error_t **error"
+.Fn libcthreads_condition_wait "libcthreads_condition_t *condition" "libcthreads_mutex_t *mutex" "libcthreads_error_t **error"
 .Pp
 Lock functions
 .Ft int
-.Fn libcthreads_lock_initialize "libcthreads_lock_t **lock, libcthreads_error_t **error"
+.Fn libcthreads_lock_initialize "libcthreads_lock_t **lock" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_lock_free "libcthreads_lock_t **lock, libcthreads_error_t **error"
+.Fn libcthreads_lock_free "libcthreads_lock_t **lock" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_lock_grab "libcthreads_lock_t *lock, libcthreads_error_t **error"
+.Fn libcthreads_lock_grab "libcthreads_lock_t *lock" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_lock_release "libcthreads_lock_t *lock, libcthreads_error_t **error"
+.Fn libcthreads_lock_release "libcthreads_lock_t *lock" "libcthreads_error_t **error"
 .Pp
 Mutex functions
 .Ft int
-.Fn libcthreads_mutex_initialize "libcthreads_mutex_t **mutex, libcthreads_error_t **error"
+.Fn libcthreads_mutex_initialize "libcthreads_mutex_t **mutex" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_mutex_free "libcthreads_mutex_t **mutex, libcthreads_error_t **error"
+.Fn libcthreads_mutex_free "libcthreads_mutex_t **mutex" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_mutex_grab "libcthreads_mutex_t *mutex, libcthreads_error_t **error"
+.Fn libcthreads_mutex_grab "libcthreads_mutex_t *mutex" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_mutex_try_grab "libcthreads_mutex_t *mutex, libcthreads_error_t **error"
+.Fn libcthreads_mutex_try_grab "libcthreads_mutex_t *mutex" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_mutex_release "libcthreads_mutex_t *mutex, libcthreads_error_t **error"
+.Fn libcthreads_mutex_release "libcthreads_mutex_t *mutex" "libcthreads_error_t **error"
 .Pp
 Read/Write lock functions
 .Ft int
-.Fn libcthreads_read_write_lock_initialize "libcthreads_read_write_lock_t **read_write_lock, libcthreads_error_t **error"
+.Fn libcthreads_read_write_lock_initialize "libcthreads_read_write_lock_t **read_write_lock" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_read_write_lock_free "libcthreads_read_write_lock_t **read_write_lock, libcthreads_error_t **error"
+.Fn libcthreads_read_write_lock_free "libcthreads_read_write_lock_t **read_write_lock" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_read_write_lock_grab_for_read "libcthreads_read_write_lock_t *read_write_lock, libcthreads_error_t **error"
+.Fn libcthreads_read_write_lock_grab_for_read "libcthreads_read_write_lock_t *read_write_lock" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_read_write_lock_grab_for_write "libcthreads_read_write_lock_t *read_write_lock, libcthreads_error_t **error"
+.Fn libcthreads_read_write_lock_grab_for_write "libcthreads_read_write_lock_t *read_write_lock" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_read_write_lock_release_for_read "libcthreads_read_write_lock_t *read_write_lock, libcthreads_error_t **error"
+.Fn libcthreads_read_write_lock_release_for_read "libcthreads_read_write_lock_t *read_write_lock" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_read_write_lock_release_for_write "libcthreads_read_write_lock_t *read_write_lock, libcthreads_error_t **error"
+.Fn libcthreads_read_write_lock_release_for_write "libcthreads_read_write_lock_t *read_write_lock" "libcthreads_error_t **error"
 .Pp
 Queue functions
 .Ft int
-.Fn libcthreads_queue_initialize "libcthreads_queue_t **queue, int maximum_number_of_values, libcthreads_error_t **error"
+.Fn libcthreads_queue_initialize "libcthreads_queue_t **queue" "int maximum_number_of_values" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_queue_free "libcthreads_queue_t **queue, int (*value_free_function)( intptr_t **value, libcthreads_error_t **error ), libcthreads_error_t **error"
+.Fn libcthreads_queue_free "libcthreads_queue_t **queue" "int (*value_free_function)( intptr_t **value, libcthreads_error_t **error )" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_queue_empty "libcthreads_queue_t *queue, libcthreads_error_t **error"
+.Fn libcthreads_queue_empty "libcthreads_queue_t *queue" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_queue_try_pop "libcthreads_queue_t *queue, intptr_t **value, libcthreads_error_t **error"
+.Fn libcthreads_queue_try_pop "libcthreads_queue_t *queue" "intptr_t **value" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_queue_pop "libcthreads_queue_t *queue, intptr_t **value, libcthreads_error_t **error"
+.Fn libcthreads_queue_pop "libcthreads_queue_t *queue" "intptr_t **value" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_queue_try_push "libcthreads_queue_t *queue, intptr_t *value, libcthreads_error_t **error"
+.Fn libcthreads_queue_try_push "libcthreads_queue_t *queue" "intptr_t *value" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_queue_push "libcthreads_queue_t *queue, intptr_t *value, libcthreads_error_t **error"
+.Fn libcthreads_queue_push "libcthreads_queue_t *queue" "intptr_t *value" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_queue_push_sorted "libcthreads_queue_t *queue, intptr_t *value, int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value, libcthreads_error_t **error ), uint8_t sort_flags, libcthreads_error_t **error"
+.Fn libcthreads_queue_push_sorted "libcthreads_queue_t *queue" "intptr_t *value" "int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value, libcthreads_error_t **error )" "uint8_t sort_flags" "libcthreads_error_t **error"
 .Pp
 Thread pool functions
 .Ft int
-.Fn libcthreads_thread_pool_create "libcthreads_thread_pool_t **thread_pool, const libcthreads_thread_attributes_t *thread_attributes, int number_of_threads, int maximum_number_of_values, int (*callback_function)( intptr_t *value, void *arguments ), void *callback_function_arguments, libcthreads_error_t **error"
+.Fn libcthreads_thread_pool_create "libcthreads_thread_pool_t **thread_pool" "const libcthreads_thread_attributes_t *thread_attributes" "int number_of_threads" "int maximum_number_of_values" "int (*callback_function)( intptr_t *value, void *arguments )" "void *callback_function_arguments" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_thread_pool_push "libcthreads_thread_pool_t *thread_pool, intptr_t *value, libcthreads_error_t **error"
+.Fn libcthreads_thread_pool_push "libcthreads_thread_pool_t *thread_pool" "intptr_t *value" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_thread_pool_push_sorted "libcthreads_thread_pool_t *thread_pool, intptr_t *value, int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value, libcthreads_error_t **error ), uint8_t sort_flags, libcthreads_error_t **error"
+.Fn libcthreads_thread_pool_push_sorted "libcthreads_thread_pool_t *thread_pool" "intptr_t *value" "int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value, libcthreads_error_t **error )" "uint8_t sort_flags" "libcthreads_error_t **error"
 .Ft int
-.Fn libcthreads_thread_pool_join "libcthreads_thread_pool_t **thread_pool, libcthreads_error_t **error"
+.Fn libcthreads_thread_pool_join "libcthreads_thread_pool_t **thread_pool" "libcthreads_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libcthreads_get_version
@@ -129,7 +127,7 @@ Please report bugs of any kind on the project issue tracker: https://github.com/
 These man pages are generated from "libcthreads.h".
 .Sh COPYRIGHT
 Copyright (C) 2012-2019, Joachim Metz <joachim.metz@gmail.com>.
-
+.sp
 This is free software; see the source for copying conditions.
 There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO
