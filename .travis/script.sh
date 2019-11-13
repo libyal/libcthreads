@@ -25,7 +25,7 @@ then
 
 		make install DESTDIR=${PWD}/osx-pkg;
 		mkdir -p ${PWD}/osx-pkg/usr/share/doc/libcthreads;
-		cp AUTHORS COPYING NEWS README ${PWD}/osx-pkg/usr/share/doc/libcthreads;
+		cp AUTHORS COPYING COPYING.LESSER NEWS README ${PWD}/osx-pkg/usr/share/doc/libcthreads;
 
 		pkgbuild --root osx-pkg --identifier com.github.libyal.libcthreads --version ${VERSION} --ownership recommended ../libcthreads-${VERSION}.pkg;
 	fi
