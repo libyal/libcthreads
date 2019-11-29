@@ -162,7 +162,7 @@ int libcthreads_condition_initialize(
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_cond_init(
-		          &( internal_condition->condition ),
+	                  &( internal_condition->condition ),
 	                  NULL );
 
 	switch( pthread_result )
@@ -686,8 +686,8 @@ int libcthreads_condition_wait(
 	else
 	{
 		wait_status = WaitForSingleObject(
-			       internal_mutex->mutex_handle,
-			       INFINITE );
+		               internal_mutex->mutex_handle,
+		               INFINITE );
 
 		if( wait_status == WAIT_FAILED )
 		{

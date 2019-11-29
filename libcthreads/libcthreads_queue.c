@@ -1026,9 +1026,9 @@ int libcthreads_queue_push_sorted(
 	     value_index++ )
 	{
 		compare_result = value_compare_function(
-				  value,
-				  internal_queue->values_array[ pop_index ],
-				  error );
+		                  value,
+		                  internal_queue->values_array[ pop_index ],
+		                  error );
 
 		if( compare_result == -1 )
 		{

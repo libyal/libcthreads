@@ -86,7 +86,7 @@ void *libcthreads_thread_callback_function_helper(
 		internal_thread = (libcthreads_internal_thread_t *) arguments;
 
 		if( ( internal_thread != NULL )
-  		 && ( internal_thread->callback_function != NULL ) )
+		 && ( internal_thread->callback_function != NULL ) )
 		{
 			result = (int *) memory_allocate(
 			                  sizeof( int ) );
@@ -233,7 +233,7 @@ int libcthreads_thread_create(
 		attributes = &( ( (libcthreads_internal_thread_attributes_t *) thread_attributes )->attributes );
 	}
 	pthread_result = pthread_create(
-		          &( internal_thread->thread ),
+	                  &( internal_thread->thread ),
 	                  attributes,
 	                  &libcthreads_thread_callback_function_helper,
 	                  (void *) internal_thread );

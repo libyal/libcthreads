@@ -123,7 +123,7 @@ void *libcthreads_repeating_thread_start_function_helper(
 		internal_repeating_thread = (libcthreads_internal_repeating_thread_t *) arguments;
 
 		if( ( internal_repeating_thread != NULL )
-  		 && ( internal_repeating_thread->start_function != NULL ) )
+		 && ( internal_repeating_thread->start_function != NULL ) )
 		{
 			internal_repeating_thread->start_function_result = 1;
 
@@ -319,7 +319,7 @@ int libcthreads_repeating_thread_create(
 		attributes = &( ( (libcthreads_internal_thread_attributes_t *) thread_attributes )->attributes );
 	}
 	pthread_result = pthread_create(
-		          &( internal_repeating_thread->thread ),
+	                  &( internal_repeating_thread->thread ),
 	                  attributes,
 	                  &libcthreads_repeating_thread_start_function_helper,
 	                  (void *) internal_repeating_thread );

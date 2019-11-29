@@ -121,7 +121,7 @@ int libcthreads_read_write_lock_initialize(
 	InitializeCriticalSection(
 	 &( internal_read_write_lock->read_critical_section ) );
 
-        internal_read_write_lock->no_read_event_handle = CreateEvent(
+	internal_read_write_lock->no_read_event_handle = CreateEvent(
 	                                                  NULL,
 	                                                  TRUE,
 	                                                  TRUE,
@@ -147,7 +147,7 @@ int libcthreads_read_write_lock_initialize(
 
 #elif defined( HAVE_PTHREAD_H )
 	pthread_result = pthread_rwlock_init(
-		          &( internal_read_write_lock->read_write_lock ),
+	                  &( internal_read_write_lock->read_write_lock ),
 	                  NULL );
 
 	switch( pthread_result )

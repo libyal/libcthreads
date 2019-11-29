@@ -70,9 +70,9 @@ void CALLBACK libcthreads_thread_pool_callback_function_helper(
 		return;
 	}
 	pop_result = libcthreads_internal_thread_pool_pop(
-		      internal_thread_pool,
-		      &value,
-		      &error );
+	              internal_thread_pool,
+	              &value,
+	              &error );
 
 	if( pop_result == -1 )
 	{
@@ -133,9 +133,9 @@ DWORD WINAPI libcthreads_thread_pool_callback_function_helper(
 			do
 			{
 				pop_result = libcthreads_internal_thread_pool_pop(
-					      internal_thread_pool,
-					      &value,
-					      &error );
+				              internal_thread_pool,
+				              &value,
+				              &error );
 
 				if( pop_result == -1 )
 				{
@@ -144,8 +144,8 @@ DWORD WINAPI libcthreads_thread_pool_callback_function_helper(
 				else if( pop_result != 0 )
 				{
 					callback_function_result = internal_thread_pool->callback_function(
-								    value,
-								    internal_thread_pool->callback_function_arguments );
+					                            value,
+					                            internal_thread_pool->callback_function_arguments );
 
 					if( ( callback_function_result != 1 )
 					 && ( result == 1 ) )
@@ -224,8 +224,8 @@ void *libcthreads_thread_pool_callback_function_helper(
 					else if( pop_result != 0 )
 					{
 						callback_function_result = internal_thread_pool->callback_function(
-									    value,
-									    internal_thread_pool->callback_function_arguments );
+						                            value,
+						                            internal_thread_pool->callback_function_arguments );
 
 						if( ( callback_function_result != 1 )
 						 && ( *result == 1 ) )
@@ -769,10 +769,10 @@ int libcthreads_thread_pool_create(
 	     thread_index++ )
 	{
 		pthread_result = pthread_create(
-				  &( internal_thread_pool->threads_array[ thread_index ] ),
-				  attributes,
-				  &libcthreads_thread_pool_callback_function_helper,
-				  (void *) internal_thread_pool );
+		                  &( internal_thread_pool->threads_array[ thread_index ] ),
+		                  attributes,
+		                  &libcthreads_thread_pool_callback_function_helper,
+		                  (void *) internal_thread_pool );
 
 		switch( pthread_result )
 		{
@@ -1298,9 +1298,9 @@ int libcthreads_thread_pool_push_sorted(
 	     value_index++ )
 	{
 		compare_result = value_compare_function(
-				  value,
-				  internal_thread_pool->values_array[ pop_index ],
-				  error );
+		                  value,
+		                  internal_thread_pool->values_array[ pop_index ],
+		                  error );
 
 		if( compare_result == -1 )
 		{
@@ -1579,8 +1579,8 @@ int libcthreads_thread_pool_join(
 	     thread_index++ )
 	{
 		wait_status = WaitForSingleObject(
-			       internal_thread_pool->thread_handles_array[ thread_index ],
-			       INFINITE );
+		               internal_thread_pool->thread_handles_array[ thread_index ],
+		               INFINITE );
 
 		if( wait_status == WAIT_FAILED )
 		{
