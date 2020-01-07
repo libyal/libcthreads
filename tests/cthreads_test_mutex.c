@@ -1,7 +1,7 @@
 /*
  * Library mutex type test program
  *
- * Copyright (C) 2012-2019, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2012-2020, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1519,7 +1519,7 @@ int main(
 	 cthreads_test_mutex_grab );
 
 	CTHREADS_TEST_RUN(
-	 "ibcthreads_mutex_try_grab",
+	 "libcthreads_mutex_try_grab",
 	 cthreads_test_mutex_try_grab );
 
 	CTHREADS_TEST_RUN(
