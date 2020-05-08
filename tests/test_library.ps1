@@ -1,6 +1,6 @@
 # Tests library functions and types.
 #
-# Version: 20200413
+# Version: 20200427
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -8,7 +8,7 @@ $ExitIgnore = 77
 
 $LibraryTests = "condition error lock mutex queue read_write_lock repeating_thread support thread thread_attributes thread_pool"
 $LibraryTestsWithInput = ""
-$OptionSets = "";
+$OptionSets = ""
 
 $InputGlob = "*"
 
