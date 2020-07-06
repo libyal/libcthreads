@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #endif
 
-#include "cthreads_test_libcerror.h"
 #include "cthreads_test_libcthreads.h"
 #include "cthreads_test_macros.h"
 #include "cthreads_test_unused.h"
