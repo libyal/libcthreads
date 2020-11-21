@@ -30,7 +30,11 @@
 
 #include <libcthreads/extern.h>
 
+#if defined( __CYGWIN__ )
+#define LIBCTHREADS_EXTERN_VARIABLE	extern
+#else
 #define LIBCTHREADS_EXTERN_VARIABLE	LIBCTHREADS_EXTERN
+#endif
 
 #else
 #define LIBCTHREADS_EXTERN		/* extern */
