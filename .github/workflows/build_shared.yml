@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - architecture: 'x86'
+        - architecture: 'x64'
           compiler: 'gcc'
           configure_options: ''
     steps:
