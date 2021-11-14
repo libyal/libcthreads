@@ -562,9 +562,9 @@ int libcthreads_condition_wait(
 
 #if ( WINVER >= 0x0600 )
 	BOOL result                                          = 0;
+
 #elif ( WINVER >= 0x0400 )
 	DWORD wait_status                                    = 0;
-#else
 	int is_last_waiting_thread                           = 0;
 #endif
 
@@ -604,7 +604,7 @@ int libcthreads_condition_wait(
 	          &( internal_mutex->critical_section ),
 	          INFINITE );
 
-	if( result != 0 )
+	if( result == 0 )
 	{
 		error_code = GetLastError();
 
