@@ -25,7 +25,7 @@
 
 #include <errno.h>
 
-#if defined( WINAPI ) && ( WINVER >= 0x0602 )
+#if defined( _MSC_VER ) && defined( WINAPI ) && ( WINVER >= 0x0602 )
 #include <Synchapi.h>
 #endif
 
@@ -559,10 +559,11 @@ int libcthreads_condition_wait(
 
 #if defined( WINAPI )
 	DWORD error_code                                     = 0;
-	DWORD wait_status                                    = 0;
 
 #if ( WINVER >= 0x0600 )
 	BOOL result                                          = 0;
+#elif ( WINVER >= 0x0400 )
+	DWORD wait_status                                    = 0;
 #else
 	int is_last_waiting_thread                           = 0;
 #endif
@@ -603,7 +604,7 @@ int libcthreads_condition_wait(
 	          &( internal_mutex->critical_section ),
 	          INFINITE );
 
-	if( wait_status == WAIT_FAILED )
+	if( result != 0 )
 	{
 		error_code = GetLastError();
 
