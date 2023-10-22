@@ -18,9 +18,9 @@ MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
-	/bin/rm -f libcthreads.h
-	/bin/rm -f libcthreads/definitions.h
-	/bin/rm -f libcthreads/features.h
-	/bin/rm -f libcthreads/types.h
-	/bin/rm -f Makefile
+	-rm -f libcthreads.h
+	-rm -f libcthreads/definitions.h
+	-rm -f libcthreads/features.h
+	-rm -f libcthreads/types.h
+	-rm -f Makefile
 
