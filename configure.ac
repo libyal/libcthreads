@@ -1,4 +1,4 @@
-AC_PREREQ([2.71])
+AC_PREREQ([2.69])
 
 AC_INIT(
  [libcthreads],
@@ -33,7 +33,7 @@ AC_PATH_PROG(PKGCONFIG,[pkg-config])
 
 dnl Support of internationalization (i18n)
 AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.21])
+AM_GNU_GETTEXT_VERSION([0.19])
 
 dnl Check for compiler language support
 AC_C_CONST
