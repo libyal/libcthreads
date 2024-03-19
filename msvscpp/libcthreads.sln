@@ -1,6 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcthreads", "libcthreads\libcthreads.vcproj", "{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cthreads_test_condition", "cthreads_test_condition\cthreads_test_condition.vcproj", "{F65656A3-27DE-4363-AF13-F9457E1B8CDC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536} = {C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}
@@ -65,11 +70,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cthreads_test_thread_pool",
 		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcthreads", "libcthreads\libcthreads.vcproj", "{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}"
-	ProjectSection(ProjectDependencies) = postProject
-		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcerror", "libcerror\libcerror.vcproj", "{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}"
 EndProject
 Global
@@ -78,6 +78,10 @@ Global
 		VSDebug|Win32 = VSDebug|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}.Release|Win32.ActiveCfg = Release|Win32
+		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}.Release|Win32.Build.0 = Release|Win32
+		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}.VSDebug|Win32.Build.0 = VSDebug|Win32
 		{F65656A3-27DE-4363-AF13-F9457E1B8CDC}.Release|Win32.ActiveCfg = Release|Win32
 		{F65656A3-27DE-4363-AF13-F9457E1B8CDC}.Release|Win32.Build.0 = Release|Win32
 		{F65656A3-27DE-4363-AF13-F9457E1B8CDC}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
@@ -122,10 +126,6 @@ Global
 		{DAFA82CC-4B04-4AF2-9338-6B55C3141DC6}.Release|Win32.Build.0 = Release|Win32
 		{DAFA82CC-4B04-4AF2-9338-6B55C3141DC6}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
 		{DAFA82CC-4B04-4AF2-9338-6B55C3141DC6}.VSDebug|Win32.Build.0 = VSDebug|Win32
-		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}.Release|Win32.ActiveCfg = Release|Win32
-		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}.Release|Win32.Build.0 = Release|Win32
-		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
-		{C3FA5968-220C-4D30-B2EF-4BFE6D5D8536}.VSDebug|Win32.Build.0 = VSDebug|Win32
 		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.Release|Win32.ActiveCfg = Release|Win32
 		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.Release|Win32.Build.0 = Release|Win32
 		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
