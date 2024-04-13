@@ -14,13 +14,11 @@ EXTRA_DIST = \
 	libcthreads/features.h.in \
 	libcthreads/types.h.in
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	libcthreads.h \
+	libcthreads/definitions.h \
+	libcthreads/features.h \
+	libcthreads/types.h \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f libcthreads.h
-	-rm -f libcthreads/definitions.h
-	-rm -f libcthreads/features.h
-	-rm -f libcthreads/types.h
-	-rm -f Makefile
 

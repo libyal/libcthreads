@@ -1,6 +1,6 @@
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/common \
+	-I../include -I$(top_srcdir)/include \
+	-I../common -I$(top_srcdir)/common \
 	@LIBCERROR_CPPFLAGS@ \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBCTHREADS_DLL_EXPORT@
@@ -37,13 +37,11 @@ EXTRA_DIST = \
 	libcthreads.rc \
 	libcthreads.rc.in
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	libcthreads_definitions.h \
+	libcthreads.rc \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f libcthreads_definitions.h
-	-rm -f libcthreads.rc
-	-rm -f Makefile
 
 sources-local: $(BUILT_SOURCES)
 
