@@ -1,6 +1,6 @@
 AM_CPPFLAGS = \
 	-I../include -I$(top_srcdir)/include \
-	-I../include -I$(top_srcdir)/common \
+	-I../common -I$(top_srcdir)/common \
 	@LIBCERROR_CPPFLAGS@ \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBCTHREADS_DLL_IMPORT@
