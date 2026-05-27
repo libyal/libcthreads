@@ -28,6 +28,7 @@
 #endif
 
 #include <errno.h>
+#include <unistd.h>
 
 #if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ )
 #define __USE_GNU
@@ -152,6 +153,17 @@ int cthreads_test_thread_callback_function(
 	return( 1 );
 }
 
+/* The thread callback function that returns -1
+ * Returns 1 if successful or -1 on error
+ */
+int cthreads_test_thread_error_callback_function(
+     void *arguments CTHREADS_TEST_ATTRIBUTE_UNUSED )
+{
+	CTHREADS_TEST_UNREFERENCED_PARAMETER( arguments )
+
+	return( -1 );
+}
+
 /* Tests the libcthreads_thread_create function
  * Returns 1 if successful or 0 if not
  */
@@ -162,7 +174,7 @@ int cthreads_test_thread_create(
 	libcthreads_thread_t *thread = NULL;
 	int result                   = 0;
 
-	/* Test libcthreads_thread_create
+	/* Test regular cases
 	 */
 	result = libcthreads_thread_create(
 	          &thread,
@@ -620,6 +632,50 @@ int cthreads_test_thread_join(
 		 &error );
 	}
 #endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
+
+	/* Initialize test
+	 */
+	result = libcthreads_thread_create(
+	          &thread,
+	          NULL,
+	          &cthreads_test_thread_error_callback_function,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Allow the callback function to run
+	 */
+	sleep( 0.1 );
+
+	/* Test libcthreads_thread_join with the callback function returning -1
+	 */
+	result = libcthreads_thread_join(
+	          &thread,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "thread",
+	 thread );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 

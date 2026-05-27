@@ -121,7 +121,7 @@ int cthreads_test_thread_pool_create(
 	libcthreads_thread_pool_t *thread_pool = NULL;
 	int result                             = 0;
 
-	/* Test libcthreads_thread_pool_create
+	/* Test regular cases
 	 */
 	result = libcthreads_thread_pool_create(
 	          &thread_pool,

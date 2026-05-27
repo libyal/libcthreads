@@ -102,7 +102,7 @@ void *libcthreads_thread_callback_function_helper(
 	 (void *) result );
 }
 
-#endif
+#endif /* defined( WINAPI ) else defined( HAVE_PTHREAD_H ) */
 
 /* Creates a thread
  * Make sure the value thread is referencing, is set to NULL
@@ -264,7 +264,8 @@ int libcthreads_thread_create(
 
 			goto on_error;
 	}
-#endif
+#endif /* defined( WINAPI ) else defined( HAVE_PTHREAD_H ) */
+
 	*thread = (libcthreads_thread_t *) internal_thread;
 
 	return( 1 );
@@ -394,7 +395,8 @@ int libcthreads_thread_join(
 
 		thread_return_value = NULL;
 	}
-#endif
+#endif /* defined( WINAPI ) else defined( HAVE_PTHREAD_H ) */
+
 	memory_free(
 	 internal_thread );
 

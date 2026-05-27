@@ -49,21 +49,24 @@
 /* Start function helper function for WINAPI
  * Returns 0 if successful or 1 on error
  */
-DWORD WINAPI libcthreads_repeating_thread_start_function_helper(
+DWORD WINAPI libcthreads_repeating_thread_callback_function_helper(
               void *arguments )
 {
 	libcthreads_internal_repeating_thread_t *internal_repeating_thread = NULL;
-	DWORD result                                                       = 0;
-	int start_function_result                                          = 0;
+	DWORD result                                                       = 1;
+	int callback_function_result                                       = 0;
+	int number_of_tasks                                                = 0;
+	int task_index                                                     = 0;
+	uint8_t status                                                     = 0;
 
 	if( arguments != NULL )
 	{
 		internal_repeating_thread = (libcthreads_internal_repeating_thread_t *) arguments;
 
 		if( ( internal_repeating_thread != NULL )
-		 && ( internal_repeating_thread->start_function != NULL ) )
+		 && ( internal_repeating_thread->callback_function != NULL ) )
 		{
-			internal_repeating_thread->start_function_result = 1;
+			internal_repeating_thread->callback_function_result = 1;
 
 			do
 			{
@@ -71,35 +74,47 @@ DWORD WINAPI libcthreads_repeating_thread_start_function_helper(
 				 internal_repeating_thread->condition_mutex,
 				 NULL );
 
+				status          = internal_repeating_thread->status;
+				number_of_tasks = internal_repeating_thread->active_tasks;
+
 				/* Check for exit status in case of the situation where the thread
 				 * is created after the join has been called
 				 */
-				while( internal_repeating_thread->status != LIBCTHREADS_STATUS_EXIT )
+				while( ( number_of_tasks == 0 )
+				    && ( status != LIBCTHREADS_STATUS_EXIT ) )
 				{
 					libcthreads_condition_wait(
 					 internal_repeating_thread->status_condition,
 					 internal_repeating_thread->condition_mutex,
 					 NULL );
+
+					status          = internal_repeating_thread->status;
+					number_of_tasks = internal_repeating_thread->active_tasks;
 				}
+				internal_repeating_thread->active_tasks -= number_of_tasks;
+
 				libcthreads_mutex_release(
 				 internal_repeating_thread->condition_mutex,
 				 NULL );
 
-				start_function_result = internal_repeating_thread->start_function(
-				                         internal_repeating_thread->start_function_arguments );
-
-				if( ( start_function_result != 1 )
-				 && ( internal_repeating_thread->start_function_result == 1 ) )
+				for( task_index = 0;
+				     task_index < number_of_tasks;
+				     task_index++ )
 				{
-					internal_repeating_thread->start_function_result = start_function_result;
+					callback_function_result = internal_repeating_thread->callback_function(
+					                            internal_repeating_thread->callback_function_arguments );
+
+					if( ( callback_function_result != 1 )
+					 && ( internal_repeating_thread->callback_function_result == 1 ) )
+					{
+						internal_repeating_thread->callback_function_result = callback_function_result;
+					}
 				}
 			}
-			while( internal_repeating_thread->status != LIBCTHREADS_STATUS_EXIT );
+			while( ( number_of_tasks > 0 )
+			    || ( status != LIBCTHREADS_STATUS_EXIT ) );
 
-			if( internal_repeating_thread->start_function_result != 1 )
-			{
-				result = 1;
-			}
+			result = (DWORD) ( internal_repeating_thread->callback_function_result != 1 );
 		}
 	}
 	ExitThread(
@@ -109,23 +124,26 @@ DWORD WINAPI libcthreads_repeating_thread_start_function_helper(
 #elif defined( HAVE_PTHREAD_H )
 
 /* Start function helper function for pthread
- * Returns a pointer to the start function result if successful or NULL on error
+ * Returns a pointer to the callback function result if successful or NULL on error
  */
-void *libcthreads_repeating_thread_start_function_helper(
+void *libcthreads_repeating_thread_callback_function_helper(
        void *arguments )
 {
 	libcthreads_internal_repeating_thread_t *internal_repeating_thread = NULL;
-	void *result                                                       = NULL;
-	int start_function_result                                          = 0;
+	int *result                                                        = NULL;
+	int callback_function_result                                       = 0;
+	int number_of_tasks                                                = 0;
+	int task_index                                                     = 0;
+	uint8_t status                                                     = 0;
 
 	if( arguments != NULL )
 	{
 		internal_repeating_thread = (libcthreads_internal_repeating_thread_t *) arguments;
 
 		if( ( internal_repeating_thread != NULL )
-		 && ( internal_repeating_thread->start_function != NULL ) )
+		 && ( internal_repeating_thread->callback_function != NULL ) )
 		{
-			internal_repeating_thread->start_function_result = 1;
+			internal_repeating_thread->callback_function_result = 1;
 
 			do
 			{
@@ -133,36 +151,51 @@ void *libcthreads_repeating_thread_start_function_helper(
 				 internal_repeating_thread->condition_mutex,
 				 NULL );
 
+				status          = internal_repeating_thread->status;
+				number_of_tasks = internal_repeating_thread->active_tasks;
+
 				/* Check for exit status in case of the situation where the thread
 				 * is created after the join has been called
 				 */
-				while( internal_repeating_thread->status != LIBCTHREADS_STATUS_EXIT )
+				while( ( number_of_tasks == 0 )
+				    && ( status != LIBCTHREADS_STATUS_EXIT ) )
 				{
 					libcthreads_condition_wait(
 					 internal_repeating_thread->status_condition,
 					 internal_repeating_thread->condition_mutex,
 					 NULL );
+
+					status          = internal_repeating_thread->status;
+					number_of_tasks = internal_repeating_thread->active_tasks;
 				}
+				internal_repeating_thread->active_tasks -= number_of_tasks;
+
 				libcthreads_mutex_release(
 				 internal_repeating_thread->condition_mutex,
 				 NULL );
 
-				start_function_result = internal_repeating_thread->start_function(
-				                         internal_repeating_thread->start_function_arguments );
-
-				if( ( start_function_result != 1 )
-				 && ( internal_repeating_thread->start_function_result == 1 ) )
+				for( task_index = 0;
+				     task_index < number_of_tasks;
+				     task_index++ )
 				{
-					internal_repeating_thread->start_function_result = start_function_result;
+					callback_function_result = internal_repeating_thread->callback_function(
+					                            internal_repeating_thread->callback_function_arguments );
+
+					if( ( callback_function_result != 1 )
+					 && ( internal_repeating_thread->callback_function_result == 1 ) )
+					{
+						internal_repeating_thread->callback_function_result = callback_function_result;
+					}
 				}
 			}
-			while( internal_repeating_thread->status != LIBCTHREADS_STATUS_EXIT );
+			while( ( number_of_tasks > 0 )
+			    || ( status != LIBCTHREADS_STATUS_EXIT ) );
 
-			result = (void *) &( internal_repeating_thread->start_function_result );
+			result = &( internal_repeating_thread->callback_function_result );
 		}
 	}
 	pthread_exit(
-	 result );
+	 (void *) result );
 }
 
 #endif /* defined( WINAPI ) else defined( HAVE_PTHREAD_H ) */
@@ -170,15 +203,15 @@ void *libcthreads_repeating_thread_start_function_helper(
 /* Creates a repeating thread
  * Make sure the value repeating_thread is referencing, is set to NULL
  *
- * The start_function should return 1 if successful and -1 on error
+ * The callback_function should return 1 if successful and -1 on error
  * Returns 1 if successful or -1 on error
  */
 int libcthreads_repeating_thread_create(
      libcthreads_repeating_thread_t **repeating_thread,
      const libcthreads_thread_attributes_t *thread_attributes,
-     int (*start_function)(
+     int (*callback_function)(
             void *arguments ),
-     void *start_function_arguments,
+     void *callback_function_arguments,
      libcerror_error_t **error )
 {
 	libcthreads_internal_repeating_thread_t *internal_repeating_thread = NULL;
@@ -215,13 +248,13 @@ int libcthreads_repeating_thread_create(
 
 		return( -1 );
 	}
-	if( start_function == NULL )
+	if( callback_function == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid start function.",
+		 "%s: invalid callback function.",
 		 function );
 
 		return( -1 );
@@ -283,8 +316,8 @@ int libcthreads_repeating_thread_create(
 
 		goto on_error;
 	}
-	internal_repeating_thread->start_function           = start_function;
-	internal_repeating_thread->start_function_arguments = start_function_arguments;
+	internal_repeating_thread->callback_function           = callback_function;
+	internal_repeating_thread->callback_function_arguments = callback_function_arguments;
 
 #if defined( WINAPI )
 	if( thread_attributes != NULL )
@@ -294,7 +327,7 @@ int libcthreads_repeating_thread_create(
 	internal_repeating_thread->thread_handle = CreateThread(
 	                                            security_attributes,
 	                                            0, /* stack size */
-	                                            &libcthreads_repeating_thread_start_function_helper,
+	                                            &libcthreads_repeating_thread_callback_function_helper,
 	                                            (void *) internal_repeating_thread,
 	                                            0, /* creation flags */
 	                                            &( internal_repeating_thread->thread_identifier ) );
@@ -321,7 +354,7 @@ int libcthreads_repeating_thread_create(
 	pthread_result = pthread_create(
 	                  &( internal_repeating_thread->thread ),
 	                  attributes,
-	                  &libcthreads_repeating_thread_start_function_helper,
+	                  &libcthreads_repeating_thread_callback_function_helper,
 	                  (void *) internal_repeating_thread );
 
 	switch( pthread_result )
@@ -350,7 +383,8 @@ int libcthreads_repeating_thread_create(
 
 			goto on_error;
 	}
-#endif
+#endif /* defined( WINAPI ) else defined( HAVE_PTHREAD_H ) */
+
 	*repeating_thread = (libcthreads_repeating_thread_t *) internal_repeating_thread;
 
 	return( 1 );
@@ -385,7 +419,6 @@ int libcthreads_repeating_thread_push(
 {
 	libcthreads_internal_repeating_thread_t *internal_repeating_thread = NULL;
 	static char *function                                              = "libcthreads_repeating_thread_push";
-	int result                                                         = 1;
 
 	if( repeating_thread == NULL )
 	{
@@ -400,8 +433,6 @@ int libcthreads_repeating_thread_push(
 	}
 	internal_repeating_thread = (libcthreads_internal_repeating_thread_t *) repeating_thread;
 
-/* TODO some work */
-
 	if( libcthreads_mutex_grab(
 	     internal_repeating_thread->condition_mutex,
 	     error ) != 1 )
@@ -415,6 +446,9 @@ int libcthreads_repeating_thread_push(
 
 		return( -1 );
 	}
+	internal_repeating_thread->active_tasks += 1;
+	internal_repeating_thread->total_tasks  += 1;
+
 	if( libcthreads_condition_signal(
 	     internal_repeating_thread->status_condition,
 	     error ) != 1 )
@@ -426,7 +460,7 @@ int libcthreads_repeating_thread_push(
 		 "%s: unable to signal status condition.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 	if( libcthreads_mutex_release(
 	     internal_repeating_thread->condition_mutex,
@@ -441,7 +475,14 @@ int libcthreads_repeating_thread_push(
 
 		return( -1 );
 	}
-	return( result );
+	return( 1 );
+
+on_error:
+	libcthreads_mutex_release(
+	 internal_repeating_thread->condition_mutex,
+	 NULL );
+
+	return( -1 );
 }
 
 /* Joins the current with a specified repeating thread
@@ -583,31 +624,25 @@ int libcthreads_repeating_thread_join(
 
 		result = -1;
 	}
-	else if( ( thread_return_value == NULL )
-	      || ( thread_return_value != &( internal_repeating_thread->start_function_result ) ) )
+	/* If the thread returns NULL it never got around to launching the callback function
+	 */
+	else if( ( thread_return_value != NULL )
+	      && ( *thread_return_value != 1 ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: invalid thread return value.",
-		 function );
-
-		result = -1;
-	}
-	else if( *thread_return_value != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: thread returned an error status.",
+		 "%s: thread returned an error status of: %d.",
 		 function,
 		 *thread_return_value );
 
 		result = -1;
 	}
-#endif
+	/* Note that thread_return_value is a pointer to internal_repeating_thread->callback_function_result */
+
+#endif /* defined( WINAPI ) else defined( HAVE_PTHREAD_H ) */
+
 	if( libcthreads_condition_free(
 	     &( internal_repeating_thread->status_condition ),
 	     error ) != 1 )

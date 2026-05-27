@@ -87,6 +87,7 @@ int pthread_rwlock_init(
 
 	return( result );
 }
+
 static int (*cthreads_test_real_pthread_rwlock_destroy)(pthread_rwlock_t *) = NULL;
 int cthreads_test_pthread_rwlock_destroy_attempts_before_fail               = -1;
 int cthreads_test_real_pthread_rwlock_destroy_function_return_value         = EBUSY;
@@ -125,6 +126,7 @@ int pthread_rwlock_destroy(
 
 	return( result );
 }
+
 static int (*cthreads_test_real_pthread_rwlock_rdlock)(pthread_rwlock_t *) = NULL;
 int cthreads_test_pthread_rwlock_rdlock_attempts_before_fail               = -1;
 int cthreads_test_real_pthread_rwlock_rdlock_function_return_value         = EBUSY;
@@ -163,6 +165,7 @@ int pthread_rwlock_rdlock(
 
 	return( result );
 }
+
 static int (*cthreads_test_real_pthread_rwlock_wrlock)(pthread_rwlock_t *) = NULL;
 int cthreads_test_pthread_rwlock_wrlock_attempts_before_fail               = -1;
 int cthreads_test_real_pthread_rwlock_wrlock_function_return_value         = EBUSY;

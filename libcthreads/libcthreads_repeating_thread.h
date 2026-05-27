@@ -60,18 +60,18 @@ struct libcthreads_internal_repeating_thread
 #error Missing thread type
 #endif
 
-	/* The start function
+	/* The callback function
 	 */
-	int (*start_function)(
+	int (*callback_function)(
 	       void *arguments );
 
-	/* The start function arguments
+	/* The callback function arguments
 	 */
-	void *start_function_arguments;
+	void *callback_function_arguments;
 
-	/* The start functions return value
+	/* The callback functions return value
 	 */
-	int start_function_result;
+	int callback_function_result;
 
 	/* The condition mutex
 	 */
@@ -84,15 +84,23 @@ struct libcthreads_internal_repeating_thread
 	/* The status
 	 */
 	uint8_t status;
+
+	/* The number of active tasks
+	 */
+	uint8_t active_tasks;
+
+	/* The total number of tasks
+	 */
+	uint8_t total_tasks;
 };
 
 LIBCTHREADS_EXTERN \
 int libcthreads_repeating_thread_create(
      libcthreads_repeating_thread_t **repeating_thread,
      const libcthreads_thread_attributes_t *thread_attributes,
-     int (*start_function)(
+     int (*callback_function)(
             void *arguments ),
-     void *start_function_arguments,
+     void *callback_function_arguments,
      libcerror_error_t **error );
 
 LIBCTHREADS_EXTERN \
