@@ -31,14 +31,17 @@
  */
 #if defined( LIBCTHREADS_DLL_EXPORT )
 #define LIBCTHREADS_EXTERN __declspec(dllexport)
+#define LIBCTHREADS_EXTERN_VARIABLE extern __declspec(dllexport)
 
 #elif defined( LIBCTHREADS_DLL_IMPORT )
-#define LIBCTHREADS_EXTERN extern __declspec(dllimport)
+#define LIBCTHREADS_EXTERN __declspec(dllimport)
+#define LIBCTHREADS_EXTERN_VARIABLE extern __declspec(dllimport)
 
 #else
 #define LIBCTHREADS_EXTERN extern
+#define LIBCTHREADS_EXTERN_VARIABLE extern
 
-#endif
+#endif /* defined( LIBCTHREADS_DLL_EXPORT ) */
 
 #endif /* !defined( _LIBCTHREADS_EXTERN_H ) */
 

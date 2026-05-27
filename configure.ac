@@ -2,7 +2,7 @@ AC_PREREQ([2.71])
 
 AC_INIT(
   [libcthreads],
-  [20260518],
+  [20260527],
   [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -62,8 +62,12 @@ AX_LIBCTHREADS_CHECK_LOCAL
 dnl Check if DLL support is needed
 AX_LIBCTHREADS_CHECK_DLL_SUPPORT
 
+dnl Check if code coverage support should be enabled
+AX_TESTS_CHECK_ENABLE_CODE_COVERAGE
+
 dnl Check if tests required headers and functions are available
 AX_TESTS_CHECK_LOCAL
+AX_TESTS_CHECK_PTHREAD_RWLOCK_UNLOCK_HOOK
 
 dnl Set additional compiler flags
 CFLAGS="$CFLAGS -Wall";

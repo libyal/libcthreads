@@ -30,10 +30,14 @@
 
 #include <errno.h>
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ )
 #define __USE_GNU
 #include <dlfcn.h>
 #undef __USE_GNU
+#endif
+
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#define HAVE_CTHREADS_TEST_FUNCTION_HOOK	1
 #endif
 
 #include "cthreads_test_libcerror.h"
@@ -44,23 +48,10 @@
 
 #include "../libcthreads/libcthreads_queue.h"
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#if defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK )
 
-static int (*cthreads_test_real_pthread_mutex_lock)(pthread_mutex_t *)   = NULL;
-static int (*cthreads_test_real_pthread_mutex_unlock)(pthread_mutex_t *) = NULL;
-
-int cthreads_test_pthread_mutex_lock_attempts_before_fail                = -1;
-int cthreads_test_pthread_mutex_unlock_attempts_before_fail              = -1;
-
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
-
-libcthreads_queue_t *cthreads_test_queue = NULL;
-int cthreads_test_expected_queued_value  = 0;
-int cthreads_test_queued_value           = 0;
-int cthreads_test_number_of_iterations   = 497;
-int cthreads_test_number_of_values       = 32;
-
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+static int (*cthreads_test_real_pthread_mutex_lock)(pthread_mutex_t *) = NULL;
+int cthreads_test_pthread_mutex_lock_attempts_before_fail              = -1;
 
 /* Custom pthread_mutex_lock for testing error cases
  * Returns 0 if successful or an error value otherwise
@@ -75,6 +66,11 @@ int pthread_mutex_lock(
 		cthreads_test_real_pthread_mutex_lock = dlsym(
 		                                         RTLD_NEXT,
 		                                         "pthread_mutex_lock" );
+
+		if( cthreads_test_real_pthread_mutex_lock == NULL )
+		{
+			return( EBUSY );
+		}
 	}
 	if( cthreads_test_pthread_mutex_lock_attempts_before_fail == 0 )
 	{
@@ -92,6 +88,9 @@ int pthread_mutex_lock(
 	return( result );
 }
 
+static int (*cthreads_test_real_pthread_mutex_unlock)(pthread_mutex_t *) = NULL;
+int cthreads_test_pthread_mutex_unlock_attempts_before_fail              = -1;
+
 /* Custom pthread_mutex_unlock for testing error cases
  * Returns 0 if successful or an error value otherwise
  */
@@ -105,6 +104,11 @@ int pthread_mutex_unlock(
 		cthreads_test_real_pthread_mutex_unlock = dlsym(
 		                                           RTLD_NEXT,
 		                                           "pthread_mutex_unlock" );
+
+		if( cthreads_test_real_pthread_mutex_unlock == NULL )
+		{
+			return( EBUSY );
+		}
 	}
 	if( cthreads_test_pthread_mutex_unlock_attempts_before_fail == 0 )
 	{
@@ -122,7 +126,13 @@ int pthread_mutex_unlock(
 	return( result );
 }
 
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
+#endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
+
+libcthreads_queue_t *cthreads_test_queue = NULL;
+int cthreads_test_expected_queued_value  = 0;
+int cthreads_test_queued_value           = 0;
+int cthreads_test_number_of_iterations   = 497;
+int cthreads_test_number_of_values       = 32;
 
 /* Test element compare function
  * Returns LIBCTHREADS_COMPARE_LESS, LIBCTHREADS_COMPARE_EQUAL, LIBCTHREADS_COMPARE_GREATER if successful or -1 on error
@@ -335,10 +345,14 @@ int cthreads_test_queue_initialize(
 	libcerror_error_free(
 	 &error );
 
+	queue = (libcthreads_queue_t *) 0x12345678UL;
+
 	result = libcthreads_queue_initialize(
 	          &queue,
-	          (int) SSIZE_MAX,
+	          0,
 	          &error );
+
+	queue = NULL;
 
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -369,14 +383,10 @@ int cthreads_test_queue_initialize(
 	libcerror_error_free(
 	 &error );
 
-	queue = (libcthreads_queue_t *) 0x12345678UL;
-
 	result = libcthreads_queue_initialize(
 	          &queue,
-	          0,
+	          (int) SSIZE_MAX,
 	          &error );
-
-	queue = NULL;
 
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -506,8 +516,30 @@ on_error:
 int cthreads_test_queue_free(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error   = NULL;
+	libcthreads_queue_t *queue = NULL;
+	int result                 = 0;
+
+	/* Test regular cases
+	 */
+	result = libcthreads_queue_free(
+	          &queue,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* TODO test with value free function */
+	/* TODO test with value free function failing */
+	/* TODO test with libcthreads_condition_free failing 2 times */
+	/* TODO test with libcthreads_mutex_free failing 1 time */
 
 	/* Test error cases
 	 */
@@ -531,6 +563,13 @@ int cthreads_test_queue_free(
 	return( 1 );
 
 on_error:
+	if( queue != NULL )
+	{
+		libcthreads_queue_free(
+		 &queue,
+		 NULL,
+		 NULL );
+	}
 	if( error != NULL )
 	{
 		libcerror_error_free(
@@ -548,6 +587,10 @@ int cthreads_test_queue_empty(
 	libcerror_error_t *error   = NULL;
 	libcthreads_queue_t *queue = NULL;
 	intptr_t **values_array    = NULL;
+/*
+	int queued_value1          = 1;
+	int queued_value2          = 2;
+*/
 	int result                 = 0;
 
 	/* Initialize test
@@ -569,6 +612,36 @@ int cthreads_test_queue_empty(
 	CTHREADS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+/* TODO prevent test from stalling
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value1,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value2,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+*/
 
 	/* Test regular cases
 	 */
@@ -625,7 +698,7 @@ int cthreads_test_queue_empty(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#if defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK )
 
 	/* Test libcthreads_queue_empty with pthread_mutex_lock failing in libcthreads_mutex_grab
 	 */
@@ -696,7 +769,7 @@ int cthreads_test_queue_empty(
 		 "error",
 		 error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
+#endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
 
 	/* Clean up
 	 */
@@ -891,7 +964,7 @@ int cthreads_test_queue_try_pop(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#if defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK )
 
 	/* Test libcthreads_queue_try_pop with pthread_mutex_lock failing in libcthreads_mutex_grab
 	 */
@@ -964,7 +1037,7 @@ int cthreads_test_queue_try_pop(
 		 "error",
 		 error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
+#endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
 
 	/* Clean up
 	 */
@@ -1141,7 +1214,7 @@ int cthreads_test_queue_pop(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#if defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK )
 
 	/* Test libcthreads_queue_pop with pthread_mutex_lock failing in libcthreads_mutex_grab
 	 */
@@ -1215,7 +1288,7 @@ int cthreads_test_queue_pop(
 		 "error",
 		 error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
+#endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
 
 	/* Clean up
 	 */
@@ -1410,7 +1483,7 @@ int cthreads_test_queue_try_push(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#if defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK )
 
 	/* Test libcthreads_queue_try_push with pthread_mutex_lock failing in libcthreads_mutex_grab
 	 */
@@ -1483,7 +1556,7 @@ int cthreads_test_queue_try_push(
 		 "error",
 		 error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
+#endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
 
 	/* Clean up
 	 */
@@ -1641,7 +1714,7 @@ int cthreads_test_queue_push(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#if defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK )
 
 	/* Test libcthreads_queue_push with pthread_mutex_lock failing in libcthreads_mutex_grab
 	 */
@@ -1715,7 +1788,7 @@ int cthreads_test_queue_push(
 		 "error",
 		 error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
+#endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
 
 	/* Clean up
 	 */
@@ -1919,7 +1992,7 @@ int cthreads_test_queue_push_sorted(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#if defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK )
 
 	/* Test libcthreads_queue_push_sorted with pthread_mutex_lock failing in libcthreads_mutex_grab
 	 */
@@ -1997,7 +2070,7 @@ int cthreads_test_queue_push_sorted(
 		 "error",
 		 error );
 	}
-#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ ) */
+#endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
 
 	/* Clean up
 	 */

@@ -1,6 +1,8 @@
 # Build from source on Linux.
 name: build_linux
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
 permissions: read-all
 jobs:
   build:
@@ -24,7 +26,7 @@ jobs:
     - uses: actions/checkout@v6
     - name: Install build dependencies
       run: |
-        sudo apt-get -y install autoconf automake autopoint build-essential git libtool pkg-config
+        sudo apt -y install autoconf automake autopoint build-essential git libtool pkg-config
     - name: Download test data
       run: |
         if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
@@ -48,7 +50,7 @@ jobs:
     - uses: actions/checkout@v6
     - name: Install build dependencies
       run: |
-        sudo apt-get -y install autoconf automake autopoint build-essential git libtool pkg-config
+        sudo apt -y install autoconf automake autopoint build-essential git libtool pkg-config
     - name: Download test data
       run: |
         if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
@@ -72,7 +74,7 @@ jobs:
     - uses: actions/checkout@v6
     - name: Install build dependencies
       run: |
-        sudo apt-get -y install autoconf automake autopoint build-essential git libtool pkg-config
+        sudo apt -y install autoconf automake autopoint build-essential git libtool pkg-config
     - name: Download test data
       run: |
         if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
@@ -99,7 +101,7 @@ jobs:
     - uses: actions/checkout@v6
     - name: Install build dependencies
       run: |
-        sudo apt-get -y install curl autoconf automake autopoint build-essential git libtool pkg-config
+        sudo apt -y install curl autoconf automake autopoint build-essential git libtool pkg-config
     - name: Download test data
       run: |
         if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
@@ -107,7 +109,7 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
       run: |
-        tests/build.sh ${{ matrix.configure_options }} --enable-shared=no CFLAGS="--coverage -O0" CPPFLAGS="-DOPTIMIZATION_DISABLED" LDFLAGS="--coverage"
+        tests/build.sh ${{ matrix.configure_options }} --enable-code-coverage
     - name: Run tests
       run: |
         make check CHECK_WITH_STDERR=1 SKIP_TOOLS_END_TO_END_TESTS=1
