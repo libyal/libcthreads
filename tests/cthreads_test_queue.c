@@ -126,6 +126,84 @@ int pthread_mutex_unlock(
 	return( result );
 }
 
+static int (*cthreads_test_real_pthread_cond_broadcast)(pthread_cond_t *) = NULL;
+int cthreads_test_pthread_cond_broadcast_attempts_before_fail             = -1;
+
+/* Custom pthread_cond_broadcast for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_cond_broadcast(
+      pthread_cond_t *cond )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_cond_broadcast == NULL )
+	{
+		cthreads_test_real_pthread_cond_broadcast = dlsym(
+		                                             RTLD_NEXT,
+		                                             "pthread_cond_broadcast" );
+
+		if( cthreads_test_real_pthread_cond_broadcast == NULL )
+		{
+			return( EBUSY );
+		}
+	}
+	if( cthreads_test_pthread_cond_broadcast_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_cond_broadcast_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_cond_broadcast_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_cond_broadcast_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_cond_broadcast(
+	          cond );
+
+	return( result );
+}
+
+static int (*cthreads_test_real_pthread_cond_wait)(pthread_cond_t *, pthread_mutex_t *) = NULL;
+int cthreads_test_pthread_cond_wait_attempts_before_fail                                = -1;
+
+/* Custom pthread_cond_wait for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_cond_wait(
+      pthread_cond_t *cond,
+      pthread_mutex_t *mutex )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_cond_wait == NULL )
+	{
+		cthreads_test_real_pthread_cond_wait = dlsym(
+		                                        RTLD_NEXT,
+		                                        "pthread_cond_wait" );
+
+		if( cthreads_test_real_pthread_cond_wait == NULL )
+		{
+			return( EBUSY );
+		}
+	}
+	if( cthreads_test_pthread_cond_wait_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_cond_wait_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_cond_wait_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_cond_wait_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_cond_wait(
+	          cond,
+	          mutex );
+
+	return( result );
+}
+
 #endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
 
 libcthreads_queue_t *cthreads_test_queue = NULL;
@@ -134,7 +212,53 @@ int cthreads_test_queued_value           = 0;
 int cthreads_test_number_of_iterations   = 497;
 int cthreads_test_number_of_values       = 32;
 
-/* Test element compare function
+/* The value free function
+ * Returns 1 if successful or -1 on error
+ */
+int cthreads_test_queue_value_free_function(
+     int *value,
+     libcthreads_error_t **error )
+{
+	static char *function = "cthreads_test_queue_value_free_function";
+
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* The value free function that returns -1
+ * Returns 1 if successful or -1 on error
+ */
+int cthreads_test_queue_error_value_free_function(
+     int *value,
+     libcthreads_error_t **error )
+{
+	static char *function = "cthreads_test_queue_error_value_free_function";
+
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	return( -1 );
+}
+
+/* Test value compare function
  * Returns LIBCTHREADS_COMPARE_LESS, LIBCTHREADS_COMPARE_EQUAL, LIBCTHREADS_COMPARE_GREATER if successful or -1 on error
  */
 int cthreads_test_queue_value_compare_function(
@@ -518,13 +642,33 @@ int cthreads_test_queue_free(
 {
 	libcerror_error_t *error   = NULL;
 	libcthreads_queue_t *queue = NULL;
+	int queued_value1          = 1;
+	int queued_value2          = 2;
 	int result                 = 0;
 
-	/* Test regular cases
+	/* Initialize test
 	 */
-	result = libcthreads_queue_free(
+	result = libcthreads_queue_initialize(
 	          &queue,
-	          NULL,
+	          10,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "queue",
+	 queue );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value1,
 	          &error );
 
 	CTHREADS_TEST_ASSERT_EQUAL_INT(
@@ -536,10 +680,39 @@ int cthreads_test_queue_free(
 	 "error",
 	 error );
 
-	/* TODO test with value free function */
-	/* TODO test with value free function failing */
-	/* TODO test with libcthreads_condition_free failing 2 times */
-	/* TODO test with libcthreads_mutex_free failing 1 time */
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value2,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libcthreads_queue_free(
+	          &queue,
+	          (int (*)(intptr_t **, libcerror_error_t **)) &cthreads_test_queue_value_free_function,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "queue",
+	 queue );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -552,6 +725,58 @@ int cthreads_test_queue_free(
 	 "result",
 	 result,
 	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* TODO test with libcthreads_condition_free failing 2 times */
+	/* TODO test with libcthreads_mutex_free failing 1 time */
+
+	/* Initialize test
+	 */
+	result = libcthreads_queue_initialize(
+	          &queue,
+	          10,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "queue",
+	 queue );
+
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value1,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	/* Test libcthreads_queue_free with the free_value function returning -1
+	 */
+	result = libcthreads_queue_free(
+	          &queue,
+	          (int (*)(intptr_t **, libcerror_error_t **)) &cthreads_test_queue_error_value_free_function,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "queue",
+	 queue );
 
 	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
@@ -587,10 +812,6 @@ int cthreads_test_queue_empty(
 	libcerror_error_t *error   = NULL;
 	libcthreads_queue_t *queue = NULL;
 	intptr_t **values_array    = NULL;
-/*
-	int queued_value1          = 1;
-	int queued_value2          = 2;
-*/
 	int result                 = 0;
 
 	/* Initialize test
@@ -613,36 +834,6 @@ int cthreads_test_queue_empty(
 	 "error",
 	 error );
 
-/* TODO prevent test from stalling
-	result = libcthreads_queue_push(
-	          queue,
-	          (intptr_t *) &queued_value1,
-	          &error );
-
-	CTHREADS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	CTHREADS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libcthreads_queue_push(
-	          queue,
-	          (intptr_t *) &queued_value2,
-	          &error );
-
-	CTHREADS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	CTHREADS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-*/
-
 	/* Test regular cases
 	 */
 	result = libcthreads_queue_empty(
@@ -657,6 +848,8 @@ int cthreads_test_queue_empty(
 	CTHREADS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	/* TODO test libcthreads_queue_empty on filled queue without stalling */
 
 	/* Test error cases
 	 */
@@ -726,8 +919,32 @@ int cthreads_test_queue_empty(
 		libcerror_error_free(
 		 &error );
 	}
-/* TODO test libcthreads_queue_empty with libcthreads_condition_wait failing */
+	/* Test libcthreads_queue_empty with pthread_cond_wait failing in libcthreads_condition_wait
+	 */
+	cthreads_test_pthread_cond_wait_attempts_before_fail = 0;
 
+	result = libcthreads_queue_empty(
+	          queue,
+	          &error );
+
+	if( cthreads_test_pthread_cond_wait_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_wait_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
 	/* Test libcthreads_queue_empty with pthread_mutex_unlock failing in libcthreads_mutex_release
 	 */
 	cthreads_test_pthread_mutex_unlock_attempts_before_fail = 0;
@@ -993,8 +1210,33 @@ int cthreads_test_queue_try_pop(
 		libcerror_error_free(
 		 &error );
 	}
-/* TODO test libcthreads_queue_try_pop with libcthreads_condition_broadcast failing */
+	/* Test libcthreads_queue_try_pop with pthread_cond_broadcast failing
+	 */
+	cthreads_test_pthread_cond_broadcast_attempts_before_fail = 0;
 
+	result = libcthreads_queue_try_pop(
+	          queue,
+	          &value,
+	          &error );
+
+	if( cthreads_test_pthread_cond_broadcast_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_broadcast_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
 	/* Test libcthreads_queue_try_pop with pthread_mutex_unlock failing in libcthreads_mutex_release
 	 */
 	cthreads_test_pthread_mutex_unlock_attempts_before_fail = 0;
@@ -1135,6 +1377,22 @@ int cthreads_test_queue_pop(
 	 "error",
 	 error );
 
+	/* Re-add the popped value
+	 */
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value2,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test regular cases
 	 */
 	result = libcthreads_queue_pop(
@@ -1243,8 +1501,106 @@ int cthreads_test_queue_pop(
 		libcerror_error_free(
 		 &error );
 	}
-/* TODO test libcthreads_queue_pop with libcthreads_condition_wait failing */
-/* TODO test libcthreads_queue_pop with libcthreads_condition_broadcast failing */
+	/* Test libcthreads_queue_pop with pthread_cond_wait failing in libcthreads_condition_wait
+	 */
+	cthreads_test_pthread_cond_wait_attempts_before_fail = 0;
+
+	result = libcthreads_queue_pop(
+	          queue,
+	          &value,
+	          &error );
+
+	if( cthreads_test_pthread_cond_wait_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_wait_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		/* Manually reset the empty condition otherwise the next call to libcthreads_queue_pop will stall.
+		 */
+		result = libcthreads_condition_signal(
+		          ( (libcthreads_internal_queue_t *) queue )->empty_condition,
+		          &error );
+
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
+	/* Re-add the popped value
+	 */
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value2,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libcthreads_queue_pop with pthread_cond_broadcast failing
+	 */
+	cthreads_test_pthread_cond_broadcast_attempts_before_fail = 0;
+
+	result = libcthreads_queue_pop(
+	          queue,
+	          &value,
+	          &error );
+
+	if( cthreads_test_pthread_cond_broadcast_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_broadcast_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Re-add the popped value
+	 */
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value2,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test libcthreads_queue_pop with pthread_mutex_unlock failing in libcthreads_mutex_release
 	 */
@@ -1512,8 +1868,33 @@ int cthreads_test_queue_try_push(
 		libcerror_error_free(
 		 &error );
 	}
-/* TODO test libcthreads_queue_try_push with libcthreads_condition_broadcast failing */
+	/* Test libcthreads_queue_try_push with pthread_cond_broadcast failing
+	 */
+	cthreads_test_pthread_cond_broadcast_attempts_before_fail = 0;
 
+	result = libcthreads_queue_try_push(
+	          queue,
+	          (intptr_t *) &queued_value2,
+	          &error );
+
+	if( cthreads_test_pthread_cond_broadcast_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_broadcast_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
 	/* Test libcthreads_queue_try_push with pthread_mutex_unlock failing in libcthreads_mutex_release
 	 */
 	cthreads_test_pthread_mutex_unlock_attempts_before_fail = 0;
@@ -1743,9 +2124,60 @@ int cthreads_test_queue_push(
 		libcerror_error_free(
 		 &error );
 	}
-/* TODO test libcthreads_queue_push with libcthreads_condition_wait failing */
-/* TODO test libcthreads_queue_push with libcthreads_condition_broadcast failing */
+	/* Test libcthreads_queue_push with pthread_cond_wait failing in libcthreads_condition_wait
+	 */
+	cthreads_test_pthread_cond_wait_attempts_before_fail = 0;
 
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value2,
+	          &error );
+
+	if( cthreads_test_pthread_cond_wait_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_wait_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libcthreads_queue_push with pthread_cond_broadcast failing
+	 */
+	cthreads_test_pthread_cond_broadcast_attempts_before_fail = 0;
+
+	result = libcthreads_queue_push(
+	          queue,
+	          (intptr_t *) &queued_value2,
+	          &error );
+
+	if( cthreads_test_pthread_cond_broadcast_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_broadcast_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
 	/* Test libcthreads_queue_push with pthread_mutex_unlock failing in libcthreads_mutex_release
 	 */
 	cthreads_test_pthread_mutex_unlock_attempts_before_fail = 0;
@@ -1835,6 +2267,7 @@ int cthreads_test_queue_push_sorted(
 	intptr_t **values_array    = NULL;
 	int queued_value1          = 1;
 	int queued_value2          = 2;
+	int queued_value3          = 3;
 	int result                 = 0;
 
 	/* Initialize test
@@ -1884,6 +2317,42 @@ int cthreads_test_queue_push_sorted(
 	 "result",
 	 result,
 	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test with unique value and LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES set
+	 */
+	result = libcthreads_queue_push_sorted(
+	          queue,
+	          (intptr_t *) &queued_value3,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
+	          LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test with duplicate value and LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES set
+	 */
+	result = libcthreads_queue_push_sorted(
+	          queue,
+	          (intptr_t *) &queued_value3,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
+	          LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
 
 	CTHREADS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2023,9 +2492,64 @@ int cthreads_test_queue_push_sorted(
 		libcerror_error_free(
 		 &error );
 	}
-/* TODO test libcthreads_queue_push_sorted with libcthreads_condition_wait failing */
-/* TODO test libcthreads_queue_push_sorted with libcthreads_condition_broadcast failing */
+	/* Test libcthreads_queue_push_sorted with pthread_cond_wait failing in libcthreads_condition_wait
+	 */
+	cthreads_test_pthread_cond_wait_attempts_before_fail = 0;
 
+	result = libcthreads_queue_push_sorted(
+	          queue,
+	          (intptr_t *) &queued_value2,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
+	          0,
+	          &error );
+
+	if( cthreads_test_pthread_cond_wait_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_wait_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libcthreads_queue_push_sorted with pthread_cond_broadcast failing
+	 */
+	cthreads_test_pthread_cond_broadcast_attempts_before_fail = 0;
+
+	result = libcthreads_queue_push_sorted(
+	          queue,
+	          (intptr_t *) &queued_value2,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &cthreads_test_queue_value_compare_function,
+	          0,
+	          &error );
+
+	if( cthreads_test_pthread_cond_broadcast_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_broadcast_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
 	/* Test libcthreads_queue_push_sorted with pthread_mutex_unlock failing in libcthreads_mutex_release
 	 */
 	cthreads_test_pthread_mutex_unlock_attempts_before_fail = 0;

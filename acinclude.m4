@@ -67,16 +67,15 @@ if( pthread_rwlock_destroy( &rwlock ) != 0 ) { return 4; }]] )],
 
   LIBS="$SAVE_LIBS"
 
+  AC_MSG_RESULT(
+    [$ac_cv_have_pthread_rwlock_unlock_hook])
+
   AS_IF(
     [test "x$ac_cv_have_pthread_rwlock_unlock_hook" = xyes],
-    [AC_MSG_RESULT(
-      [yes])
-    AC_DEFINE(
+    [AC_DEFINE(
       [HAVE_PTHREAD_RWLOCK_UNLOCK_HOOK],
       [1],
-      [Define to 1 whether pthread_rwlock_unlock can be hooked for testing.]) ],
-    [AC_MSG_RESULT(
-      [$ac_cv_have_pthread_rwlock_unlock_hook])
+      [Define to 1 whether pthread_rwlock_unlock can be hooked for testing.])
     ])
   ])
 

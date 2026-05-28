@@ -96,7 +96,7 @@ jobs:
         include:
         - os: ubuntu-24.04
           compiler: 'gcc'
-          configure_options: ''
+          configure_options: 'CPPFLAGS=-DHAVE_MEMORY_TESTS=1 --enable-code-coverage'
     steps:
     - uses: actions/checkout@v6
     - name: Install build dependencies
@@ -109,7 +109,7 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
       run: |
-        tests/build.sh ${{ matrix.configure_options }} --enable-code-coverage
+        tests/build.sh ${{ matrix.configure_options }}
     - name: Run tests
       run: |
         make check CHECK_WITH_STDERR=1 SKIP_TOOLS_END_TO_END_TESTS=1
