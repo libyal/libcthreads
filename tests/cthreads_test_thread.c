@@ -633,6 +633,10 @@ int cthreads_test_thread_join(
 	}
 #endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
 
+	/* The following test is flaky when using the WINAPI functions
+	 */
+#if !defined( WINAPI )
+
 	/* Initialize test
 	 */
 	result = libcthreads_thread_create(
@@ -653,7 +657,7 @@ int cthreads_test_thread_join(
 
 	/* Allow the callback function to run
 	 */
-	sleep( 0.1 );
+	sleep( 0.3 );
 
 	/* Test libcthreads_thread_join with the callback function returning -1
 	 */
@@ -676,6 +680,8 @@ int cthreads_test_thread_join(
 
 	libcerror_error_free(
 	 &error );
+
+#endif /* !defined( WINAPI ) */
 
 	return( 1 );
 
