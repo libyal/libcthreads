@@ -1,6 +1,6 @@
 dnl Checks for required headers and functions
 dnl
-dnl Version: 20240513
+dnl Version: 20260530
 
 dnl Function to detect if libcthreads dependencies are available
 AC_DEFUN([AX_LIBCTHREADS_CHECK_LOCAL],
@@ -40,7 +40,9 @@ AC_DEFUN([AX_LIBCTHREADS_CHECK_DLL_SUPPORT],
 
 dnl Function to check if pthread_rwlock_unlock can be hooked for testing
 AC_DEFUN([AX_TESTS_CHECK_PTHREAD_RWLOCK_UNLOCK_HOOK],
-  [AC_MSG_CHECKING([whether pthread_rwlock_unlock can be hooked for testing])
+  [AC_REQUIRE([AC_PROG_CC])
+
+  AC_MSG_CHECKING([whether pthread_rwlock_unlock can be hooked for testing])
 
   SAVE_LIBS="$LIBS"
   LIBS="-ldl -lpthread $LIBS"
