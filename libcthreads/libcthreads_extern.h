@@ -24,6 +24,19 @@
 
 #include <common.h>
 
+#if !defined( __CYGWIN__ ) && !defined( _WIN32 ) && defined( __has_attribute )
+#if __has_attribute( visibility )
+#define LIBCTHREADS_INTERNAL	__attribute__((visibility("hidden"))) extern
+
+#else
+#define LIBCTHREADS_INTERNAL	extern
+
+#endif /* __has_attribute( visibility ) */
+#else
+#define LIBCTHREADS_INTERNAL	extern
+
+#endif /* !defined( __CYGWIN__ ) && !defined( _WIN32 ) && defined( __has_attribute ) */
+
 /* Define HAVE_LOCAL_LIBCTHREADS for local use of libcthreads
  */
 #if !defined( HAVE_LOCAL_LIBCTHREADS )
@@ -32,7 +45,7 @@
 
 #else
 #define LIBCTHREADS_EXTERN		/* extern */
-#define LIBCTHREADS_EXTERN_VARIABLE	extern
+#define LIBCTHREADS_EXTERN_VARIABLE	LIBCTHREADS_INTERNAL
 
 #endif /* !defined( HAVE_LOCAL_LIBCTHREADS ) */
 
