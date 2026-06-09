@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20251129
+# Version: 20260604
 
 # Generic auto-generated build files
 *~
@@ -127,7 +127,12 @@ stamp-h[1-9]
 /libcthreads.spec
 /libcthreads/libcthreads.rc
 /libcthreads/libcthreads_definitions.h
+/tests/*.dir
 /tests/*.exe
+/tests/*.log
+/tests/*.tmp
+/tests/atconfig
+/tests/atlocal
 /tests/cthreads_test_condition
 /tests/cthreads_test_error
 /tests/cthreads_test_lock
@@ -139,6 +144,9 @@ stamp-h[1-9]
 /tests/cthreads_test_thread
 /tests/cthreads_test_thread_attributes
 /tests/cthreads_test_thread_pool
+/tests/package.m4
+/tests/test_library
+/tests/test_manpages
 /tests/tmp*
 
 # Local library dependencies specific files

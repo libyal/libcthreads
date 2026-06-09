@@ -369,7 +369,6 @@ int cthreads_test_thread_pool_push(
 	libcerror_error_t *error          = NULL;
 	libcthreads_thread_t *thread_pool = NULL;
 	int *queued_values                = NULL;
-	static char *function             = "cthreads_test_thread_pool_push";
 	int iterator                      = 0;
 	int result                        = 0;
 
@@ -379,124 +378,120 @@ int cthreads_test_thread_pool_push(
 	queued_values = (int *) memory_allocate(
 	                         sizeof( int ) * cthreads_test_number_of_iterations );
 
-	if( queued_values == NULL )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create queued values.",
-		 function );
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "queued_values",
+	 queued_values );
 
-		goto on_error;
-	}
-	if( libcthreads_lock_initialize(
-	     &cthreads_test_lock,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create lock.",
-		 function );
+	result = libcthreads_lock_initialize(
+	          &cthreads_test_lock,
+	          &error );
 
-		goto on_error;
-	}
-	if( libcthreads_thread_pool_create(
-	     &thread_pool,
-	     NULL,
-	     8,
-	     cthreads_test_number_of_values,
-	     (int (*)(intptr_t *, void *)) &cthreads_test_thread_pool_callback_function,
-	     NULL,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create thread pool.",
-		 function );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-		goto on_error;
-	}
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "cthreads_test_lock",
+	 cthreads_test_lock );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcthreads_thread_pool_create(
+	          &thread_pool,
+	          NULL,
+	          8,
+	          cthreads_test_number_of_values,
+	          &cthreads_test_thread_pool_callback_function,
+	          NULL,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "thread_pool",
+	 thread_pool );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	for( iterator = 0;
 	     iterator < cthreads_test_number_of_iterations;
 	     iterator++ )
 	{
 		queued_values[ iterator ] = ( 98 * iterator ) % 45;
 
-		if( libcthreads_thread_pool_push(
-		     thread_pool,
-		     (intptr_t *) &( queued_values[ iterator ] ),
-		     &error ) == -1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to push value onto queue.",
-			 function );
+		result = libcthreads_thread_pool_push(
+		          thread_pool,
+		          (intptr_t *) &( queued_values[ iterator ] ),
+		          &error );
 
-			goto on_error;
-		}
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
 		cthreads_test_expected_queued_value += queued_values[ iterator ];
 	}
-	if( libcthreads_thread_pool_join(
-	     &thread_pool,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to join thread pool.",
-		 function );
+	result = libcthreads_thread_pool_join(
+	          &thread_pool,
+	          &error );
 
-		goto on_error;
-	}
-	if( libcthreads_lock_free(
-	     &cthreads_test_lock,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free lock.",
-		 function );
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-		goto on_error;
-	}
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "thread_pool",
+	 thread_pool );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = ( cthreads_test_queued_value == cthreads_test_expected_queued_value );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	/* Clean up
+	 */
+	result = libcthreads_lock_free(
+	          &cthreads_test_lock,
+	          &error );
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "cthreads_test_lock",
+	 cthreads_test_lock );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	memory_free(
 	 queued_values );
 
 	queued_values = NULL;
 
-	fprintf(
-	 stdout,
-	 "Testing queued value\t" );
-
-	result = ( cthreads_test_queued_value == cthreads_test_expected_queued_value );
-
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
-	{
-		fprintf(
-		 stdout,
-		 "(FAIL)" );
-	}
-	fprintf(
-	 stdout,
-	 "\n" );
-
-	return( result );
+	return( 1 );
 
 on_error:
 	if( error != NULL )
@@ -592,16 +587,10 @@ int main(
 	 "libcthreads_thread_pool_join",
 	 cthreads_test_thread_pool_join );
 
-	/* Test: thread_pool_push
-	 */
-	if( cthreads_test_thread_pool_push() != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test push.\n" );
+	CTHREADS_TEST_RUN(
+	 "libcthreads_thread_pool_push",
+	 cthreads_test_thread_pool_push );
 
-		return( EXIT_FAILURE );
-	}
 	return( EXIT_SUCCESS );
 
 on_error:

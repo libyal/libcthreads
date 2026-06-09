@@ -1,0 +1,84 @@
+dnl Determines the test prefix based on the package name.
+m4_define([test_prefix],
+  [m4_expand(m4_substr(AT_PACKAGE_NAME, 3))])dnl
+
+dnl Includes test inputs
+dnl Arguments:
+dnl   test_profile
+m4_define(
+  [include_test_inputs],
+  [m4_include([test_inputs_$1.at])])
+
+dnl Runs one or more test binaries.
+dnl Arguments:
+dnl   skip_condition
+dnl   test_names
+m4_define([RUN_TEST_BINARIES],
+  [m4_ifblank([$2], [m4_fatal([Missing test names])])
+
+  m4_foreach_w(
+    [test_name],
+    [$2],
+    [m4_define(
+      [test_binary],
+      [m4_expand(test_prefix[]_test_[]test_name)])dnl
+
+    AT_SETUP(test_binary)
+
+    AT_SKIP_IF(
+      [test -n "${]$1[}"])
+
+    AT_CHECK([$abs_builddir/test_binary])
+    AT_CLEANUP]
+  )]
+)
+
+m4_define([get_test_result_value], [
+  m4_argn([$2], m4_unquote(m4_translit(m4_defn([$1]), [[[]]])))
+])
+
+dnl Runs one or more test binaries with input.
+dnl Arguments:
+dnl   skip_condition
+dnl   test_names
+dnl   test_inputs
+m4_define([RUN_TEST_BINARIES_WITH_INPUT],
+  [m4_ifblank([$2], [m4_fatal([Missing test names])])
+
+  m4_foreach_w(
+    [test_name],
+    [$2],
+    [m4_foreach_w(
+      [test_input],
+      [$3],
+      [m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
+      m4_define([test_file], m4_normalize(get_test_result_value([test_input], 3)))
+
+      m4_define(
+        [test_binary],
+        [m4_expand(test_prefix[]_test_[]test_name)])dnl
+
+      m4_define([sanitized_test_file],
+        [m4_translit([test_file], [[],[],[]"'`\], [______])])
+
+      m4_ifblank(
+        test_options,
+        [AT_SETUP(test_binary with input: 'sanitized_test_file')
+
+        AT_SKIP_IF(
+          [test -n "${]$1[}"])
+
+        AT_CHECK([$abs_builddir/test_binary $abs_srcdir/input/test_file])
+
+	AT_CLEANUP],
+        [AT_SETUP(test_binary with options: 'test_options' and input: 'sanitized_test_file')
+
+        AT_SKIP_IF(
+          [test -n "${]$1[}"])
+
+        AT_CHECK([$abs_builddir/test_binary test_options $abs_srcdir/input/test_file])
+
+        AT_CLEANUP])]
+    )]
+  )]
+)

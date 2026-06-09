@@ -23,12 +23,15 @@
 #include <file_stream.h>
 #include <types.h>
 
+#include <errno.h>
+
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <errno.h>
+#if defined( HAVE_UNISTD_H )
 #include <unistd.h>
+#endif
 
 #if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ )
 #define __USE_GNU
