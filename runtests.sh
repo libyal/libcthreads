@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Script that runs tests.
 #
-# Version: 20260609
+# Version: 20260610
 
 initialize_configure_options()
 {
@@ -47,7 +47,7 @@ run_configure_make()
 
 	./configure ${CONFIGURE_OPTIONS[@]} | sed '1,/^configure:$/ d'
 	make clean > /dev/null
-	make > /dev/null
+	make "-j${NUMBER_OF_JOBS}" > /dev/null
 }
 
 run_configure_make_check()
@@ -224,7 +224,8 @@ fi
 set -e
 set -o pipefail
 
-MAKE_CHECK_OPTIONS="--no-print-directory --quiet TESTSUITEFLAGS=--color=always V=0 VERBOSE=1"
+NUMBER_OF_JOBS=4
+MAKE_CHECK_OPTIONS="-j${NUMBER_OF_JOBS} --no-print-directory --quiet TESTSUITEFLAGS=--color=always V=0 VERBOSE=1"
 
 echo -e "\033[1mTesting without options.\033[0m"
 run_configure_make_check

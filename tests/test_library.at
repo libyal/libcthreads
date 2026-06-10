@@ -27,16 +27,8 @@ m4_define([AT_SETUP],
     ])
   )
 
+SETUP_HELPER_FUNCTIONS
+
 RUN_TEST_BINARIES(
   [SKIP_LIBRARY_TESTS],
-  [condition
-  error
-  lock
-  mutex
-  queue
-  read_write_lock
-  repeating_thread
-  support
-  thread
-  thread_attributes
-  thread_pool])
+  [condition error lock mutex queue read_write_lock repeating_thread support thread thread_attributes thread_pool])

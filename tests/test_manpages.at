@@ -8,25 +8,28 @@ m4_define([LINT_MANPAGE],
   AT_SKIP_IF(
     [test -n "${SKIP_MANPAGES_TESTS}"])
 
-  AT_CHECK(
-    [command -v man >/dev/null || exit 77],
-    [0])
+  case "${MANPAGE_LINTER}" in
+    "man-db")
+      AT_SKIP_IF(
+        [! command -v "${MAN}" >/dev/null 2>&1])
 
-  AT_CHECK(
-    [[LC_ALL="en_US.UTF-8" MANROFFSEQ="" MANWIDTH="80" \
-          man --warnings -E UTF-8 -l -Tutf8 -Z "$abs_srcdir/../manuals/$1" > /dev/null 2> warnings
-    STATUS=$?
+      AT_CHECK(
+        [LC_ALL="en_US.UTF-8" MANROFFSEQ="" MANWIDTH="80" "${MAN}" --warnings -E UTF-8 -l -Tutf8 -Z "$abs_srcdir/../manuals/$1" > /dev/null])
+      ;;
 
-    if test -f warnings;
-    then
-        sed "/cannot break line/ d" warnings > filtered_warnings
-    else
-        : > filtered_warnings
-    fi
-    cat filtered_warnings >&2
+    "mandoc")
+      AT_SKIP_IF(
+        [! command -v "${MANDOC}" >/dev/null 2>&1])
 
-    exit $STATUS]]
-    [0])
+      AT_CHECK(
+        [LC_ALL="en_US.UTF-8" "${MANDOC}" -O width=80 -T lint -W all "$abs_srcdir/../manuals/$1"])
+      ;;
+
+    *)
+      AT_SKIP_IF([true])
+      ;;
+
+  esac
 
   AT_CLEANUP]
 )
