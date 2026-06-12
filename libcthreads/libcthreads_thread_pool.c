@@ -259,6 +259,10 @@ void *libcthreads_thread_pool_callback_function_helper(
 	}
 	pthread_exit(
 	 (void *) result );
+
+#if defined( __MINGW32__ )
+	return( NULL );
+#endif
 }
 
 #endif /* defined( WINAPI ) && ( WINVER >= 0x0602 ) */

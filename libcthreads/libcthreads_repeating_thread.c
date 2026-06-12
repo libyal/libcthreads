@@ -196,6 +196,10 @@ void *libcthreads_repeating_thread_callback_function_helper(
 	}
 	pthread_exit(
 	 (void *) result );
+
+#if defined( __MINGW32__ )
+	return( NULL );
+#endif
 }
 
 #endif /* defined( WINAPI ) else defined( HAVE_PTHREAD_H ) */
