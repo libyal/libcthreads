@@ -271,7 +271,7 @@ int libcthreads_queue_free(
 		if( value_free_function != NULL )
 		{
 			for( value_index = 0;
-			     value_index < internal_queue->number_of_values;
+			     value_index < internal_queue->allocated_number_of_values;
 			     value_index++ )
 			{
 				if( value_free_function(

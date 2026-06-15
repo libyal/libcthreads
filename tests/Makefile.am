@@ -188,9 +188,14 @@ package.m4: $(top_srcdir)/configure.ac
 	  echo 'm4_define([AT_PACKAGE_BUGREPORT], [$(PACKAGE_BUGREPORT)])' ; \
 	} > $@
 
-test_library: package.m4 test_library.at test_macros.at
+test_library: \
+	package.m4 \
+	test_library.at \
+	test_macros.at
 
-test_manpages: package.m4 test_manpages.at
+test_manpages: \
+	package.m4 \
+	test_manpages.at
 
 EXTRA_DIST = \
 	$(check_AUTOTESTS:=.at) \
