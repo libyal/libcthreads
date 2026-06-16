@@ -87,11 +87,11 @@ struct libcthreads_internal_repeating_thread
 
 	/* The number of active tasks
 	 */
-	uint8_t active_tasks;
+	int active_tasks;
 
 	/* The total number of tasks
 	 */
-	uint8_t total_tasks;
+	int total_tasks;
 };
 
 LIBCTHREADS_EXTERN \
