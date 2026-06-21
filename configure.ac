@@ -2,7 +2,7 @@ AC_PREREQ([2.71])
 
 AC_INIT(
   [libcthreads],
-  [20260616],
+  [20260621],
   [https://github.com/libyal/libcthreads/issues])
 
 AC_CONFIG_SRCDIR(
