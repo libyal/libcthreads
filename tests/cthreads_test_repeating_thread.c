@@ -49,6 +49,8 @@
 #include "cthreads_test_memory.h"
 #include "cthreads_test_unused.h"
 
+#include "../libcthreads/libcthreads_repeating_thread.h"
+
 LIBCTHREADS_EXTERN \
 int libcthreads_repeating_thread_create(
      libcthreads_repeating_thread_t **repeating_thread,
@@ -158,6 +160,121 @@ int pthread_thread_join(
 	result = cthreads_test_real_pthread_thread_join(
 	          thread,
 	          retval );
+
+	return( result );
+}
+
+
+static int (*cthreads_test_real_pthread_mutex_lock)(pthread_mutex_t *) = NULL;
+int cthreads_test_pthread_mutex_lock_attempts_before_fail              = -1;
+
+/* Custom pthread_mutex_lock for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_mutex_lock(
+     pthread_mutex_t *mutex )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_mutex_lock == NULL )
+	{
+		cthreads_test_real_pthread_mutex_lock = dlsym(
+		                                         RTLD_NEXT,
+		                                         "pthread_mutex_lock" );
+
+		if( cthreads_test_real_pthread_mutex_lock == NULL )
+		{
+			return( EBUSY );
+		}
+	}
+	if( cthreads_test_pthread_mutex_lock_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_mutex_lock_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_mutex_lock_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_mutex_lock_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_mutex_lock(
+	          mutex );
+
+	return( result );
+}
+
+static int (*cthreads_test_real_pthread_mutex_unlock)(pthread_mutex_t *) = NULL;
+int cthreads_test_pthread_mutex_unlock_attempts_before_fail              = -1;
+
+/* Custom pthread_mutex_unlock for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_mutex_unlock(
+     pthread_mutex_t *mutex )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_mutex_unlock == NULL )
+	{
+		cthreads_test_real_pthread_mutex_unlock = dlsym(
+		                                           RTLD_NEXT,
+		                                           "pthread_mutex_unlock" );
+
+		if( cthreads_test_real_pthread_mutex_unlock == NULL )
+		{
+			return( EBUSY );
+		}
+	}
+	if( cthreads_test_pthread_mutex_unlock_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_mutex_unlock_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_mutex_unlock_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_mutex_unlock_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_mutex_unlock(
+	          mutex );
+
+	return( result );
+}
+
+static int (*cthreads_test_real_pthread_cond_signal)(pthread_cond_t *) = NULL;
+int cthreads_test_pthread_cond_signal_attempts_before_fail             = -1;
+
+/* Custom pthread_cond_signal for testing error cases
+ * Returns 0 if successful or an error value otherwise
+ */
+int pthread_cond_signal(
+     pthread_cond_t *cond )
+{
+	int result = 0;
+
+	if( cthreads_test_real_pthread_cond_signal == NULL )
+	{
+		cthreads_test_real_pthread_cond_signal = dlsym(
+		                                          RTLD_NEXT,
+		                                          "pthread_cond_signal" );
+
+		if( cthreads_test_real_pthread_cond_signal == NULL )
+		{
+			return( EBUSY );
+		}
+	}
+	if( cthreads_test_pthread_cond_signal_attempts_before_fail == 0 )
+	{
+		cthreads_test_pthread_cond_signal_attempts_before_fail = -1;
+
+		return( EBUSY );
+	}
+	else if( cthreads_test_pthread_cond_signal_attempts_before_fail > 0 )
+	{
+		cthreads_test_pthread_cond_signal_attempts_before_fail--;
+	}
+	result = cthreads_test_real_pthread_cond_signal(
+	          cond );
 
 	return( result );
 }
@@ -505,9 +622,10 @@ on_error:
 int cthreads_test_repeating_thread_push(
       void )
 {
-	libcerror_error_t *error                         = NULL;
-	libcthreads_repeating_thread_t *repeating_thread = NULL;
-	int result                                       = 0;
+	libcerror_error_t *error                          = NULL;
+	libcthreads_repeating_thread_t *repeating_thread  = NULL;
+	libcthreads_repeating_thread_t *repeating_thread2 = NULL;
+	int result                                        = 0;
 
 	/* Test regular cases
 	 */
@@ -599,6 +717,165 @@ int cthreads_test_repeating_thread_push(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK )
+
+	/* Create a dedicated thread so the push error paths do not interfere
+	 * with the test thread created above
+	 */
+	result = libcthreads_repeating_thread_create(
+	          &repeating_thread2,
+	          NULL,
+	          &cthreads_test_repeating_thread_callback_function,
+	          NULL,
+	          &error
+	);
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+	 "repeating_thread2",
+	 repeating_thread2 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libcthreads_repeating_thread_push with pthread_mutex_lock failing in libcthreads_mutex_grab */
+	cthreads_test_pthread_mutex_lock_attempts_before_fail = 0;
+
+	result = libcthreads_repeating_thread_push(
+	          repeating_thread2,
+	          &error
+	);
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "cthreads_test_pthread_mutex_lock_attempts_before_fail",
+	 cthreads_test_pthread_mutex_lock_attempts_before_fail,
+	 -1 );
+
+	if( cthreads_test_pthread_mutex_lock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_lock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+
+	/* Test libcthreads_repeating_thread_push with pthread_cond_signal failing in libcthreads_condition_signal */
+	cthreads_test_pthread_cond_signal_attempts_before_fail = 0;
+
+	result = libcthreads_repeating_thread_push(
+	          repeating_thread2,
+	          &error
+	);
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "cthreads_test_pthread_cond_signal_attempts_before_fail",
+	 cthreads_test_pthread_cond_signal_attempts_before_fail,
+	 -1 );
+
+	if( cthreads_test_pthread_cond_signal_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_cond_signal_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+
+	/* Test libcthreads_repeating_thread_push with pthread_mutex_unlock failing in libcthreads_mutex_release */
+	cthreads_test_pthread_mutex_unlock_attempts_before_fail = 0;
+
+	result = libcthreads_repeating_thread_push(
+	          repeating_thread2,
+	          &error
+	);
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "cthreads_test_pthread_mutex_unlock_attempts_before_fail",
+	 cthreads_test_pthread_mutex_unlock_attempts_before_fail,
+	 -1 );
+
+	if( cthreads_test_pthread_mutex_unlock_attempts_before_fail != -1 )
+	{
+		cthreads_test_pthread_mutex_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		CTHREADS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		/* Manually release the mutex otherwise a worker thread will block on the held mutex
+		 */
+		result = libcthreads_mutex_release(
+		           ( ( libcthreads_internal_repeating_thread_t * ) repeating_thread2 )->condition_mutex,
+		          &error );
+
+		CTHREADS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		CTHREADS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
+
+	/* Join the dedicated thread so its worker exits cleanly
+	 */
+	result = libcthreads_repeating_thread_join(
+	          &repeating_thread2,
+	          &error
+	);
+
+	CTHREADS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "repeating_thread2",
+	 repeating_thread2 );
+
+	CTHREADS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_CTHREADS_TEST_FUNCTION_HOOK ) */
+
 	return( 1 );
 
 on_error:
@@ -611,6 +888,12 @@ on_error:
 	{
 		libcthreads_repeating_thread_join(
 		 &repeating_thread,
+		 NULL );
+	}
+	if( repeating_thread2 != NULL )
+	{
+		libcthreads_repeating_thread_join(
+		 &repeating_thread2,
 		 NULL );
 	}
 	return( 0 );

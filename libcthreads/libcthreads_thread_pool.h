@@ -29,6 +29,10 @@
 #include <Threadpoolapiset.h>
 #endif
 
+#if defined( HAVE_PTHREAD_H ) && !defined( WINAPI )
+#include <pthread.h>
+#endif
+
 #include "libcthreads_extern.h"
 #include "libcthreads_libcerror.h"
 #include "libcthreads_types.h"
